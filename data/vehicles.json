@@ -1,0 +1,24 @@
+{
+  "words": [
+    { "category": "vehicles", "word": "car", "translation": "araba", "image": "images/vehicles/car.jpg", "sentence": "The car is parked outside.", "translation_sentence": "Araba dışarıda park edilmiş." },
+    { "category": "vehicles", "word": "bus", "translation": "otobüs", "image": "images/vehicles/bus.jpg", "sentence": "The bus is full of passengers.", "translation_sentence": "Otobüs yolcularla dolu." },
+    { "category": "vehicles", "word": "bicycle", "translation": "bisiklet", "image": "images/vehicles/bicycle.jpg", "sentence": "She rides her bicycle to school.", "translation_sentence": "Okula bisikletiyle gider." },
+    { "category": "vehicles", "word": "motorcycle", "translation": "motosiklet", "image": "images/vehicles/motorcycle.jpg", "sentence": "He bought a new motorcycle.", "translation_sentence": "Yeni bir motosiklet aldı." },
+    { "category": "vehicles", "word": "truck", "translation": "kamyon", "image": "images/vehicles/truck.jpg", "sentence": "The truck carries heavy goods.", "translation_sentence": "Kamyon ağır eşyaları taşır." },
+    { "category": "vehicles", "word": "train", "translation": "tren", "image": "images/vehicles/train.jpg", "sentence": "The train is leaving the station.", "translation_sentence": "Tren istasyondan ayrılıyor." },
+    { "category": "vehicles", "word": "airplane", "translation": "uçak", "image": "images/vehicles/airplane.jpg", "sentence": "The airplane is flying in the sky.", "translation_sentence": "Uçak gökyüzünde uçuyor." },
+    { "category": "vehicles", "word": "ship", "translation": "gemi", "image": "images/vehicles/ship.jpg", "sentence": "The ship is sailing on the sea.", "translation_sentence": "Gemi denizde seyrediyor." },
+    { "category": "vehicles", "word": "boat", "translation": "tekne", "image": "images/vehicles/boat.jpg", "sentence": "The boat is near the shore.", "translation_sentence": "Tekne kıyının yakınında." },
+    { "category": "vehicles", "word": "submarine", "translation": "denizaltı", "image": "images/vehicles/submarine.jpg", "sentence": "The submarine is under the water.", "translation_sentence": "Denizaltı suyun altında." },
+    { "category": "vehicles", "word": "helicopter", "translation": "helikopter", "image": "images/vehicles/helicopter.jpg", "sentence": "The helicopter is landing.", "translation_sentence": "Helikopter iniş yapıyor." },
+    { "category": "vehicles", "word": "tram", "translation": "tramvay", "image": "images/vehicles/tram.jpg", "sentence": "The tram is moving slowly.", "translation_sentence": "Tramvay yavaşça ilerliyor." },
+    { "category": "vehicles", "word": "taxi", "translation": "taksi", "image": "images/vehicles/taxi.jpg", "sentence": "We took a taxi to the hotel.", "translation_sentence": "Otele taksiyle gittik." },
+    { "category": "vehicles", "word": "van", "translation": "minibüs", "image": "images/vehicles/van.jpg", "sentence": "The van is delivering packages.", "translation_sentence": "Minibüs paketleri teslim ediyor." },
+    { "category": "vehicles", "word": "rocket", "translation": "roket", "image": "images/vehicles/rocket.jpg", "sentence": "The rocket is going to space.", "translation_sentence": "Roket uzaya gidiyor." },
+    { "category": "vehicles", "word": "scooter", "translation": "scooter", "image": "images/vehicles/scooter.jpg", "sentence": "The boy is riding a scooter.", "translation_sentence": "Çocuk scooter sürüyor." },
+    { "category": "vehicles", "word": "ambulance", "translation": "ambulans", "image": "images/vehicles/ambulance.jpg", "sentence": "The ambulance is very fast.", "translation_sentence": "Ambulans çok hızlıdır." },
+    { "category": "vehicles", "word": "fire truck", "translation": "itfaiye aracı", "image": "images/vehicles/fire_truck.jpg", "sentence": "The fire truck is red.", "translation_sentence": "İtfaiye aracı kırmızıdır." },
+    { "category": "vehicles", "word": "police car", "translation": "polis arabası", "image": "images/vehicles/police_car.jpg", "sentence": "The police car has a siren.", "translation_sentence": "Polis arabasında siren var." },
+    { "category": "vehicles", "word": "subway", "translation": "metro", "image": "images/vehicles/subway.jpg", "sentence": "The subway is underground.", "translation_sentence": "Metro yerin altındadır." }
+  ]
+}

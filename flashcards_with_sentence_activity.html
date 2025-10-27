@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cümle Kurma Çalışması - İngilizce Öğrenme Platformu</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/flashcards_with_sentence_activity.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>İngilizce Öğrenme Platformu</h1>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Ana Sayfa</a></li>
+                    <li><a href="teaching.html">Kelime Öğrenme</a></li>
+                    <li><a href="flip_cards.html">İngilizce-Türkçe Kelimeler</a></li>
+                    <li><a href="daily.html">Günlük Cümle Öğrenme</a></li>
+                    <li><a href="reading.html">Okuma-Anlama</a></li>
+                    <li><a href="word_games.html">Kelime Oyunları</a></li>
+                    <li><a href="flashcards_with_sentence_activity.html" class="active">Cümle Kurma Çalışması</a></li>
+                    <li><a href="exam.html">Sınav</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container compact-layout">
+        <h2>Cümle Kurma Çalışması</h2>
+        <p class="subtitle">Kategori seçerek İngilizce-Türkçe karışık verilen cümleyi kelimeleri tıklayarak doğru şekilde düzenleyin</p>
+        
+        <!-- Öğrenim İlerlemesi -->
+        <div class="learning-progress" id="learningProgress" style="display: none;">
+            <div class="progress-header">
+                <h3><i class="fas fa-language"></i> Cümle Kurma İlerlemeniz</h3>
+            </div>
+            <div class="progress-content">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-stats">
+                    <span id="progressStats">0/0 tamamlandı</span>
+                    <span id="progressPercent">%0</span>
+                </div>
+                <div class="next-category" id="nextCategory">
+                    <strong>Sonraki öneri:</strong> <span id="nextCategoryName">Yükleniyor...</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="game-controls">
+            <div class="control-group">
+                <label for="sentenceCategory">Kategori:</label>
+                <select id="sentenceCategory">
+                    <option value="recommended">Önerilen Kategori</option>
+                    <option value="all">Tüm Kategoriler</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label for="difficultyLevel">Zorluk:</label>
+                <select id="difficultyLevel">
+                    <option value="easy">Kolay</option>
+                    <option value="medium">Orta</option>
+                    <option value="hard">Zor</option>
+                </select>
+            </div>
+            <button id="newSentenceBtn" class="btn">
+                <i class="fas fa-redo"></i> Yeni Cümle
+            </button>
+        </div>
+
+        <div class="sentence-area">
+            <div class="sentence-card" id="sentenceCard">
+                <div class="sentence-content">
+                    <p class="sentence-english" id="sentenceEnglish"></p>
+                    <p class="sentence-turkish" id="sentenceTurkish"></p>
+                </div>
+                <div class="speaker-icon">
+                    <i class="fas fa-volume-up"></i>
+                </div>
+                <div class="category-badge" id="categoryBadge"></div>
+            </div>
+        </div>
+
+        <div class="game-info">
+            <div class="info-item">
+                <i class="fas fa-info-circle"></i>
+                <span id="gameInstruction">Kelimeleri doğru sıraya dizerek cümleyi oluşturun</span>
+            </div>
+            <div class="info-item">
+                <i class="fas fa-clock"></i>
+                <span id="gameStats">Tamamlanan: 0 | Doğru: 0</span>
+            </div>
+        </div>
+
+        <div class="flashcards-area" id="flashcardsArea">
+            <!-- Kelime kartları buraya eklenecek -->
+        </div>
+
+        <div class="user-sentence">
+            <h3>Cevabınız:</h3>
+            <div class="answer-area" id="constructedSentence"></div>
+            <div class="action-buttons">
+                <button id="checkSentenceBtn" class="btn">
+                    <i class="fas fa-check"></i> Kontrol Et
+                </button>
+                <button id="speakAnswerBtn" class="btn speak-btn">
+                    <i class="fas fa-volume-up"></i> Telaffuz Et
+                </button>
+                <button id="clearSentenceBtn" class="btn secondary">
+                    <i class="fas fa-broom"></i> Temizle
+                </button>
+            </div>
+        </div>
+
+        <div class="feedback" id="feedback"></div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>© <span id="currentDate"></span> İngilizce Öğrenme Platformu</p>
+        </div>
+    </footer>
+
+    <script>
+        function formatTurkishDate() {
+            const now = new Date();
+            const options = { 
+                day: '2-digit', 
+                month: '2-digit', 
+                year: 'numeric' 
+            };
+            
+            return now.toLocaleDateString('tr-TR', options);
+        }
+        
+        document.getElementById('currentDate').textContent = formatTurkishDate();
+    </script>
+
+    <script src="js/common.js"></script>
+    <script src="js/categories.js"></script>
+    <script src="js/flashcards_with_sentence_activity.js"></script>
+</body>
+</html>

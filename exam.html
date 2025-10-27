@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sınav - İngilizce Öğrenme Platformu</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/exam.css">
+</head>
+<body>
+    <header>
+    <div class="container">
+        <h1>İngilizce Öğrenme Platformu</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Ana Sayfa</a></li>
+                <li><a href="teaching.html">Kelime Öğrenme</a></li>
+                <li><a href="flip_cards.html">İngilizce-Türkçe Kelimeler</a></li>
+                <li><a href="daily.html">Günlük Cümle Öğrenme</a></li>
+                <li><a href="reading.html">Okuma-Anlama</a></li>
+                <li><a href="word_games.html">Kelime Oyunları</a></li>
+                <li><a href="flashcards_with_sentence_activity.html">Cümle Kurma Çalışması</a></li>
+                <li><a href="exam.html" class="active">Sınav</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+    <main class="container">
+        <div id="examSetup" class="exam-setup">
+            <h2>Sınav</h2>
+            <p class="setup-info">Öğrenim sırasına göre düzenlenmiş kategorilerden sınav yapın</p>
+            
+            <div class="setup-options">
+                <div class="option-group">
+                    <label>Soru Sayısı:</label>
+                    <select id="questionCount">
+                        <option value="5">5 Soru</option>
+                        <option value="10" selected>10 Soru</option>
+                        <option value="15">15 Soru</option>
+                        <option value="20">20 Soru</option>
+                        <option value="25">25 Soru</option>
+                    </select>
+                </div>
+                
+                <div class="option-group">
+                    <label>Kategori:</label>
+                    <select id="examCategory">
+                        <option value="all">Tüm Kategoriler</option>
+                        <!-- Kategoriler JavaScript ile dinamik olarak eklenecek -->
+                    </select>
+                </div>
+                
+                <div class="option-group">
+                    <label>Zorluk:</label>
+                    <select id="examDifficulty">
+                        <option value="all">Tüm Zorluklar</option>
+                        <option value="easy">Kolay</option>
+                        <option value="medium">Orta</option>
+                        <option value="hard">Zor</option>
+                    </select>
+                </div>
+
+                <div class="option-group">
+                    <label>Sınav Türü:</label>
+                    <select id="examType">
+                        <option value="multiple">Çoktan Seçmeli</option>
+                        <option value="listening">Dinleme Testi</option>
+                        <option value="mixed">Karışık</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="exam-progress-info" id="progressInfo" style="display: none;">
+                <div class="progress-bar-container">
+                    <div class="progress-bar" id="learningProgressBar"></div>
+                </div>
+                <p id="progressText"></p>
+            </div>
+            
+            <button id="startExamBtn" class="btn">Sınavı Başlat</button>
+        </div>
+
+        <div id="examContainer" class="exam-container hidden">
+            <div class="exam-header">
+                <div class="question-counter">Soru: <span id="currentQuestion">1</span>/<span id="totalQuestions">5</span></div>
+                <div class="score">Puan: <span id="currentScore">0</span></div>
+                <div class="timer">Süre: <span id="timer">30</span>s</div>
+                <div class="category-info" id="categoryInfo"></div>
+            </div>
+
+            <div class="question-area">
+                <div class="question" id="questionText"></div>
+                
+                <!-- Dinleme testi için özel alan -->
+                <div id="listeningSection" class="hidden">
+                    <div class="listen-controls">
+                        <button id="listenButton" class="listen-button">
+                            <i class="fas fa-volume-up"></i>
+                            Soruyu Dinle
+                        </button>
+                        <p class="listen-instruction">Ses dosyasını dinleyin ve doğru cevabı seçin</p>
+                    </div>
+                </div>
+                
+                <div class="options" id="optionsContainer"></div>
+                
+                <!-- Dinleme testi için yazma alanı -->
+                <div id="writingSection" class="hidden">
+                    <div class="answer-section">
+                        <input type="text" id="answerInput" class="answer-input" placeholder="Cevabınızı buraya yazın...">
+                        <button id="submitAnswerBtn" class="btn">Cevapla</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="exam-controls">
+                <button id="nextQuestionBtn" class="btn">Sonraki Soru</button>
+                <button id="finishExamBtn" class="btn secondary">Sınavı Bitir</button>
+                <button id="speakQuestionBtn" class="btn" title="Soruyu Seslendir">
+                    <i class="fas fa-volume-up"></i>
+                </button>
+            </div>
+        </div>
+
+        <div id="examResults" class="exam-results hidden">
+            <h2>Sınav Sonuçları</h2>
+            
+            <div class="score-display">
+                <div class="score-circle">
+                    <span id="finalScore">0</span>
+                </div>
+                <h3 id="resultMessage"></h3>
+            </div>
+            
+            <div class="result-stats">
+                <div class="stat">
+                    <h3>Toplam Puan</h3>
+                    <p id="finalScoreNumber">0</p>
+                </div>
+                <div class="stat">
+                    <h3>Doğru Sayısı</h3>
+                    <p id="correctAnswers">0</p>
+                </div>
+                <div class="stat">
+                    <h3>Yanlış Sayısı</h3>
+                    <p id="wrongAnswers">0</p>
+                </div>
+                <div class="stat">
+                    <h3>Geçen Süre</h3>
+                    <p id="timeSpent">0s</p>
+                </div>
+                <div class="stat">
+                    <h3>Ortalama Süre</h3>
+                    <p id="averageTime">0s</p>
+                </div>
+                <div class="stat">
+                    <h3>Doğruluk Oranı</h3>
+                    <p id="accuracyRate">0%</p>
+                </div>
+            </div>
+            
+            <div class="category-breakdown" id="categoryBreakdown">
+                <h3>Kategori Bazlı Performans</h3>
+                <div id="categoryStats"></div>
+            </div>
+            
+            <div class="result-actions">
+                <button id="reviewExamBtn" class="btn">Sınavı Gözden Geçir</button>
+                <button id="newExamBtn" class="btn secondary">Yeni Sınav</button>
+                <button id="saveResultsBtn" class="btn">Sonuçları Kaydet</button>
+            </div>
+        </div>
+
+        <!-- İnceleme ekranı -->
+        <div id="reviewContainer" class="review-container hidden">
+            <h2>Sınav İnceleme</h2>
+            <div id="reviewQuestions"></div>
+            <div class="result-actions">
+                <button id="backToResultsBtn" class="btn">Sonuçlara Dön</button>
+                <button id="newExamFromReviewBtn" class="btn secondary">Yeni Sınav</button>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+    <div class="container">
+        <p>© <span id="currentDate"></span> İngilizce Öğrenme Platformu</p>
+    </div>
+</footer>
+
+<!-- Font Awesome için -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+<script>
+    function formatTurkishDate() {
+        const now = new Date();
+        const options = { 
+            day: '2-digit', 
+            month: '2-digit', 
+            year: 'numeric' 
+        };
+        
+        return now.toLocaleDateString('tr-TR', options);
+    }
+    
+    document.getElementById('currentDate').textContent = formatTurkishDate();
+</script>
+
+    <script src="js/common.js"></script>
+    <script src="js/categories.js"></script>
+    <script src="js/exam.js"></script>
+</body>
+</html>

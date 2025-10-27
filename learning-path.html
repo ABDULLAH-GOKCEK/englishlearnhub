@@ -1,0 +1,1499 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Öğrenme Yolu - English Learn Hub</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        /* ANA TEMA - English Learn Hub Stili */
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3a0ca3;
+            --accent-color: #7209b7;
+            --text-dark: #2b2d42;
+            --text-light: #6c757d;
+            --background: #f8f9fa;
+            --white: #ffffff;
+            --card-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            --hover-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--background);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        /* NAVBAR - Ana Site ile Aynı */
+        .navbar {
+            background: var(--white);
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 70px;
+        }
+
+        .nav-logo a {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-menu a {
+            color: var(--text-dark);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+
+        .nav-menu a:hover {
+            color: var(--primary-color);
+        }
+
+        .nav-menu a.active {
+            color: var(--primary-color);
+        }
+
+        .nav-menu a.active::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--primary-color);
+        }
+
+        /* SECTION STILLERİ */
+        .section {
+            display: none;
+            min-height: 100vh;
+            padding-top: 70px;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        /* WELCOME SECTION - Ana Site Stili */
+        #welcomeSection {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: var(--white);
+        }
+
+        .welcome-container {
+            max-width: 800px;
+            padding: 0 20px;
+        }
+
+        .welcome-container h1 {
+            font-size: 3.5em;
+            font-weight: 700;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .welcome-container p {
+            font-size: 1.3em;
+            margin-bottom: 40px;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        .start-btn {
+            background: var(--white);
+            color: var(--primary-color);
+            border: none;
+            padding: 18px 45px;
+            font-size: 1.2em;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .start-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        /* TEST SECTION - Modern Tasarım */
+        #levelTestSection {
+            background: var(--background);
+            padding: 40px 20px;
+        }
+
+        .test-wrapper {
+            max-width: 800px;
+            margin: 0 auto;
+            background: var(--white);
+            border-radius: 20px;
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+        }
+
+        .test-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: var(--white);
+            padding: 40px;
+            text-align: center;
+        }
+
+        .test-header h2 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .test-header p {
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        .test-content {
+            padding: 40px;
+        }
+
+        .progress-container {
+            margin-bottom: 30px;
+        }
+
+        .progress-text {
+            text-align: center;
+            color: var(--text-light);
+            font-weight: 500;
+            margin-bottom: 15px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress {
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        .question {
+            font-size: 1.4em;
+            text-align: center;
+            margin-bottom: 30px;
+            color: var(--text-dark);
+            font-weight: 500;
+            line-height: 1.4;
+        }
+
+        .answers-container {
+            display: grid;
+            gap: 15px;
+            margin: 30px 0;
+        }
+
+        .answer-btn {
+            padding: 18px 25px;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            background: var(--white);
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+            text-align: left;
+            font-weight: 500;
+        }
+
+        .answer-btn:hover {
+            border-color: var(--primary-color);
+            background: #f8f9ff;
+            transform: translateY(-2px);
+        }
+
+        .answer-btn.selected {
+            background: var(--primary-color);
+            color: var(--white);
+            border-color: var(--primary-color);
+            box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
+        }
+
+        .test-navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .nav-btn {
+            padding: 14px 30px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(67, 97, 238, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: var(--white);
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        /* LEARNING PATH SECTION - Ana Site Stili */
+        #learningPathSection {
+            background: var(--background);
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .path-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .path-header h1 {
+            font-size: 3em;
+            font-weight: 700;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .user-greeting {
+            font-size: 1.3em;
+            color: var(--text-light);
+            font-weight: 400;
+        }
+
+        /* Level Card */
+        .level-card {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: var(--white);
+            padding: 50px;
+            border-radius: 20px;
+            margin-bottom: 50px;
+            box-shadow: var(--card-shadow);
+            text-align: center;
+        }
+
+        .level-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1.2em;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 25px;
+            backdrop-filter: blur(10px);
+        }
+
+        .level-score {
+            font-size: 3.5em;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .level-description {
+            font-size: 1.2em;
+            opacity: 0.9;
+            margin-bottom: 30px;
+            line-height: 1.5;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .level-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        .stat-item {
+            background: rgba(255,255,255,0.1);
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            opacity: 0.8;
+            font-size: 0.9em;
+        }
+
+        /* Dashboard Grid - Ana Site Kart Stili */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin: 50px 0;
+        }
+
+        .dashboard-card {
+            background: var(--white);
+            padding: 35px;
+            border-radius: 20px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dashboard-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--hover-shadow);
+        }
+
+        .dashboard-card.featured {
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .card-icon {
+            font-size: 2.8em;
+            margin-right: 20px;
+        }
+
+        .card-title {
+            font-size: 1.5em;
+            color: var(--text-dark);
+            font-weight: 600;
+        }
+
+        .card-content {
+            color: var(--text-light);
+            line-height: 1.6;
+            margin-bottom: 25px;
+            font-size: 1.05em;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 0.95em;
+        }
+
+        .action-btn.btn-primary {
+            background: var(--primary-color);
+            color: var(--white);
+        }
+
+        .action-btn.btn-primary:hover {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        .action-btn.btn-secondary {
+            background: #f8f9fa;
+            color: var(--text-dark);
+            border: 1px solid #e9ecef;
+        }
+
+        .action-btn.btn-secondary:hover {
+            background: #e9ecef;
+            transform: translateY(-2px);
+        }
+
+        /* Sections */
+        .content-section {
+            background: var(--white);
+            padding: 45px;
+            border-radius: 20px;
+            box-shadow: var(--card-shadow);
+            margin: 40px 0;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .section-title {
+            font-size: 1.8em;
+            color: var(--text-dark);
+            margin-bottom: 35px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-weight: 600;
+        }
+
+        /* Weekly Plan */
+        .weekly-plan {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+        }
+
+        .day-card {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .day-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--primary-color);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .day-card:hover {
+            background: var(--white);
+            border-color: var(--primary-color);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .day-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .day-card.today {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: var(--white);
+            border-color: var(--primary-color);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(67, 97, 238, 0.3);
+        }
+
+        .day-card.today::before {
+            transform: scaleX(1);
+            background: var(--white);
+        }
+
+        .day-name {
+            font-weight: 600;
+            margin-bottom: 12px;
+            font-size: 1.1em;
+        }
+
+        .day-task {
+            font-size: 0.9em;
+            opacity: 0.8;
+            line-height: 1.4;
+        }
+
+        /* Recommended Content */
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
+        }
+
+        .content-card {
+            background: var(--white);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0,0,0,0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .content-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+        }
+
+        .content-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--hover-shadow);
+        }
+
+        .content-icon {
+            font-size: 3.2em;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .content-title {
+            font-size: 1.3em;
+            color: var(--text-dark);
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .content-description {
+            color: var(--text-light);
+            line-height: 1.5;
+            margin-bottom: 20px;
+            font-size: 0.95em;
+        }
+
+        /* Restart Button */
+        .restart-section {
+            text-align: center;
+            margin: 60px 0 30px;
+        }
+
+        .restart-btn {
+            background: #dc3545;
+            color: var(--white);
+            border: none;
+            padding: 16px 35px;
+            font-size: 1.1em;
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(220, 53, 69, 0.3);
+        }
+
+        .restart-btn:hover {
+            background: #c82333;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(220, 53, 69, 0.4);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-menu {
+                gap: 20px;
+            }
+            
+            .welcome-container h1 {
+                font-size: 2.5em;
+            }
+            
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .weekly-plan {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .level-stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .path-header h1 {
+                font-size: 2.2em;
+            }
+            
+            .test-content {
+                padding: 30px 20px;
+            }
+            
+            .test-navigation {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .nav-btn {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .weekly-plan {
+                grid-template-columns: 1fr;
+            }
+            
+            .welcome-container h1 {
+                font-size: 2em;
+            }
+            
+            .level-card {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- NAVBAR - Ana Site ile Aynı -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <a href="../index.html">English Learn Hub</a>
+            </div>
+            <div class="nav-menu">
+                <a href="../index.html">Ana Sayfa</a>
+                <a href="learning-path.html" class="active">Öğrenme Yolum</a>
+                <a href="../vocabulary/vocabulary.html">Kelime</a>
+                <a href="../grammar/grammar.html">Gramer</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+        <!-- WELCOME SECTION -->
+        <section id="welcomeSection" class="section active">
+            <div class="welcome-container">
+                <h1>İngilizce Seviyenizi Keşfedin</h1>
+                <p>Kişiselleştirilmiş öğrenme yolunuzu oluşturmak için kısa bir seviye testi çözün</p>
+                <button id="startTestBtn" class="start-btn">
+                    Ücretsiz Teste Başla
+                </button>
+            </div>
+        </section>
+
+        <!-- TEST SECTION -->
+        <section id="levelTestSection" class="section">
+            <div class="test-wrapper">
+                <div class="test-header">
+                    <h2>Seviye Belirleme Testi</h2>
+                    <p>Doğru seviyeyi belirlemek için aşağıdaki soruları cevaplayın</p>
+                </div>
+                <div class="test-content">
+                    <div class="progress-container">
+                        <div class="progress-text" id="progressText">Soru 1/5</div>
+                        <div class="progress-bar">
+                            <div id="progressBar" class="progress"></div>
+                        </div>
+                    </div>
+                    
+                    <div id="questionText" class="question">Soru burada gösterilecek...</div>
+                    
+                    <div id="answersContainer" class="answers-container"></div>
+                    
+                    <div class="test-navigation">
+                        <button id="prevQuestionBtn" class="nav-btn btn-secondary" style="display: none;">← Önceki Soru</button>
+                        <button id="nextQuestionBtn" class="nav-btn btn-primary">Sonraki Soru →</button>
+                        <button id="submitTestBtn" class="nav-btn btn-primary" style="display: none; background: #28a745;">Testi Tamamla ✓</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- LEARNING PATH SECTION -->
+        <section id="learningPathSection" class="section">
+            <div class="container">
+                <!-- Header -->
+                <div class="path-header">
+                    <h1>Kişiselleştirilmiş Öğrenme Yolunuz</h1>
+                    <p class="user-greeting" id="userGreeting">Öğrenme maceranıza hoş geldiniz!</p>
+                </div>
+
+                <!-- Level Card -->
+                <div class="level-card">
+                    <div class="level-badge" id="levelBadge">A1 Seviyesi</div>
+                    <div class="level-score" id="levelScore">%0 Başarı</div>
+                    <div class="level-description" id="levelDescription">Seviyeniz belirleniyor...</div>
+                    
+                    <div class="level-stats">
+                        <div class="stat-item">
+                            <div class="stat-value" id="correctAnswers">0/0</div>
+                            <div class="stat-label">Doğru Cevaplar</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="testDate">-</div>
+                            <div class="stat-label">Test Tarihi</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="weakAreas">-</div>
+                            <div class="stat-label">Gelişim Alanları</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dashboard Grid -->
+                <div class="dashboard-grid">
+                    <div class="dashboard-card featured">
+                        <div class="card-header">
+                            <div class="card-icon">🎯</div>
+                            <div class="card-title">Günlük Hedefleriniz</div>
+                        </div>
+                        <div class="card-content">
+                            Seviyenize özel olarak belirlenmiş günlük öğrenme hedefleri. Düzenli çalışma ile hızlı ilerleme kaydedin.
+                        </div>
+                        <div class="card-actions">
+                            <button class="action-btn btn-primary" onclick="learningPath.startDailyGoals()">Hedeflere Başla</button>
+                            <button class="action-btn btn-secondary" onclick="learningPath.showGoalSettings()">Hedefleri Görüntüle</button>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <div class="card-icon">📚</div>
+                            <div class="card-title">Kelime Çalışması</div>
+                        </div>
+                        <div class="card-content">
+                            Seviyenize uygun kelimeleri interaktif yöntemlerle öğrenin. Günlük kelime hedeflerinizi takip edin.
+                        </div>
+                        <div class="card-actions">
+                            <button class="action-btn btn-primary" onclick="learningPath.startVocabulary()">Kelime Çalış</button>
+                            <button class="action-btn btn-secondary" onclick="learningPath.showVocabularyStats()">İlerlemeyi Gör</button>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <div class="card-icon">📖</div>
+                            <div class="card-title">Gramer Dersleri</div>
+                        </div>
+                        <div class="card-content">
+                            Test sonucunuza göre önerilen gramer konuları. Anlaşılır anlatımlar ve interaktif alıştırmalar.
+                        </div>
+                        <div class="card-actions">
+                            <button class="action-btn btn-primary" onclick="learningPath.startGrammar()">Gramer Çalış</button>
+                            <button class="action-btn btn-secondary" onclick="learningPath.showGrammarProgress()">Konuları Gör</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Weekly Plan -->
+                <div class="content-section">
+                    <h3 class="section-title">📅 Haftalık Çalışma Planı</h3>
+                    <div id="weeklyPlan" class="weekly-plan">
+                        <!-- JavaScript ile doldurulacak -->
+                    </div>
+                </div>
+
+                <!-- Recommended Content -->
+                <div class="content-section">
+                    <h3 class="section-title">🎯 Size Özel Öneriler</h3>
+                    <div id="recommendedContent" class="content-grid">
+                        <!-- JavaScript ile doldurulacak -->
+                    </div>
+                </div>
+
+                <!-- Restart Button -->
+                <div class="restart-section">
+                    <button id="restartTestBtn" class="restart-btn">🔄 Testi Yeniden Başlat</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // JavaScript kodu aynen önceki gibi kalacak, sadece stil değişti
+        // Önceki JavaScript kodunu buraya ekleyelim...
+        console.log('✅ English Learn Hub Tasarımı Yüklendi!');
+
+        class LearningPath {
+            constructor() {
+                this.currentQuestion = 0;
+                this.score = 0;
+                this.testData = [];
+                this.userAnswers = [];
+                this.init();
+            }
+
+            init() {
+                console.log('🚀 LearningPath başlatıldı');
+                this.bindEvents();
+                this.showCorrectSection();
+            }
+
+            bindEvents() {
+                console.log('🔗 Eventler bağlanıyor...');
+
+                // TEST BAŞLAT BUTONU
+                const startTestBtn = document.getElementById('startTestBtn');
+                if (startTestBtn) {
+                    startTestBtn.addEventListener('click', () => {
+                        console.log('✅ Test butonuna tıklandı!');
+                        this.showSection('levelTestSection');
+                        this.startTest();
+                    });
+                }
+
+                // CEVAP BUTONLARI
+                document.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('answer-btn')) {
+                        console.log('🔘 Cevap butonuna tıklandı:', e.target.textContent);
+                        this.selectAnswer(e.target);
+                    }
+                });
+
+                // NAVIGASYON BUTONLARI
+                const prevBtn = document.getElementById('prevQuestionBtn');
+                const nextBtn = document.getElementById('nextQuestionBtn');
+                const submitBtn = document.getElementById('submitTestBtn');
+                const restartBtn = document.getElementById('restartTestBtn');
+
+                if (prevBtn) prevBtn.addEventListener('click', () => this.prevQuestion());
+                if (nextBtn) nextBtn.addEventListener('click', () => this.nextQuestion());
+                if (submitBtn) submitBtn.addEventListener('click', () => this.submitTest());
+                if (restartBtn) restartBtn.addEventListener('click', () => this.restartTest());
+            }
+
+            showSection(sectionId) {
+                console.log('📁 Section değiştiriliyor:', sectionId);
+                document.querySelectorAll('.section').forEach(section => {
+                    section.classList.remove('active');
+                });
+                
+                const targetSection = document.getElementById(sectionId);
+                if (targetSection) {
+                    targetSection.classList.add('active');
+                }
+            }
+
+            showCorrectSection() {
+                const saved = localStorage.getItem('englishLearnerProfile');
+                
+                if (saved) {
+                    try {
+                        const profile = JSON.parse(saved);
+                        if (profile.testResults) {
+                            this.showSection('learningPathSection');
+                            this.loadProfileForDisplay();
+                            return;
+                        }
+                    } catch (e) {
+                        console.log('❌ Profil okunamadı:', e);
+                    }
+                }
+                
+                this.showSection('welcomeSection');
+            }
+
+            // TEST METOTLARI - AYNI
+            startTest() {
+                console.log('🧪 TEST BAŞLATILIYOR...');
+                this.loadTestData();
+                this.showQuestion(0);
+            }
+
+            loadTestData() {
+                this.testData = [
+                    {
+                        id: 1,
+                        question: "Hello, how ___ you?",
+                        answers: ["is", "are", "am", "be"],
+                        correct: 1,
+                        area: "Basic Verbs"
+                    },
+                    {
+                        id: 2, 
+                        question: "She ___ to school every day.",
+                        answers: ["go", "goes", "going", "went"],
+                        correct: 1,
+                        area: "Present Simple"
+                    },
+                    {
+                        id: 3,
+                        question: "If I ___ time, I will call you.",
+                        answers: ["have", "has", "had", "will have"],
+                        correct: 0,
+                        area: "Conditionals"
+                    },
+                    {
+                        id: 4,
+                        question: "They ___ watching TV when I arrived.",
+                        answers: ["are", "were", "is", "was"],
+                        correct: 1,
+                        area: "Past Continuous"
+                    },
+                    {
+                        id: 5,
+                        question: "This is ___ book I told you about.",
+                        answers: ["a", "an", "the", "-"],
+                        correct: 2,
+                        area: "Articles"
+                    }
+                ];
+                
+                this.userAnswers = new Array(this.testData.length).fill(null);
+                this.currentQuestion = 0;
+                this.score = 0;
+            }
+
+            showQuestion(questionIndex) {
+                if (questionIndex < 0 || questionIndex >= this.testData.length) return;
+                
+                this.currentQuestion = questionIndex;
+                const question = this.testData[questionIndex];
+                
+                const questionElement = document.getElementById('questionText');
+                if (questionElement) {
+                    questionElement.textContent = question.question;
+                }
+
+                const answersContainer = document.getElementById('answersContainer');
+                if (answersContainer) {
+                    answersContainer.innerHTML = '';
+                    question.answers.forEach((answer, index) => {
+                        const isSelected = this.userAnswers[questionIndex] === index;
+                        const button = document.createElement('button');
+                        button.className = isSelected ? 'answer-btn selected' : 'answer-btn';
+                        button.textContent = answer;
+                        button.dataset.index = index;
+                        answersContainer.appendChild(button);
+                    });
+                }
+                
+                this.updateProgress();
+                this.updateNavigationButtons();
+            }
+
+            selectAnswer(button) {
+                const answerIndex = parseInt(button.dataset.index);
+                this.userAnswers[this.currentQuestion] = answerIndex;
+                
+                document.querySelectorAll('.answer-btn').forEach(btn => {
+                    btn.classList.remove('selected');
+                });
+                
+                button.classList.add('selected');
+            }
+
+            prevQuestion() {
+                if (this.currentQuestion > 0) {
+                    this.showQuestion(this.currentQuestion - 1);
+                }
+            }
+
+            nextQuestion() {
+                if (this.currentQuestion < this.testData.length - 1) {
+                    this.showQuestion(this.currentQuestion + 1);
+                }
+            }
+
+            updateProgress() {
+                const progressText = document.getElementById('progressText');
+                const progressBar = document.getElementById('progressBar');
+                
+                if (progressText) {
+                    progressText.textContent = `Soru ${this.currentQuestion + 1}/${this.testData.length}`;
+                }
+                
+                if (progressBar) {
+                    const progress = ((this.currentQuestion + 1) / this.testData.length) * 100;
+                    progressBar.style.width = `${progress}%`;
+                }
+            }
+
+            updateNavigationButtons() {
+                const prevBtn = document.getElementById('prevQuestionBtn');
+                const nextBtn = document.getElementById('nextQuestionBtn');
+                const submitBtn = document.getElementById('submitTestBtn');
+                
+                if (prevBtn) prevBtn.style.display = this.currentQuestion > 0 ? 'inline-block' : 'none';
+                if (nextBtn) nextBtn.style.display = this.currentQuestion < this.testData.length - 1 ? 'inline-block' : 'none';
+                if (submitBtn) submitBtn.style.display = this.currentQuestion === this.testData.length - 1 ? 'inline-block' : 'none';
+            }
+
+            submitTest() {
+                this.calculateScore();
+                
+                const results = {
+                    score: Math.round((this.score / this.testData.length) * 100),
+                    correctAnswers: this.score,
+                    totalQuestions: this.testData.length,
+                    determinedLevel: this.determineLevel(),
+                    weakAreas: this.analyzeWeakAreas(),
+                    levelExplanation: this.getLevelExplanation(),
+                    testDate: new Date().toISOString()
+                };
+                
+                this.saveTestResults(results);
+                this.showSection('learningPathSection');
+                setTimeout(() => this.loadProfileForDisplay(), 100);
+            }
+
+            calculateScore() {
+                this.score = 0;
+                this.testData.forEach((question, index) => {
+                    if (this.userAnswers[index] === question.correct) {
+                        this.score++;
+                    }
+                });
+            }
+
+            determineLevel() {
+                const percentage = (this.score / this.testData.length) * 100;
+                if (percentage >= 80) return 'B2';
+                if (percentage >= 60) return 'B1';
+                if (percentage >= 40) return 'A2';
+                return 'A1';
+            }
+
+            analyzeWeakAreas() {
+                const areas = {};
+                this.testData.forEach((question, index) => {
+                    if (this.userAnswers[index] !== question.correct) {
+                        areas[question.area] = (areas[question.area] || 0) + 1;
+                    }
+                });
+                return Object.keys(areas).slice(0, 3);
+            }
+
+            getLevelExplanation() {
+                const level = this.determineLevel();
+                const explanations = {
+                    'A1': 'Başlangıç seviyesindesiniz. Temel kelimeler ve basit cümleler üzerine odaklanmanız önerilir.',
+                    'A2': 'Temel seviyedesiniz. Günlük konuşmaları anlama ve basit diyaloglar kurma üzerine çalışabilirsiniz.',
+                    'B1': 'Orta seviyedesiniz. Kendinizi ifade etme ve daha karmaşık cümleler kurma becerilerinizi geliştirebilirsiniz.',
+                    'B2': 'İleri seviyedesiniz. Akıcı konuşma ve karmaşık metinleri anlama üzerine odaklanabilirsiniz.'
+                };
+                return explanations[level] || 'Seviyeniz belirlendi.';
+            }
+
+            saveTestResults(results) {
+                const profile = {
+                    testResults: results,
+                    level: results.determinedLevel,
+                    stats: {
+                        totalExercises: 1,
+                        totalPoints: results.score,
+                        totalWords: 0
+                    },
+                    dailyProgress: {
+                        wordsToday: 0,
+                        pointsToday: results.score,
+                        exercisesToday: 1,
+                        date: new Date().toISOString().split('T')[0]
+                    },
+                    lastUpdated: new Date().toISOString()
+                };
+                
+                localStorage.setItem('englishLearnerProfile', JSON.stringify(profile));
+            }
+
+            restartTest() {
+                if (confirm('Testi yeniden başlatmak istediğinizden emin misiniz? Mevcut sonuçlarınız silinecek.')) {
+                    localStorage.removeItem('englishLearnerProfile');
+                    this.showSection('welcomeSection');
+                }
+            }
+
+            // LEARNING PATH METOTLARI - AYNI
+            loadProfileForDisplay() {
+                try {
+                    const saved = localStorage.getItem('englishLearnerProfile');
+                    if (saved) {
+                        const profile = JSON.parse(saved);
+                        console.log('✅ Profil yüklendi:', profile);
+                        
+                        this.updateLevelInfo(profile);
+                        this.updateDashboard(profile);
+                        this.showWeeklyPlan(profile);
+                        this.showRecommendedContent(profile);
+                    }
+                } catch (error) {
+                    console.error('❌ Profil yükleme hatası:', error);
+                }
+            }
+
+            updateLevelInfo(profile) {
+                const results = profile.testResults;
+                if (!results) return;
+
+                document.getElementById('levelBadge').textContent = `${results.determinedLevel} Seviyesi`;
+                document.getElementById('levelScore').textContent = `%${results.score} Başarı`;
+                document.getElementById('levelDescription').textContent = results.levelExplanation;
+                document.getElementById('correctAnswers').textContent = `${results.correctAnswers}/${results.totalQuestions}`;
+                document.getElementById('testDate').textContent = new Date(results.testDate).toLocaleDateString('tr-TR');
+                document.getElementById('weakAreas').textContent = results.weakAreas.length > 0 ? results.weakAreas.join(', ') : 'Yok';
+
+                const greeting = document.getElementById('userGreeting');
+                if (greeting) {
+                    const hour = new Date().getHours();
+                    const timeGreeting = hour < 12 ? 'Günaydın' : hour < 18 ? 'Tünaydın' : 'İyi akşamlar';
+                    greeting.textContent = `${timeGreeting}! ${results.determinedLevel} seviyesindesiniz ve %${results.score} başarı gösterdiniz.`;
+                }
+            }
+
+            updateDashboard(profile) {
+                const level = profile.level;
+                const dailyGoals = {
+                    'A1': { words: 5, grammar: 2, practice: 15 },
+                    'A2': { words: 8, grammar: 3, practice: 20 },
+                    'B1': { words: 12, grammar: 4, practice: 25 },
+                    'B2': { words: 15, grammar: 5, practice: 30 }
+                };
+                
+                const goals = dailyGoals[level] || dailyGoals['A1'];
+                const goalCard = document.querySelector('.dashboard-card.featured .card-content');
+                if (goalCard) {
+                    goalCard.innerHTML = `
+                        <strong>Günlük Hedefleriniz:</strong><br>
+                        • ${goals.words} yeni kelime<br>
+                        • ${goals.grammar} gramer konusu<br>
+                        • ${goals.practice} dakika pratik<br>
+                        <small style="color: #6c757d; margin-top: 10px; display: block;">Seviye: ${level}</small>
+                    `;
+                }
+            }
+
+            showWeeklyPlan(profile) {
+                const planContainer = document.getElementById('weeklyPlan');
+                if (!planContainer) return;
+
+                const days = ['Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi', 'Pazar'];
+                const level = profile.level;
+                
+                const weeklyTasks = {
+                    'A1': [
+                        'Temel selamlaşma kelimeleri',
+                        'Simple Present Tense',
+                        'Sayılar ve renkler',
+                        'Temel soru kalıpları',
+                        'Günlük rutin ifadeleri',
+                        'Aile üyeleri',
+                        'Tekrar ve pratik'
+                    ],
+                    'A2': [
+                        'Yeni kelime seti çalışması',
+                        'Past Simple Tense',
+                        'Sıfatlar ve zarflar',
+                        'Karşılaştırma cümleleri',
+                        'Future Tense',
+                        'Okuma pratiği',
+                        'Genel tekrar'
+                    ],
+                    'B1': [
+                        'İleri kelime çalışması',
+                        'Present Perfect Tense',
+                        'Koşul cümleleri',
+                        'Dolaylı anlatım',
+                        'Dinleme pratiği',
+                        'Yazma çalışması',
+                        'Karma alıştırmalar'
+                    ],
+                    'B2': [
+                        'Akademik kelimeler',
+                        'Complex gramer yapıları',
+                        'İleri okuma parçaları',
+                        'Essay yazma pratiği',
+                        'İleri dinleme',
+                        'Konuşma pratiği',
+                        'Sınav hazırlığı'
+                    ]
+                };
+
+                const tasks = weeklyTasks[level] || weeklyTasks['A1'];
+                const today = new Date().getDay();
+                const adjustedToday = today === 0 ? 6 : today - 1;
+
+                let planHTML = '';
+                days.forEach((day, index) => {
+                    const isToday = index === adjustedToday;
+                    const dayClass = isToday ? 'day-card today' : 'day-card';
+                    
+                    planHTML += `
+                        <div class="${dayClass}" onclick="learningPath.startDailyTask(${index}, '${tasks[index]}')">
+                            <div class="day-name">${day}</div>
+                            <div class="day-task">${tasks[index]}</div>
+                        </div>
+                    `;
+                });
+                planContainer.innerHTML = planHTML;
+            }
+
+            showRecommendedContent(profile) {
+                const contentContainer = document.getElementById('recommendedContent');
+                if (!contentContainer) return;
+
+                const level = profile.level;
+                const weakAreas = profile.testResults.weakAreas || [];
+
+                const recommendations = {
+                    'A1': [
+                        { icon: '🔤', title: 'Temel Kelimeler', desc: 'Günlük hayatta en çok kullanılan 100 temel kelime', type: 'vocabulary' },
+                        { icon: '📝', title: 'Basit Cümleler', desc: 'Subject + Verb + Object yapısını öğrenin', type: 'grammar' },
+                        { icon: '🎧', title: 'Temel Dinleme', desc: 'Yavaş ve net konuşulan İngilizce dinleme pratiği', type: 'listening' }
+                    ],
+                    'A2': [
+                        { icon: '🔄', title: 'Günlük Rutin', desc: 'Present Simple ile günlük aktiviteleri anlatın', type: 'grammar' },
+                        { icon: '🛒', title: 'Alışveriş Diyalogları', desc: 'Market ve mağaza konuşmaları', type: 'speaking' },
+                        { icon: '📖', title: 'Kısa Hikayeler', desc: 'Basit seviyede okuma parçaları', type: 'reading' }
+                    ]
+                };
+
+                let content = recommendations[level] || recommendations['A1'];
+                
+                weakAreas.forEach(area => {
+                    if (area.includes('Grammar') || area.includes('Verbs') || area.includes('Tense')) {
+                        content.unshift({
+                            icon: '⚠️',
+                            title: `${area} Pratiği`,
+                            desc: 'Bu alanda ekstra pratik yapmalısınız',
+                            type: 'grammar',
+                            priority: true
+                        });
+                    }
+                });
+
+                let contentHTML = '';
+                content.forEach((item, index) => {
+                    const priorityClass = item.priority ? 'featured' : '';
+                    contentHTML += `
+                        <div class="content-card ${priorityClass}" onclick="learningPath.startRecommended('${item.type}', '${item.title}')">
+                            <div class="content-icon">${item.icon}</div>
+                            <div class="content-title">${item.title}</div>
+                            <div class="content-description">${item.desc}</div>
+                            <button class="action-btn btn-primary">Başla</button>
+                        </div>
+                    `;
+                });
+
+                contentContainer.innerHTML = contentHTML;
+            }
+
+            // MODÜL FONKSİYONLARI - AYNI
+            startDailyGoals() {
+                this.showModule('Günlük Hedefler', `
+                    <div style="padding: 20px;">
+                        <h3>🎯 Günlük Hedeflerinize Hoş Geldiniz!</h3>
+                        <p>Bugünkü hedefleriniz:</p>
+                        <ul style="text-align: left; margin: 20px 0;">
+                            <li>✅ 5 yeni kelime öğrenin</li>
+                            <li>✅ 2 gramer konusu çalışın</li>
+                            <li>✅ 15 dakika pratik yapın</li>
+                        </ul>
+                        <div style="display: flex; gap: 10px; justify-content: center; margin-top: 30px;">
+                            <button class="action-btn btn-primary" onclick="learningPath.startVocabulary()">Kelime Çalış</button>
+                            <button class="action-btn btn-primary" onclick="learningPath.startGrammar()">Gramer Çalış</button>
+                            <button class="action-btn btn-secondary" onclick="learningPath.closeModule()">Sonra</button>
+                        </div>
+                    </div>
+                `);
+            }
+
+            startVocabulary() {
+                window.location.href = '../vocabulary/vocabulary.html';
+            }
+
+            startGrammar() {
+                window.location.href = '../grammar/grammar.html';
+            }
+
+            startDailyTask(dayIndex, task) {
+                this.showModule('Günlük Görev', `
+                    <div style="padding: 20px; text-align: center;">
+                        <h3>📅 ${['Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi', 'Pazar'][dayIndex]}</h3>
+                        <p style="font-size: 1.2em; margin: 20px 0; color: #6c757d;">${task}</p>
+                        <div style="display: flex; gap: 10px; justify-content: center; margin-top: 30px;">
+                            <button class="action-btn btn-primary" onclick="learningPath.startTaskNow('${task}')">Hemen Başla</button>
+                            <button class="action-btn btn-secondary" onclick="learningPath.closeModule()">Sonra Hatırlat</button>
+                        </div>
+                    </div>
+                `);
+            }
+
+            startTaskNow(task) {
+                if (task.includes('kelime') || task.includes('Kelime')) {
+                    this.startVocabulary();
+                } else if (task.includes('gramer') || task.includes('Gramer') || task.includes('Tense')) {
+                    this.startGrammar();
+                } else {
+                    this.showModule('Görev Başlatılıyor', `
+                        <div style="padding: 20px; text-align: center;">
+                            <h3>🚀 ${task}</h3>
+                            <p>Bu görev için özel modül yakında eklenecek!</p>
+                            <button class="action-btn btn-primary" onclick="learningPath.closeModule()">Tamam</button>
+                        </div>
+                    `);
+                }
+            }
+
+            startRecommended(type, title) {
+                const modules = {
+                    'vocabulary': () => this.startVocabulary(),
+                    'grammar': () => this.startGrammar(),
+                    'listening': () => this.showModule('Dinleme Pratiği', 'Dinleme modülü yakında eklenecek!'),
+                    'speaking': () => this.showModule('Konuşma Pratiği', 'Konuşma modülü yakında eklenecek!'),
+                    'reading': () => this.showModule('Okuma Pratiği', 'Okuma modülü yakında eklenecek!')
+                };
+
+                if (modules[type]) {
+                    modules[type]();
+                } else {
+                    this.showModule(title, 'Bu içerik yakında eklenecek!');
+                }
+            }
+
+            showModule(title, content) {
+                const modal = document.createElement('div');
+                modal.style.cssText = `
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(0,0,0,0.5);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    z-index: 1000;
+                `;
+                
+                modal.innerHTML = `
+                    <div style="
+                        background: white;
+                        padding: 30px;
+                        border-radius: 15px;
+                        max-width: 500px;
+                        width: 90%;
+                        box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+                    ">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <h3 style="margin: 0; color: #2b2d42;">${title}</h3>
+                            <button onclick="this.closest('div').parentElement.remove()" style="background: none; border: none; font-size: 1.5em; cursor: pointer;">×</button>
+                        </div>
+                        ${content}
+                    </div>
+                `;
+                
+                document.body.appendChild(modal);
+            }
+
+            closeModule() {
+                const modal = document.querySelector('div[style*="position: fixed"]');
+                if (modal) {
+                    modal.remove();
+                }
+            }
+
+            showGoalSettings() {
+                this.showModule('Hedef Ayarları', `
+                    <div style="padding: 20px;">
+                        <h3>🎯 Günlük Hedeflerinizi Ayarlayın</h3>
+                        <p>Seviyenize göre otomatik ayarlanmış hedefler:</p>
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 15px 0;">
+                            <strong>Mevcut Seviye:</strong> ${this.getCurrentLevel()}<br>
+                            <strong>Günlük Kelime:</strong> ${this.getDailyGoal('words')}<br>
+                            <strong>Günlük Gramer:</strong> ${this.getDailyGoal('grammar')} konu<br>
+                            <strong>Günlük Pratik:</strong> ${this.getDailyGoal('practice')} dakika
+                        </div>
+                        <p style="color: #6c757d; font-size: 0.9em;">Hedefler seviyenize göre otomatik ayarlanır. İlerledikçe hedefleriniz artacak!</p>
+                        <button class="action-btn btn-primary" onclick="learningPath.closeModule()" style="margin-top: 20px;">Tamam</button>
+                    </div>
+                `);
+            }
+
+            getCurrentLevel() {
+                const saved = localStorage.getItem('englishLearnerProfile');
+                if (saved) {
+                    const profile = JSON.parse(saved);
+                    return profile.level || 'A1';
+                }
+                return 'A1';
+            }
+
+            getDailyGoal(type) {
+                const level = this.getCurrentLevel();
+                const goals = {
+                    'A1': { words: 5, grammar: 2, practice: 15 },
+                    'A2': { words: 8, grammar: 3, practice: 20 },
+                    'B1': { words: 12, grammar: 4, practice: 25 },
+                    'B2': { words: 15, grammar: 5, practice: 30 }
+                };
+                return (goals[level] || goals['A1'])[type];
+            }
+        }
+
+        // SAYFA YÜKLENDİĞİNDE
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('📄 DOM Content Loaded - LearningPath başlatılıyor');
+            window.learningPath = new LearningPath();
+        });
+    </script>
+</body>
+</html>

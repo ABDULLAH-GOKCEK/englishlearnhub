@@ -1,0 +1,24 @@
+{
+  "words": [
+    { "category": "foods", "word": "apple", "translation": "elma", "image": "images/foods/apple.jpg", "sentence": "I eat an apple every morning.", "translation_sentence": "Her sabah bir elma yerim." },
+    { "category": "foods", "word": "banana", "translation": "muz", "image": "images/foods/banana.jpg", "sentence": "Monkeys love eating bananas.", "translation_sentence": "Maymunlar muz yemeyi sever." },
+    { "category": "foods", "word": "bread", "translation": "ekmek", "image": "images/foods/bread.jpg", "sentence": "She bought fresh bread from the bakery.", "translation_sentence": "Fırından taze ekmek aldı." },
+    { "category": "foods", "word": "milk", "translation": "süt", "image": "images/foods/milk.jpg", "sentence": "The child drinks milk every night.", "translation_sentence": "Çocuk her gece süt içer." },
+    { "category": "foods", "word": "cheese", "translation": "peynir", "image": "images/foods/cheese.jpg", "sentence": "This pizza has a lot of cheese.", "translation_sentence": "Bu pizzada çok peynir var." },
+    { "category": "foods", "word": "egg", "translation": "yumurta", "image": "images/foods/egg.jpg", "sentence": "I had boiled eggs for breakfast.", "translation_sentence": "Kahvaltıda haşlanmış yumurta yedim." },
+    { "category": "foods", "word": "meat", "translation": "et", "image": "images/foods/meat.jpg", "sentence": "They grilled the meat for dinner.", "translation_sentence": "Akşam yemeği için eti ızgarada pişirdiler." },
+    { "category": "foods", "word": "rice", "translation": "pirinç", "image": "images/foods/rice.jpg", "sentence": "Rice is common in Asian countries.", "translation_sentence": "Pirinç Asya ülkelerinde yaygındır." },
+    { "category": "foods", "word": "fish", "translation": "balık", "image": "images/foods/fish.jpg", "sentence": "We ate grilled fish yesterday.", "translation_sentence": "Dün ızgara balık yedik." },
+    { "category": "foods", "word": "chicken", "translation": "tavuk", "image": "images/foods/chicken.jpg", "sentence": "The chicken is very delicious.", "translation_sentence": "Tavuk çok lezzetli." },
+    { "category": "foods", "word": "potato", "translation": "patates", "image": "images/foods/potato.jpg", "sentence": "I like fried potatoes.", "translation_sentence": "Kızartılmış patates severim." },
+    { "category": "foods", "word": "tomato", "translation": "domates", "image": "images/foods/tomato.jpg", "sentence": "She cut the tomato into slices.", "translation_sentence": "Domatesi dilimlere kesti." },
+    { "category": "foods", "word": "orange", "translation": "portakal", "image": "images/foods/orange.jpg", "sentence": "Orange juice is healthy.", "translation_sentence": "Portakal suyu sağlıklıdır." },
+    { "category": "foods", "word": "strawberry", "translation": "çilek", "image": "images/foods/strawberry.jpg", "sentence": "Strawberries are sweet and tasty.", "translation_sentence": "Çilekler tatlı ve lezzetlidir." },
+    { "category": "foods", "word": "grape", "translation": "üzüm", "image": "images/foods/grape.jpg", "sentence": "Grapes grow in vineyards.", "translation_sentence": "Üzümler bağlarda yetişir." },
+    { "category": "foods", "word": "lemon", "translation": "limon", "image": "images/foods/lemon.jpg", "sentence": "Lemon tea is refreshing.", "translation_sentence": "Limon çayı ferahlatıcıdır." },
+    { "category": "foods", "word": "watermelon", "translation": "karpuz", "image": "images/foods/watermelon.jpg", "sentence": "Watermelon is popular in summer.", "translation_sentence": "Karpuz yazın popülerdir." },
+    { "category": "foods", "word": "pear", "translation": "armut", "image": "images/foods/pear.jpg", "sentence": "I picked a pear from the tree.", "translation_sentence": "Ağaçtan bir armut topladım." },
+    { "category": "foods", "word": "onion", "translation": "soğan", "image": "images/foods/onion.jpg", "sentence": "Onions make me cry.", "translation_sentence": "Soğan beni ağlatır." },
+    { "category": "foods", "word": "carrot", "translation": "havuç", "image": "images/foods/carrot.jpg", "sentence": "Rabbits like eating carrots.", "translation_sentence": "Tavşanlar havuç yemeyi sever." }
+  ]
+}

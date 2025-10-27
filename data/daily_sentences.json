@@ -1,0 +1,1803 @@
+[
+  {
+    "english": "Hello, how are you?",
+    "turkish": "Merhaba, nasılsın?",
+    "category": "Greetings"
+  },
+  {
+    "english": "Good morning!",
+    "turkish": "Günaydın!",
+    "category": "Greetings"
+  },
+  {
+    "english": "Good afternoon!",
+    "turkish": "Tünaydın!",
+    "category": "Greetings"
+  },
+  {
+    "english": "Good evening!",
+    "turkish": "İyi akşamlar!",
+    "category": "Greetings"
+  },
+  {
+    "english": "How have you been?",
+    "turkish": "Nasılsın? (uzun süre sonra)",
+    "category": "Greetings"
+  },
+  {
+    "english": "Nice to meet you!",
+    "turkish": "Tanıştığımıza memnun oldum!",
+    "category": "Greetings"
+  },
+  {
+    "english": "What's up?",
+    "turkish": "Naber?",
+    "category": "Greetings"
+  },
+  {
+    "english": "Long time no see!",
+    "turkish": "Görüşmeyeli uzun zaman oldu!",
+    "category": "Greetings"
+  },
+  {
+    "english": "How's it going?",
+    "turkish": "Nasıl gidiyor?",
+    "category": "Greetings"
+  },
+  {
+    "english": "Good to see you!",
+    "turkish": "Seni görmek güzel!",
+    "category": "Greetings"
+  },
+  {
+    "english": "Take care!",
+    "turkish": "Kendine iyi bak!",
+    "category": "Greetings"
+  },
+  {
+    "english": "See you later!",
+    "turkish": "Sonra görüşürüz!",
+    "category": "Greetings"
+  },
+  {
+    "english": "Have a good day!",
+    "turkish": "İyi günler!",
+    "category": "Greetings"
+  },
+  {
+    "english": "Good night!",
+    "turkish": "İyi geceler!",
+    "category": "Greetings"
+  },
+  {
+    "english": "See you tomorrow!",
+    "turkish": "Yarın görüşürüz!",
+    "category": "Greetings"
+  },
+  {
+    "english": "See you soon!",
+    "turkish": "Yakında görüşürüz!",
+    "category": "Greetings"
+  },
+  {
+    "english": "It was nice seeing you!",
+    "turkish": "Seni görmek güzeldi!",
+    "category": "Greetings"
+  },
+  {
+    "english": "Until next time!",
+    "turkish": "Bir sonraki sefere kadar!",
+    "category": "Greetings"
+  },
+  {
+    "english": "Have a nice weekend!",
+    "turkish": "İyi haftasonları!",
+    "category": "Greetings"
+  },
+  {
+    "english": "Talk to you later!",
+    "turkish": "Sonra konuşuruz!",
+    "category": "Greetings"
+  },
+  
+  {
+    "english": "What is your name?",
+    "turkish": "Adın ne?",
+    "category": "Introduction"
+  },
+  {
+    "english": "My name is Ahmet.",
+    "turkish": "Benim adım Ahmet.",
+    "category": "Introduction"
+  },
+  {
+    "english": "Where are you from?",
+    "turkish": "Nerelisin?",
+    "category": "Introduction"
+  },
+  {
+    "english": "I am from Turkey.",
+    "turkish": "Türkiye'denim.",
+    "category": "Introduction"
+  },
+  {
+    "english": "How old are you?",
+    "turkish": "Kaç yaşındasın?",
+    "category": "Introduction"
+  },
+  {
+    "english": "I am 25 years old.",
+    "turkish": "25 yaşındayım.",
+    "category": "Introduction"
+  },
+  {
+    "english": "What do you do?",
+    "turkish": "Ne iş yapıyorsun?",
+    "category": "Introduction"
+  },
+  {
+    "english": "I am a student.",
+    "turkish": "Ben bir öğrenciyim.",
+    "category": "Introduction"
+  },
+  {
+    "english": "I work as a teacher.",
+    "turkish": "Öğretmen olarak çalışıyorum.",
+    "category": "Introduction"
+  },
+  {
+    "english": "Where do you live?",
+    "turkish": "Nerede yaşıyorsun?",
+    "category": "Introduction"
+  },
+  {
+    "english": "I live in Istanbul.",
+    "turkish": "İstanbul'da yaşıyorum.",
+    "category": "Introduction"
+  },
+  {
+    "english": "Nice to meet you!",
+    "turkish": "Tanıştığımıza memnun oldum!",
+    "category": "Introduction"
+  },
+  {
+    "english": "Pleased to meet you!",
+    "turkish": "Tanıştığımıza memnun oldum!",
+    "category": "Introduction"
+  },
+  {
+    "english": "This is my friend, Ali.",
+    "turkish": "Bu benim arkadaşım, Ali.",
+    "category": "Introduction"
+  },
+  {
+    "english": "I'd like to introduce myself.",
+    "turkish": "Kendimi tanıtmak istiyorum.",
+    "category": "Introduction"
+  },
+  {
+    "english": "What brings you here?",
+    "turkish": "Seni buraya getiren nedir?",
+    "category": "Introduction"
+  },
+  {
+    "english": "I'm here for vacation.",
+    "turkish": "Tatil için buradayım.",
+    "category": "Introduction"
+  },
+  {
+    "english": "I'm visiting family.",
+    "turkish": "Ailemi ziyaret ediyorum.",
+    "category": "Introduction"
+  },
+  {
+    "english": "How long have you been here?",
+    "turkish": "Ne zamandır buradasın?",
+    "category": "Introduction"
+  },
+  {
+    "english": "I just arrived yesterday.",
+    "turkish": "Dün yeni geldim.",
+    "category": "Introduction"
+  },
+  {
+    "english": "I'm hungry.",
+    "turkish": "Acıktım.",
+    "category": "Food"
+  },
+  {
+    "english": "I'm thirsty.",
+    "turkish": "Susadım.",
+    "category": "Food"
+  },
+  {
+    "english": "What would you like to eat?",
+    "turkish": "Ne yemek istersin?",
+    "category": "Food"
+  },
+  {
+    "english": "I'd like a menu, please.",
+    "turkish": "Bir menü alabilir miyim, lütfen?",
+    "category": "Food"
+  },
+  {
+    "english": "What do you recommend?",
+    "turkish": "Ne önerirsiniz?",
+    "category": "Food"
+  },
+  {
+    "english": "I'll have the chicken dish.",
+    "turkish": "Tavuk yemeğinden alacağım.",
+    "category": "Food"
+  },
+  {
+    "english": "Could I have some water, please?",
+    "turkish": "Biraz su alabilir miyim, lütfen?",
+    "category": "Food"
+  },
+  {
+    "english": "This is delicious!",
+    "turkish": "Bu çok lezzetli!",
+    "category": "Food"
+  },
+  {
+    "english": "The bill, please.",
+    "turkish": "Hesap, lütfen.",
+    "category": "Food"
+  },
+  {
+    "english": "Do you accept credit cards?",
+    "turkish": "Kredi kartı kabul ediyor musunuz?",
+    "category": "Food"
+  },
+  {
+    "english": "I'm vegetarian.",
+    "turkish": "Ben vejeteryanım.",
+    "category": "Food"
+  },
+  {
+    "english": "I'm allergic to nuts.",
+    "turkish": "Fındığa alerjim var.",
+    "category": "Food"
+  },
+  {
+    "english": "Could I have the recipe?",
+    "turkish": "Tarifi alabilir miyim?",
+    "category": "Food"
+  },
+  {
+    "english": "This is too salty.",
+    "turkish": "Bu çok tuzlu.",
+    "category": "Food"
+  },
+  {
+    "english": "Could I have some more bread?",
+    "turkish": "Biraz daha ekmek alabilir miyim?",
+    "category": "Food"
+  },
+  {
+    "english": "I'd like to order dessert.",
+    "turkish": "Tatlı sipariş etmek istiyorum.",
+    "category": "Food"
+  },
+  {
+    "english": "Is service included?",
+    "turkish": "Servis dahil mi?",
+    "category": "Food"
+  },
+  {
+    "english": "Keep the change.",
+    "turkish": "Üstü kalsın.",
+    "category": "Food"
+  },
+  {
+    "english": "I'd like a table for two.",
+    "turkish": "İki kişilik bir masa istiyorum.",
+    "category": "Food"
+  },
+  {
+    "english": "Do you have vegetarian options?",
+    "turkish": "Vejeteryan seçenekleriniz var mı?",
+    "category": "Food"
+  },
+   {
+    "english": "How much does this cost?",
+    "turkish": "Bu ne kadar?",
+    "category": "Shopping"
+  },
+  {
+    "english": "That's too expensive.",
+    "turkish": "Bu çok pahalı.",
+    "category": "Shopping"
+  },
+  {
+    "english": "Do you have this in a different size?",
+    "turkish": "Bunu farklı bir bedende var mı?",
+    "category": "Shopping"
+  },
+  {
+    "english": "Can I try this on?",
+    "turkish": "Bunu deneyebilir miyim?",
+    "category": "Shopping"
+  },
+  {
+    "english": "Where are the fitting rooms?",
+    "turkish": "Deneme kabinleri nerede?",
+    "category": "Shopping"
+  },
+  {
+    "english": "I'm just looking, thanks.",
+    "turkish": "Sadece bakıyorum, teşekkürler.",
+    "category": "Shopping"
+  },
+  {
+    "english": "Do you accept returns?",
+    "turkish": "İade kabul ediyor musunuz?",
+    "category": "Shopping"
+  },
+  {
+    "english": "I'll take this.",
+    "turkish": "Bunu alacağım.",
+    "category": "Shopping"
+  },
+  {
+    "english": "Is this on sale?",
+    "turkish": "Bu indirimde mi?",
+    "category": "Shopping"
+  },
+  {
+    "english": "Can you give me a discount?",
+    "turkish": "Bana indirim yapabilir misiniz?",
+    "category": "Shopping"
+  },
+  {
+    "english": "Do you have this in black?",
+    "turkish": "Bunu siyah renkte var mı?",
+    "category": "Shopping"
+  },
+  {
+    "english": "What's your final price?",
+    "turkish": "Son fiyatınız nedir?",
+    "category": "Shopping"
+  },
+  {
+    "english": "I'm looking for a gift.",
+    "turkish": "Bir hediye arıyorum.",
+    "category": "Shopping"
+  },
+  {
+    "english": "Can I pay by card?",
+    "turkish": "Kartla ödeyebilir miyim?",
+    "category": "Shopping"
+  },
+  {
+    "english": "Where is the cash register?",
+    "turkish": "Kasa nerede?",
+    "category": "Shopping"
+  },
+  {
+    "english": "Do you have a smaller size?",
+    "turkish": "Daha küçük bedeniniz var mı?",
+    "category": "Shopping"
+  },
+  {
+    "english": "This doesn't fit me.",
+    "turkish": "Bu bana olmuyor.",
+    "category": "Shopping"
+  },
+  {
+    "english": "I'd like a refund, please.",
+    "turkish": "İade etmek istiyorum, lütfen.",
+    "category": "Shopping"
+  },
+  {
+    "english": "Do you have this in stock?",
+    "turkish": "Bunu stoklarınızda var mı?",
+    "category": "Shopping"
+  },
+  {
+    "english": "Can you wrap it as a gift?",
+    "turkish": "Hediye olarak paketleyebilir misiniz?",
+    "category": "Shopping"
+  },
+ {
+    "english": "Where is the bus station?",
+    "turkish": "Otobüs durağı nerede?",
+    "category": "Travel"
+  },
+  {
+    "english": "How can I get to the city center?",
+    "turkish": "Şehir merkezine nasıl gidebilirim?",
+    "category": "Travel"
+  },
+  {
+    "english": "Is it far from here?",
+    "turkish": "Buradan uzak mı?",
+    "category": "Travel"
+  },
+  {
+    "english": "Can you show me on the map?",
+    "turkish": "Bana haritada gösterebilir misiniz?",
+    "category": "Travel"
+  },
+  {
+    "english": "I'm lost.",
+    "turkish": "Kayboldum.",
+    "category": "Travel"
+  },
+  {
+    "english": "Where is the nearest hotel?",
+    "turkish": "En yakın otel nerede?",
+    "category": "Travel"
+  },
+  {
+    "english": "How much is a ticket to the museum?",
+    "turkish": "Müzeye bilet ne kadar?",
+    "category": "Travel"
+  },
+  {
+    "english": "What time does the train leave?",
+    "turkish": "Tren saat kaçta kalkıyor?",
+    "category": "Travel"
+  },
+  {
+    "english": "Which platform does it depart from?",
+    "turkish": "Hangi perondan kalkıyor?",
+    "category": "Travel"
+  },
+  {
+    "english": "I'd like a window seat.",
+    "turkish": "Cam kenarı bir koltuk istiyorum.",
+    "category": "Travel"
+  },
+  {
+    "english": "Is this the right way to the beach?",
+    "turkish": "Plaja giden yol bu mu?",
+    "category": "Travel"
+  },
+  {
+    "english": "How long does it take to get there?",
+    "turkish": "Oraya gitmek ne kadar sürer?",
+    "category": "Travel"
+  },
+  {
+    "english": "Can you recommend a good restaurant?",
+    "turkish": "İyi bir restoran önerebilir misiniz?",
+    "category": "Travel"
+  },
+  {
+    "english": "Where can I buy a sim card?",
+    "turkish": "Nereden sim kart alabilirim?",
+    "category": "Travel"
+  },
+  {
+    "english": "I need a taxi.",
+    "turkish": "Taksiye ihtiyacım var.",
+    "category": "Travel"
+  },
+  {
+    "english": "What's the address?",
+    "turkish": "Adres nedir?",
+    "category": "Travel"
+  },
+  {
+    "english": "Can you speak more slowly?",
+    "turkish": "Daha yavaş konuşabilir misiniz?",
+    "category": "Travel"
+  },
+  {
+    "english": "I don't understand.",
+    "turkish": "Anlamıyorum.",
+    "category": "Travel"
+  },
+  {
+    "english": "Could you repeat that, please?",
+    "turkish": "Tekrar eder misiniz, lütfen?",
+    "category": "Travel"
+  },
+  {
+    "english": "Where is the restroom?",
+    "turkish": "Tuvalet nerede?",
+    "category": "Travel"
+  },
+   {
+    "english": "I don't feel well.",
+    "turkish": "Kendimi iyi hissetmiyorum.",
+    "category": "Health"
+  },
+  {
+    "english": "I have a headache.",
+    "turkish": "Başım ağrıyor.",
+    "category": "Health"
+  },
+  {
+    "english": "I need to see a doctor.",
+    "turkish": "Bir doktora görünmem gerekiyor.",
+    "category": "Health"
+  },
+  {
+    "english": "Where is the nearest pharmacy?",
+    "turkish": "En yakın eczane nerede?",
+    "category": "Health"
+  },
+  {
+    "english": "I have a fever.",
+    "turkish": "Ateşim var.",
+    "category": "Health"
+  },
+  {
+    "english": "My stomach hurts.",
+    "turkish": "Midem ağrıyor.",
+    "category": "Health"
+  },
+  {
+    "english": "I feel dizzy.",
+    "turkish": "Başım dönüyor.",
+    "category": "Health"
+  },
+  {
+    "english": "I need painkillers.",
+    "turkish": "Ağrı kesiciye ihtiyacım var.",
+    "category": "Health"
+  },
+  {
+    "english": "I'm allergic to penicillin.",
+    "turkish": "Penisiline alerjim var.",
+    "category": "Health"
+  },
+  {
+    "english": "I have a cold.",
+    "turkish": "Nezle oldum.",
+    "category": "Health"
+  },
+  {
+    "english": "I need to make a doctor's appointment.",
+    "turkish": "Doktor randevusu almam gerekiyor.",
+    "category": "Health"
+  },
+  {
+    "english": "Where is the emergency room?",
+    "turkish": "Acil servis nerede?",
+    "category": "Health"
+  },
+  {
+    "english": "I have health insurance.",
+    "turkish": "Sağlık sigortam var.",
+    "category": "Health"
+  },
+  {
+    "english": "I need a prescription.",
+    "turkish": "Reçeteye ihtiyacım var.",
+    "category": "Health"
+  },
+  {
+    "english": "I feel nauseous.",
+    "turkish": "Mide bulantısı hissediyorum.",
+    "category": "Health"
+  },
+  {
+    "english": "I have a sore throat.",
+    "turkish": "Boğazım ağrıyor.",
+    "category": "Health"
+  },
+  {
+    "english": "I need to rest.",
+    "turkish": "Dinlenmem gerekiyor.",
+    "category": "Health"
+  },
+  {
+    "english": "I have a cough.",
+    "turkish": "Öksürüğüm var.",
+    "category": "Health"
+  },
+  {
+    "english": "I need to take medicine.",
+    "turkish": "İlaç almam gerekiyor.",
+    "category": "Health"
+  },
+  {
+    "english": "I feel better now.",
+    "turkish": "Şimdi daha iyi hissediyorum.",
+    "category": "Health"
+  },
+  {
+    "english": "Help!",
+    "turkish": "İmdat!",
+    "category": "Emergency"
+  },
+  {
+    "english": "Call an ambulance!",
+    "turkish": "Ambulans çağırın!",
+    "category": "Emergency"
+  },
+  {
+    "english": "Call the police!",
+    "turkish": "Polisi arayın!",
+    "category": "Emergency"
+  },
+  {
+    "english": "I need help!",
+    "turkish": "Yardıma ihtiyacım var!",
+    "category": "Emergency"
+  },
+  {
+    "english": "There's been an accident.",
+    "turkish": "Kaza oldu.",
+    "category": "Emergency"
+  },
+  {
+    "english": "I'm lost.",
+    "turkish": "Kayboldum.",
+    "category": "Emergency"
+  },
+  {
+    "english": "My bag was stolen.",
+    "turkish": "Çantam çalındı.",
+    "category": "Emergency"
+  },
+  {
+    "english": "I lost my passport.",
+    "turkish": "Pasaportumu kaybettim.",
+    "category": "Emergency"
+  },
+  {
+    "english": "Where is the police station?",
+    "turkish": "Polis karakolu nerede?",
+    "category": "Emergency"
+  },
+  {
+    "english": "I need to contact the embassy.",
+    "turkish": "Büyükelçilikle iletişime geçmem gerekiyor.",
+    "category": "Emergency"
+  },
+  {
+    "english": "There's a fire!",
+    "turkish": "Yangın var!",
+    "category": "Emergency"
+  },
+  {
+    "english": "I need to report a crime.",
+    "turkish": "Bir suç bildirmem gerekiyor.",
+    "category": "Emergency"
+  },
+  {
+    "english": "I've been robbed.",
+    "turkish": "Soyuldum.",
+    "category": "Emergency"
+  },
+  {
+    "english": "Is there a doctor here?",
+    "turkish": "Burada bir doktor var mı?",
+    "category": "Emergency"
+  },
+  {
+    "english": "I need to call my family.",
+    "turkish": "Ailemi aramam gerekiyor.",
+    "category": "Emergency"
+  },
+  {
+    "english": "Where is the lost and found?",
+    "turkish": "Kayıp eşya bürosu nerede?",
+    "category": "Emergency"
+  },
+  {
+    "english": "I need to cancel my credit card.",
+    "turkish": "Kredi kartımı iptal ettirmem gerekiyor.",
+    "category": "Emergency"
+  },
+  {
+    "english": "Can you help me, please?",
+    "turkish": "Bana yardım eder misiniz, lütfen?",
+    "category": "Emergency"
+  },
+  {
+    "english": "It's an emergency!",
+    "turkish": "Bu acil bir durum!",
+    "category": "Emergency"
+  },
+  {
+    "english": "I need to go to the hospital.",
+    "turkish": "Hastaneye gitmem gerekiyor.",
+    "category": "Emergency"
+  },
+  {
+    "english": "What time is it?",
+    "turkish": "Saat kaç?",
+    "category": "Time"
+  },
+  {
+    "english": "It's three o'clock.",
+    "turkish": "Saat üç.",
+    "category": "Time"
+  },
+  {
+    "english": "What day is it today?",
+    "turkish": "Bugün günlerden ne?",
+    "category": "Time"
+  },
+  {
+    "english": "Today is Monday.",
+    "turkish": "Bugün Pazartesi.",
+    "category": "Time"
+  },
+  {
+    "english": "What's the date today?",
+    "turkish": "Bugünün tarihi ne?",
+    "category": "Time"
+  },
+  {
+    "english": "It's the tenth of June.",
+    "turkish": "Bugün Haziran'ın onu.",
+    "category": "Time"
+  },
+  {
+    "english": "When does the store open?",
+    "turkish": "Mağaza ne zaman açılıyor?",
+    "category": "Time"
+  },
+  {
+    "english": "When does the museum close?",
+    "turkish": "Müze ne zaman kapanıyor?",
+    "category": "Time"
+  },
+  {
+    "english": "How long will it take?",
+    "turkish": "Ne kadar sürecek?",
+    "category": "Time"
+  },
+  {
+    "english": "I'm running late.",
+    "turkish": "Gecikiyorum.",
+    "category": "Time"
+  },
+  {
+    "english": "I'll be there in ten minutes.",
+    "turkish": "On dakika içinde orada olacağım.",
+    "category": "Time"
+  },
+  {
+    "english": "What time should we meet?",
+    "turkish": "Saat kaçta buluşalım?",
+    "category": "Time"
+  },
+  {
+    "english": "Let's meet at seven.",
+    "turkish": "Saat yedide buluşalım.",
+    "category": "Time"
+  },
+  {
+    "english": "I'm early.",
+    "turkish": "Erken geldim.",
+    "category": "Time"
+  },
+  {
+    "english": "What time does the movie start?",
+    "turkish": "Film saat kaçta başlıyor?",
+    "category": "Time"
+  },
+  {
+    "english": "It's half past four.",
+    "turkish": "Saat dört buçuk.",
+    "category": "Time"
+  },
+  {
+    "english": "It's a quarter to five.",
+    "turkish": "Saat beşe çeyrek var.",
+    "category": "Time"
+  },
+  {
+    "english": "I need to check the schedule.",
+    "turkish": "Programı kontrol etmem gerekiyor.",
+    "category": "Time"
+  },
+  {
+    "english": "What time do you finish work?",
+    "turkish": "İşten saat kaçta çıkıyorsun?",
+    "category": "Time"
+  },
+  {
+    "english": "The meeting is postponed.",
+    "turkish": "Toplantı ertelendi.",
+    "category": "Time"
+  },
+   {
+    "english": "What's the weather like today?",
+    "turkish": "Bugün hava nasıl?",
+    "category": "Weather"
+  },
+  {
+    "english": "It's sunny today.",
+    "turkish": "Bugün hava güneşli.",
+    "category": "Weather"
+  },
+  {
+    "english": "It's raining.",
+    "turkish": "Yağmur yağıyor.",
+    "category": "Weather"
+  },
+  {
+    "english": "It's snowing.",
+    "turkish": "Kar yağıyor.",
+    "category": "Weather"
+  },
+  {
+    "english": "It's very hot today.",
+    "turkish": "Bugün hava çok sıcak.",
+    "category": "Weather"
+  },
+  {
+    "english": "It's cold outside.",
+    "turkish": "Dışarısı soğuk.",
+    "category": "Weather"
+  },
+  {
+    "english": "The weather is nice.",
+    "turkish": "Hava güzel.",
+    "category": "Weather"
+  },
+  {
+    "english": "It's windy.",
+    "turkish": "Rüzgarlı.",
+    "category": "Weather"
+  },
+  {
+    "english": "There's a storm coming.",
+    "turkish": "Fırtına geliyor.",
+    "category": "Weather"
+  },
+  {
+    "english": "What's the temperature?",
+    "turkish": "Sıcaklık ne kadar?",
+    "category": "Weather"
+  },
+  {
+    "english": "It's 25 degrees Celsius.",
+    "turkish": "Hava 25 derece.",
+    "category": "Weather"
+  },
+  {
+    "english": "The forecast says it will rain.",
+    "turkish": "Hava tahminine göre yağmur yağacak.",
+    "category": "Weather"
+  },
+  {
+    "english": "I need an umbrella.",
+    "turkish": "Bir şemsiyeye ihtiyacım var.",
+    "category": "Weather"
+  },
+  {
+    "english": "It's humid today.",
+    "turkish": "Bugün hava nemli.",
+    "category": "Weather"
+  },
+  {
+    "english": "The sky is cloudy.",
+    "turkish": "Gökyüzü bulutlu.",
+    "category": "Weather"
+  },
+  {
+    "english": "It's freezing cold.",
+    "turkish": "Hava dondurucu soğuk.",
+    "category": "Weather"
+  },
+  {
+    "english": "The sun is shining.",
+    "turkish": "Güneş parlıyor.",
+    "category": "Weather"
+  },
+  {
+    "english": "There's a breeze.",
+    "turkish": "Hafif bir rüzgar var.",
+    "category": "Weather"
+  },
+  {
+    "english": "It's foggy.",
+    "turkish": "Sisli.",
+    "category": "Weather"
+  },
+  {
+    "english": "The weather is changing.",
+    "turkish": "Hava değişiyor.",
+    "category": "Weather"
+  },
+  {
+    "english": "How many people are in your family?",
+    "turkish": "Ailende kaç kişi var?",
+    "category": "Family"
+  },
+  {
+    "english": "I have two brothers and one sister.",
+    "turkish": "İki erkek kardeşim ve bir kız kardeşim var.",
+    "category": "Family"
+  },
+  {
+    "english": "My parents live in Ankara.",
+    "turkish": "Ailem Ankara'da yaşıyor.",
+    "category": "Family"
+  },
+  {
+    "english": "I'm married.",
+    "turkish": "Evliyim.",
+    "category": "Family"
+  },
+  {
+    "english": "I'm single.",
+    "turkish": "Bekarım.",
+    "category": "Family"
+  },
+  {
+    "english": "I have two children.",
+    "turkish": "İki çocuğum var.",
+    "category": "Family"
+  },
+  {
+    "english": "This is my wife.",
+    "turkish": "Bu benim eşim.",
+    "category": "Family"
+  },
+  {
+    "english": "This is my husband.",
+    "turkish": "Bu benim eşim.",
+    "category": "Family"
+  },
+  {
+    "english": "How old is your son?",
+    "turkish": "Oğlun kaç yaşında?",
+    "category": "Family"
+  },
+  {
+    "english": "My daughter is ten years old.",
+    "turkish": "Kızım on yaşında.",
+    "category": "Family"
+  },
+  {
+    "english": "Where does your family live?",
+    "turkish": "Ailen nerede yaşıyor?",
+    "category": "Family"
+  },
+  {
+    "english": "I have a big family.",
+    "turkish": "Benim büyük bir ailem var.",
+    "category": "Family"
+  },
+  {
+    "english": "I'm the youngest in my family.",
+    "turkish": "Ailede en küçük benim.",
+    "category": "Family"
+  },
+  {
+    "english": "I have an older sister.",
+    "turkish": "Bir ablam var.",
+    "category": "Family"
+  },
+  {
+    "english": "We're expecting a baby.",
+    "turkish": "Bebek bekliyoruz.",
+    "category": "Family"
+  },
+  {
+    "english": "My grandparents are visiting.",
+    "turkish": "Büyükannem ve büyükbabam ziyarete geliyor.",
+    "category": "Family"
+  },
+  {
+    "english": "I'm engaged.",
+    "turkish": "Nişanlıyım.",
+    "category": "Family"
+  },
+  {
+    "english": "We're celebrating our anniversary.",
+    "turkish": "Yıldönümümüzü kutluyoruz.",
+    "category": "Family"
+  },
+  {
+    "english": "I miss my family.",
+    "turkish": "Ailemi özledim.",
+    "category": "Family"
+  },
+  {
+    "english": "We're going to a family reunion.",
+    "turkish": "Aile buluşmasına gidiyoruz.",
+    "category": "Family"
+  },
+  {
+    "english": "I work in an office.",
+    "turkish": "Bir ofiste çalışıyorum.",
+    "category": "Work"
+  },
+  {
+    "english": "What do you do for a living?",
+    "turkish": "Ne iş yapıyorsun?",
+    "category": "Work"
+  },
+  {
+    "english": "I have a meeting at 10 AM.",
+    "turkish": "Saat 10'da bir toplantım var.",
+    "category": "Work"
+  },
+  {
+    "english": "I need to finish this report.",
+    "turkish": "Bu raporu bitirmem gerekiyor.",
+    "category": "Work"
+  },
+  {
+    "english": "Can you send me the file?",
+    "turkish": "Bana dosyayı gönderir misin?",
+    "category": "Work"
+  },
+  {
+    "english": "I'm on a business trip.",
+    "turkish": "İş seyahatindeyim.",
+    "category": "Work"
+  },
+  {
+    "english": "When is the deadline?",
+    "turkish": "Son teslim tarihi ne zaman?",
+    "category": "Work"
+  },
+  {
+    "english": "I need to talk to my boss.",
+    "turkish": "Patronumla konuşmam gerekiyor.",
+    "category": "Work"
+  },
+  {
+    "english": "Let's schedule a meeting.",
+    "turkish": "Bir toplantı planlayalım.",
+    "category": "Work"
+  },
+  {
+    "english": "I work from home on Fridays.",
+    "turkish": "Cuma günleri evden çalışıyorum.",
+    "category": "Work"
+  },
+  {
+    "english": "I need a vacation.",
+    "turkish": "Bir tatile ihtiyacım var.",
+    "category": "Work"
+  },
+  {
+    "english": "The printer is not working.",
+    "turkish": "Yazıcı çalışmıyor.",
+    "category": "Work"
+  },
+  {
+    "english": "I got a promotion.",
+    "turkish": "Terfi aldım.",
+    "category": "Work"
+  },
+  {
+    "english": "I'm looking for a job.",
+    "turkish": "İş arıyorum.",
+    "category": "Work"
+  },
+  {
+    "english": "I have a job interview tomorrow.",
+    "turkish": "Yarın bir iş görüşmem var.",
+    "category": "Work"
+  },
+  {
+    "english": "I work full-time.",
+    "turkish": "Tam zamanlı çalışıyorum.",
+    "category": "Work"
+  },
+  {
+    "english": "I work part-time.",
+    "turkish": "Yarı zamanlı çalışıyorum.",
+    "category": "Work"
+  },
+  {
+    "english": "I'm retired.",
+    "turkish": "Emekliyim.",
+    "category": "Work"
+  },
+  {
+    "english": "I need to check my email.",
+    "turkish": "E-postalarımı kontrol etmem gerekiyor.",
+    "category": "Work"
+  },
+  {
+    "english": "Let's discuss this later.",
+    "turkish": "Bunu sonra tartışalım.",
+    "category": "Work"
+  },
+  {
+    "english": "What's your Wi-Fi password?",
+    "turkish": "Wi-Fi şifreniz nedir?",
+    "category": "Technology"
+  },
+  {
+    "english": "My phone is charging.",
+    "turkish": "Telefonum şarj oluyor.",
+    "category": "Technology"
+  },
+  {
+    "english": "I need to update the software.",
+    "turkish": "Yazılımı güncellemem gerekiyor.",
+    "category": "Technology"
+  },
+  {
+    "english": "The internet is slow.",
+    "turkish": "İnternet yavaş.",
+    "category": "Technology"
+  },
+  {
+    "english": "Can you help me with this app?",
+    "turkish": "Bu uygulama konusunda bana yardım eder misin?",
+    "category": "Technology"
+  },
+  {
+    "english": "I forgot my password.",
+    "turkish": "Şifremi unuttum.",
+    "category": "Technology"
+  },
+  {
+    "english": "How do I download this file?",
+    "turkish": "Bu dosyayı nasıl indirebilirim?",
+    "category": "Technology"
+  },
+  {
+    "english": "My computer crashed.",
+    "turkish": "Bilgisayarım çöktü.",
+    "category": "Technology"
+  },
+  {
+    "english": "I need to backup my data.",
+    "turkish": "Verilerimi yedeklemem gerekiyor.",
+    "category": "Technology"
+  },
+  {
+    "english": "The battery is low.",
+    "turkish": "Pil azalmış.",
+    "category": "Technology"
+  },
+  {
+    "english": "I'll send you a link.",
+    "turkish": "Sana bir link göndereceğim.",
+    "category": "Technology"
+  },
+  {
+    "english": "Can you share the document?",
+    "turkish": "Dokümanı paylaşır mısın?",
+    "category": "Technology"
+  },
+  {
+    "english": "I need to restart my computer.",
+    "turkish": "Bilgisayarımı yeniden başlatmam gerekiyor.",
+    "category": "Technology"
+  },
+  {
+    "english": "How do I connect to Bluetooth?",
+    "turkish": "Bluetooth'a nasıl bağlanırım?",
+    "category": "Technology"
+  },
+  {
+    "english": "The website is not loading.",
+    "turkish": "Web sitesi yüklenmiyor.",
+    "category": "Technology"
+  },
+  {
+    "english": "I need a new charger.",
+    "turkish": "Yeni bir şarj cihazına ihtiyacım var.",
+    "category": "Technology"
+  },
+  {
+    "english": "Can you print this for me?",
+    "turkish": "Bunu benim için yazdırır mısın?",
+    "category": "Technology"
+  },
+  {
+    "english": "I'll add you to the group chat.",
+    "turkish": "Seni grup sohbetine ekleyeceğim.",
+    "category": "Technology"
+  },
+  {
+    "english": "The file is too large to send.",
+    "turkish": "Dosya göndermek için çok büyük.",
+    "category": "Technology"
+  },
+  {
+    "english": "I need to install the update.",
+    "turkish": "Güncellemeyi yüklemem gerekiyor.",
+    "category": "Technology"
+  },
+  {
+    "english": "I live in an apartment.",
+    "turkish": "Bir apartman dairesinde yaşıyorum.",
+    "category": "Home"
+  },
+  {
+    "english": "I need to clean the house.",
+    "turkish": "Evi temizlemem gerekiyor.",
+    "category": "Home"
+  },
+  {
+    "english": "Where is the remote control?",
+    "turkish": "Kumanda nerede?",
+    "category": "Home"
+  },
+  {
+    "english": "I'm cooking dinner.",
+    "turkish": "Akşam yemeği pişiriyorum.",
+    "category": "Home"
+  },
+  {
+    "english": "The light bulb needs changing.",
+    "turkish": "Ampulün değiştirilmesi gerekiyor.",
+    "category": "Home"
+  },
+  {
+    "english": "I'm doing laundry.",
+    "turkish": "Çamaşır yıkıyorum.",
+    "category": "Home"
+  },
+  {
+    "english": "Can you turn off the lights?",
+    "turkish": "Işıkları kapatır mısın?",
+    "category": "Home"
+  },
+  {
+    "english": "I need to water the plants.",
+    "turkish": "Bitkileri sulamam gerekiyor.",
+    "category": "Home"
+  },
+  {
+    "english": "The toilet is clogged.",
+    "turkish": "Tuvalet tıkanmış.",
+    "category": "Home"
+  },
+  {
+    "english": "I'm moving to a new house.",
+    "turkish": "Yeni bir eve taşınıyorum.",
+    "category": "Home"
+  },
+  {
+    "english": "Where should I put this?",
+    "turkish": "Bunu nereye koymalıyım?",
+    "category": "Home"
+  },
+  {
+    "english": "I need to fix the leak.",
+    "turkish": "Sızıntıyı tamir etmem gerekiyor.",
+    "category": "Home"
+  },
+  {
+    "english": "The air conditioning is too cold.",
+    "turkish": "Klima çok soğuk.",
+    "category": "Home"
+  },
+  {
+    "english": "I'm redecorating my room.",
+    "turkish": "Odamı yeniden dekore ediyorum.",
+    "category": "Home"
+  },
+  {
+    "english": "Can you take out the trash?",
+    "turkish": "Çöpü çıkarır mısın?",
+    "category": "Home"
+  },
+  {
+    "english": "I need to buy groceries.",
+    "turkish": "Market alışverişi yapmam gerekiyor.",
+    "category": "Home"
+  },
+  {
+    "english": "The door is locked.",
+    "turkish": "Kapı kilitli.",
+    "category": "Home"
+  },
+  {
+    "english": "I lost my keys.",
+    "turkish": "Anahtarlarımı kaybettim.",
+    "category": "Home"
+  },
+  {
+    "english": "The neighbors are noisy.",
+    "turkish": "Komşular gürültülü.",
+    "category": "Home"
+  },
+  {
+    "english": "I need to vacuum the carpet.",
+    "turkish": "Halıyı süpürmem gerekiyor.",
+    "category": "Home"
+  },
+  {
+    "english": "How do I get to the city center?",
+    "turkish": "Şehir merkezine nasıl gidebilirim?",
+    "category": "Transportation"
+  },
+  {
+    "english": "Where is the nearest bus stop?",
+    "turkish": "En yakın otobüs durağı nerede?",
+    "category": "Transportation"
+  },
+  {
+    "english": "I need to buy a ticket.",
+    "turkish": "Bilet almam gerekiyor.",
+    "category": "Transportation"
+  },
+  {
+    "english": "Is this seat taken?",
+    "turkish": "Bu koltuk dolu mu?",
+    "category": "Transportation"
+  },
+  {
+    "english": "How long does the journey take?",
+    "turkish": "Yolculuk ne kadar sürer?",
+    "category": "Transportation"
+  },
+  {
+    "english": "I'm waiting for the train.",
+    "turkish": "Treni bekliyorum.",
+    "category": "Transportation"
+  },
+  {
+    "english": "Where can I rent a car?",
+    "turkish": "Nereden araba kiralayabilirim?",
+    "category": "Transportation"
+  },
+  {
+    "english": "There's a lot of traffic.",
+    "turkish": "Çok trafik var.",
+    "category": "Transportation"
+  },
+  {
+    "english": "I missed my stop.",
+    "turkish": "Durağımı kaçırdım.",
+    "category": "Transportation"
+  },
+  {
+    "english": "How much is the fare?",
+    "turkish": "Ücret ne kadar?",
+    "category": "Transportation"
+  },
+  {
+    "english": "I need directions to the airport.",
+    "turkish": "Havaalanına yol tarifine ihtiyacım var.",
+    "category": "Transportation"
+  },
+  {
+    "english": "Is there a direct flight?",
+    "turkish": "Direkt uçuş var mı?",
+    "category": "Transportation"
+  },
+  {
+    "english": "I prefer to walk.",
+    "turkish": "Yürümeyi tercih ederim.",
+    "category": "Transportation"
+  },
+  {
+    "english": "Where is the taxi stand?",
+    "turkish": "Taksi durağı nerede?",
+    "category": "Transportation"
+  },
+  {
+    "english": "I'm running late for my flight.",
+    "turkish": "Uçuşum için geç kalıyorum.",
+    "category": "Transportation"
+  },
+  {
+    "english": "Can you give me a ride?",
+    "turkish": "Beni arabayla götürebilir misin?",
+    "category": "Transportation"
+  },
+  {
+    "english": "I need to fill up the gas tank.",
+    "turkish": "Benzin deposunu doldurmam gerekiyor.",
+    "category": "Transportation"
+  },
+  {
+    "english": "The road is closed.",
+    "turkish": "Yol kapalı.",
+    "category": "Transportation"
+  },
+  {
+    "english": "I have a driver's license.",
+    "turkish": "Ehliyetim var.",
+    "category": "Transportation"
+  },
+  {
+    "english": "Where is the parking lot?",
+    "turkish": "Otopark nerede?",
+    "category": "Transportation"
+  },
+  {
+    "english": "What are your hobbies?",
+    "turkish": "Hobilerin neler?",
+    "category": "Hobbies"
+  },
+  {
+    "english": "I like reading books.",
+    "turkish": "Kitap okumayı severim.",
+    "category": "Hobbies"
+  },
+  {
+    "english": "I enjoy watching movies.",
+    "turkish": "Film izlemekten hoşlanırım.",
+    "category": "Hobbies"
+  },
+  {
+    "english": "I play the guitar.",
+    "turkish": "Gitar çalıyorum.",
+    "category": "Hobbies"
+  },
+  {
+    "english": "I love listening to music.",
+    "turkish": "Müzik dinlemeye bayılırım.",
+    "category": "Hobbies"
+  },
+  {
+    "english": "I go hiking on weekends.",
+    "turkish": "Haftasonları doğa yürüyüşüne gidiyorum.",
+    "category": "Hobbies"
+  },
+  {
+    "english": "I'm learning to cook.",
+    "turkish": "Yemek yapmayı öğreniyorum.",
+    "category": "Hobbies"
+  },
+  {
+    "english": "I like photography.",
+    "turkish": "Fotoğrafçılığı severim.",
+    "category": "Hobbies"
+  },
+  {
+    "english": "I play soccer with friends.",
+    "turkish": "Arkadaşlarımla futbol oynuyorum.",
+    "category": "Hobbies"
+  },
+  {
+    "english": "I enjoy swimming.",
+    "turkish": "Yüzmekten keyif alıyorum.",
+    "category": "Hobbies"
+  },
+  {
+    "english": "I like to travel.",
+    "turkish": "Seyahat etmeyi severim.",
+    "category": "Hobbies"
+  },
+  {
+    "english": "I'm into gardening.",
+    "turkish": "Bahçıvanlığa meraklıyım.",
+    "category": "Hobbies"
+  },
+  {
+    "english": "I play video games.",
+    "turkish": "Video oyunları oynuyorum.",
+    "category": "Hobbies"
+  },
+  {
+    "english": "I love dancing.",
+    "turkish": "Dans etmeye bayılırım.",
+    "category": "Hobbies"
+  },
+  {
+    "english": "I'm learning a new language.",
+    "turkish": "Yeni bir dil öğreniyorum.",
+    "category": "Hobbies"
+  },
+  {
+    "english": "I enjoy painting.",
+    "turkish": "Resim yapmaktan hoşlanırım.",
+    "category": "Hobbies"
+  },
+  {
+    "english": "I like going to the gym.",
+    "turkish": "Spora gitmeyi severim.",
+    "category": "Hobbies"
+  },
+  {
+    "english": "I collect stamps.",
+    "turkish": "Pul koleksiyonu yapıyorum.",
+    "category": "Hobbies"
+  },
+  {
+    "english": "I enjoy fishing.",
+    "turkish": "Balık tutmaktan keyif alıyorum.",
+    "category": "Hobbies"
+  },
+  {
+    "english": "I like playing board games.",
+    "turkish": "Kutu oyunları oynamayı severim.",
+    "category": "Hobbies"
+  },
+  {
+    "english": "I'm happy today.",
+    "turkish": "Bugün mutluyum.",
+    "category": "Emotions"
+  },
+  {
+    "english": "I feel nervous about the exam.",
+    "turkish": "Sınav hakkında gergin hissediyorum.",
+    "category": "Emotions"
+  },
+  {
+    "english": "She seems excited about the trip.",
+    "turkish": "Seyahat hakkında heyecanlı görünüyor.",
+    "category": "Emotions"
+  },
+  {
+    "english": "He looks sad today.",
+    "turkish": "Bugün üzgün görünüyor.",
+    "category": "Emotions"
+  },
+  {
+    "english": "I'm so tired after work.",
+    "turkish": "İşten sonra çok yorgunum.",
+    "category": "Emotions"
+  },
+  {
+    "english": "I feel relaxed on weekends.",
+    "turkish": "Haftasonları rahatlamış hissediyorum.",
+    "category": "Emotions"
+  },
+  {
+    "english": "She was surprised by the gift.",
+    "turkish": "Hediye ile şaşırdı.",
+    "category": "Emotions"
+  },
+  {
+    "english": "I'm worried about my health.",
+    "turkish": "Sağlığım hakkında endişeliyim.",
+    "category": "Emotions"
+  },
+  {
+    "english": "He seems confident about the presentation.",
+    "turkish": "Sunum hakkında kendinden emin görünüyor.",
+    "category": "Emotions"
+  },
+  {
+    "english": "I'm bored with this movie.",
+    "turkish": "Bu filmden sıkıldım.",
+    "category": "Emotions"
+  },
+  {
+    "english": "They look very happy together.",
+    "turkish": "Birlikte çok mutlu görünüyorlar.",
+    "category": "Emotions"
+  },
+  {
+    "english": "I'm frustrated with this computer.",
+    "turkish": "Bu bilgisayar yüzünden hayal kırıklığına uğradım.",
+    "category": "Emotions"
+  },
+  {
+    "english": "She feels proud of her achievement.",
+    "turkish": "Başarısından gurur duyuyor.",
+    "category": "Emotions"
+  },
+  {
+    "english": "I'm curious about other cultures.",
+    "turkish": "Diğer kültürler hakkında meraklıyım.",
+    "category": "Emotions"
+  },
+  {
+    "english": "He seems disappointed with the results.",
+    "turkish": "Sonuçlardan hayal kırıklığına uğramış görünüyor.",
+    "category": "Emotions"
+  },
+  {
+    "english": "I'm grateful for your help.",
+    "turkish": "Yardımın için minnettarım.",
+    "category": "Emotions"
+  },
+  {
+    "english": "She feels lonely sometimes.",
+    "turkish": "Bazen yalnız hissediyor.",
+    "category": "Emotions"
+  },
+  {
+    "english": "I'm excited about the new job.",
+    "turkish": "Yeni iş için heyecanlıyım.",
+    "category": "Emotions"
+  },
+  {
+    "english": "He looks confused about the instructions.",
+    "turkish": "Talimatlar hakkında kafası karışık görünüyor.",
+    "category": "Emotions"
+  },
+  {
+    "english": "I feel optimistic about the future.",
+    "turkish": "Gelecek hakkında iyimser hissediyorum.",
+    "category": "Emotions"
+  },
+  {
+    "english": "I have an exam tomorrow.",
+    "turkish": "Yarın sınavım var.",
+    "category": "Education"
+  },
+  {
+    "english": "What's your major?",
+    "turkish": "Bölümün nedir?",
+    "category": "Education"
+  },
+  {
+    "english": "I need to study for the test.",
+    "turkish": "Test için çalışmam gerekiyor.",
+    "category": "Education"
+  },
+  {
+    "english": "The homework is difficult.",
+    "turkish": "Ödev zor.",
+    "category": "Education"
+  },
+  {
+    "english": "I'm studying engineering.",
+    "turkish": "Mühendislik okuyorum.",
+    "category": "Education"
+  },
+  {
+    "english": "Where is the library?",
+    "turkish": "Kütüphane nerede?",
+    "category": "Education"
+  },
+  {
+    "english": "I need to borrow a book.",
+    "turkish": "Kitap ödünç almam gerekiyor.",
+    "category": "Education"
+  },
+  {
+    "english": "The class starts at nine.",
+    "turkish": "Ders dokuzda başlıyor.",
+    "category": "Education"
+  },
+  {
+    "english": "I failed the exam.",
+    "turkish": "Sınavdan kaldım.",
+    "category": "Education"
+  },
+  {
+    "english": "I passed with a good grade.",
+    "turkish": "İyi bir notla geçtim.",
+    "category": "Education"
+  },
+  {
+    "english": "The professor is very knowledgeable.",
+    "turkish": "Profesör çok bilgili.",
+    "category": "Education"
+  },
+  {
+    "english": "I need to write an essay.",
+    "turkish": "Bir makale yazmam gerekiyor.",
+    "category": "Education"
+  },
+  {
+    "english": "What's the assignment for today?",
+    "turkish": "Bugünün ödevi nedir?",
+    "category": "Education"
+  },
+  {
+    "english": "I'm learning English.",
+    "turkish": "İngilizce öğreniyorum.",
+    "category": "Education"
+  },
+  {
+    "english": "The semester ends in June.",
+    "turkish": "Dönem Haziran'da bitiyor.",
+    "category": "Education"
+  },
+  {
+    "english": "I have a presentation next week.",
+    "turkish": "Gelecek hafta bir sunumum var.",
+    "category": "Education"
+  },
+  {
+    "english": "The course is very interesting.",
+    "turkish": "Ders çok ilginç.",
+    "category": "Education"
+  },
+  {
+    "english": "I need to take notes.",
+    "turkish": "Not almam gerekiyor.",
+    "category": "Education"
+  },
+  {
+    "english": "The laboratory is on the third floor.",
+    "turkish": "Laboratuvar üçüncü katta.",
+    "category": "Education"
+  },
+  {
+    "english": "I'm preparing for university entrance exam.",
+    "turkish": "Üniversite sınavına hazırlanıyorum.",
+    "category": "Education"
+  },
+  {
+    "english": "Would you like some Turkish tea?",
+    "turkish": "Türk çayı ister misiniz?",
+    "category": "TurkishCulture"
+  },
+  {
+    "english": "Let me offer you something to drink.",
+    "turkish": "Size içecek bir şeyler ikram edeyim.",
+    "category": "TurkishCulture"
+  },
+  {
+    "english": "This is a traditional Turkish dish.",
+    "turkish": "Bu geleneksel bir Türk yemeği.",
+    "category": "TurkishCulture"
+  },
+  {
+    "english": "Welcome to our home!",
+    "turkish": "Evimize hoş geldiniz!",
+    "category": "TurkishCulture"
+  },
+  {
+    "english": "Make yourself at home.",
+    "turkish": "Kendinizi evinizde hissedin.",
+    "category": "TurkishCulture"
+  },
+  {
+    "english": "Would you like more food?",
+    "turkish": "Biraz daha yemek ister misiniz?",
+    "category": "TurkishCulture"
+  },
+  {
+    "english": "This is homemade.",
+    "turkish": "Bu ev yapımı.",
+    "category": "TurkishCulture"
+  },
+  {
+    "english": "Let's have breakfast together.",
+    "turkish": "Birlikte kahvaltı yapalım.",
+    "category": "TurkishCulture"
+  },
+  {
+    "english": "Turkish coffee is very strong.",
+    "turkish": "Türk kahvesi çok serttir.",
+    "category": "TurkishCulture"
+  },
+  {
+    "english": "This is a Turkish delight.",
+    "turkish": "Bu bir lokum.",
+    "category": "TurkishCulture"
+  },
+  {
+    "english": "We celebrate Eid with family.",
+    "turkish": "Bayramı aileyle kutlarız.",
+    "category": "TurkishCulture"
+  },
+  {
+    "english": "It's a Turkish tradition.",
+    "turkish": "Bu bir Türk geleneği.",
+    "category": "TurkishCulture"
+  },
+  {
+    "english": "Let me show you Turkish hospitality.",
+    "turkish": "Size Türk misafirperverliğini göstereyim.",
+    "category": "TurkishCulture"
+  },
+  {
+    "english": "This is how we do it in Turkey.",
+    "turkish": "Türkiye'de böyle yaparız.",
+    "category": "TurkishCulture"
+  },
+  {
+    "english": "Would you like to try baklava?",
+    "turkish": "Baklava denemek ister misiniz?",
+    "category": "TurkishCulture"
+  },
+  {
+    "english": "We drink tea all day.",
+    "turkish": "Bütün gün çay içeriz.",
+    "category": "TurkishCulture"
+  },
+  {
+    "english": "This is a typical Turkish breakfast.",
+    "turkish": "Bu tipik bir Türk kahvaltısı.",
+    "category": "TurkishCulture"
+  },
+  {
+    "english": "Let's play backgammon.",
+    "turkish": "Tavla oynayalım.",
+    "category": "TurkishCulture"
+  },
+  {
+    "english": "We value our elders.",
+    "turkish": "Büyüklerimize değer veririz.",
+    "category": "TurkishCulture"
+  },
+  {
+    "english": "Family is very important in Turkish culture.",
+    "turkish": "Türk kültüründe aile çok önemlidir.",
+    "category": "TurkishCulture"
+  }      
+]

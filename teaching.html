@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelime Öğrenme - İngilizce Öğrenme Platformu</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/teaching.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Responsive kontrol için meta tag -->
+    <script>
+        // Cihaz tespiti için script
+        function detectDevice() {
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            const isTablet = /iPad|Android|Tablet/i.test(navigator.userAgent) && !/Mobile/i.test(navigator.userAgent);
+            
+            if (isMobile || isTablet) {
+                document.documentElement.classList.add('mobile-device');
+                document.documentElement.classList.add(isTablet ? 'tablet' : 'mobile');
+            } else {
+                document.documentElement.classList.add('desktop-device');
+                document.documentElement.classList.add('desktop');
+            }
+        }
+        
+        // Sayfa yüklendiğinde cihazı tespit et
+        document.addEventListener('DOMContentLoaded', detectDevice);
+    </script>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>İngilizce Öğrenme Platformu</h1>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Ana Sayfa</a></li>
+                    <li><a href="teaching.html" class="active">Kelime Öğrenme</a></li>
+                    <li><a href="flip_cards.html">İngilizce-Türkçe Kelimeler</a></li>
+                    <li><a href="daily.html">Günlük Cümle Öğrenme</a></li>
+                    <li><a href="reading.html">Okuma-Anlama</a></li>
+                    <li><a href="word_games.html">Kelime Oyunları</a></li>
+                    <li><a href="flashcards_with_sentence_activity.html">Cümle Kurma Çalışması</a></li>
+                    <li><a href="exam.html">Sınav</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    
+    <!-- Cihaz Bilgisi Göstergesi (isteğe bağlı, test için) -->
+    <div class="device-indicator">
+        <span id="deviceInfo"></span>
+    </div>
+    
+    <main class="container">
+        <h2>*Kategori seçerek ve kartlara tıklayarak hem sesli hem görsel olarak kelimeleri öğrenin</h2>
+        
+        <div class="category-selector">
+            <label for="category">Kategori Seçin:</label>
+            <select id="category">
+                <option value="all">Tüm Kategoriler</option>
+                <!-- JavaScript ile dinamik olarak eklenecek -->
+            </select>
+        </div>
+        
+        <div class="words-grid" id="wordsContainer">
+            <!-- Kelimeler JavaScript ile buraya eklenecek -->
+        </div>
+
+        <div class="pagination-controls">
+            <button id="prevPage" class="btn secondary" disabled>
+                <i class="fas fa-chevron-left"></i> Önceki
+            </button>
+            <span id="pageInfo">Sayfa 1 / 1</span>
+            <button id="nextPage" class="btn secondary" disabled>
+                Sonraki <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+
+        <div class="audio-controls">
+            <button id="playAllAudio" class="btn">
+                <i class="fas fa-volume-up"></i> Tüm Kartları Seslendir
+            </button>
+            <button id="stopAudio" class="btn secondary">
+                <i class="fas fa-stop"></i> Sesi Durdur
+            </button>
+        </div>
+
+        <!-- Resim Büyütme Modalı -->
+        <div id="imageModal" class="image-modal">
+            <div class="modal-content">
+                <div class="modal-image-container">
+                    <img id="modalImage" src="" alt="Büyütülmüş resim">
+                </div>
+                <div class="modal-word-info">
+                    <div class="modal-word-container">
+                        <div class="modal-speaker-icon" title="Seslendir">
+                            <i class="fas fa-volume-up"></i>
+                        </div>
+                        <div class="modal-word"></div>
+                        <div class="modal-close-icon" title="Kapat">
+                            <i class="fas fa-times"></i>
+                        </div>
+                    </div>
+                    <div class="modal-category"></div>
+                    <div class="modal-level"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>© <span id="currentDate"></span> İngilizce Öğrenme Platformu</p>
+        </div>
+    </footer>
+
+    <script>
+        function formatTurkishDate() {
+            const now = new Date();
+            const options = { 
+                day: '2-digit', 
+                month: '2-digit', 
+                year: 'numeric' 
+            };
+            
+            return now.toLocaleDateString('tr-TR', options);
+        }
+        
+        document.getElementById('currentDate').textContent = formatTurkishDate();
+        
+        // Cihaz bilgisini göster (test için)
+        document.addEventListener('DOMContentLoaded', function() {
+            const deviceInfo = document.getElementById('deviceInfo');
+            if (deviceInfo) {
+                if (document.documentElement.classList.contains('mobile')) {
+                    deviceInfo.textContent = '📱 Mobil Görünüm';
+                } else if (document.documentElement.classList.contains('tablet')) {
+                    deviceInfo.textContent = '📟 Tablet Görünüm';
+                } else {
+                    deviceInfo.textContent = '🖥️ Masaüstü Görünüm';
+                }
+            }
+        });
+    </script>
+    
+    <script src="js/common.js"></script>
+    <script src="js/teaching.js"></script>
+</body>
+</html>

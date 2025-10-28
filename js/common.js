@@ -1,9 +1,9 @@
 // Firebase V11+ importları (HTML <script type="module"> içinde çalışır)
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
 import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-import { getFirestore, doc, setDoc, collection, query, onSnapshot, serverTimestamp, getDoc, getDocs, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+import { getFirestore, doc, setDoc, collection, query, onSnapshot, serverTimestamp, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-console.log('✅ common.js loaded - GÜNCELLENMİŞ VE FIREBASE DESTEKLİ VERSİYON');
+console.log('✅ common.js loaded - FIREBASE DESTEKLİ VERSİYON');
 
 // --- Global Firebase ve Auth Değişkenleri ---
 let app;
@@ -15,11 +15,11 @@ let appId;
 // --- Firebase Başlatma ve Oturum Açma ---
 
 /**
- * Firebase'i başlatır ve kullanıcı oturumunu açar (Özel Token veya Anonim).
+ * Initializes Firebase and signs in the user (Custom Token or Anonymous).
  */
 async function initializeFirebase() {
     try {
-        // Gerekli global değişkenleri güvenli bir şekilde al
+        // Safely retrieve global variables provided by the Canvas environment
         appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
         const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
@@ -33,26 +33,25 @@ async function initializeFirebase() {
         db = getFirestore(app);
         auth = getAuth(app);
         
+        // Use the initial auth token if available, otherwise sign in anonymously
         if (initialAuthToken) {
             await signInWithCustomToken(auth, initialAuthToken);
         } else {
-            // Token yoksa anonim olarak giriş yap
             await signInAnonymously(auth);
         }
 
-        // Oturum açma durumunu dinle ve userId'yi güncelle
+        // Listen for auth state changes and update userId
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 userId = user.uid;
                 console.log(`🔑 Firebase User ID: ${userId} (Authenticated)`);
-                // Firestore başlatıldıktan sonra, UI'ı güncelleyecek bir olay tetikle
-                document.dispatchEvent(new CustomEvent('firebaseReady', { detail: { userId: userId, db: db, appId: appId } }));
             } else {
-                // Anonim kullanıcılar için rastgele bir ID kullanma (geçici)
+                // Use a random ID for anonymous users if token fails
                 userId = crypto.randomUUID();
-                console.log(`🔑 Firebase User ID: ${userId} (Anonymous - No persistence)`);
-                document.dispatchEvent(new CustomEvent('firebaseReady', { detail: { userId: userId, db: db, appId: appId } }));
+                console.log(`🔑 Firebase User ID: ${userId} (Anonymous/Fallback)`);
             }
+            // Dispatch event when userId and db are ready
+            document.dispatchEvent(new CustomEvent('firebaseReady', { detail: { userId: userId, db: db, appId: appId } }));
         });
 
     } catch (error) {
@@ -60,26 +59,27 @@ async function initializeFirebase() {
     }
 }
 
-// --- Firestore Yol Yönetimi Fonksiyonları ---
+// --- Firestore Path Management Functions ---
 
 /**
- * Kullanıcıya özel veriler için Firestore yolunu döndürür.
- * @param {string} collectionName - Koleksiyonun adı (örn: 'learnedWords')
- * @returns {string} Firestore koleksiyon yolu
+ * Returns the Firestore path for user-specific data.
+ * Data is stored at /artifacts/{appId}/users/{userId}/{collectionName}
+ * @param {string} collectionName - Name of the collection (e.g., 'learnedWords')
+ * @returns {string} Firestore collection path
  */
 function getUserCollectionPath(collectionName) {
     if (!userId || userId === 'loading') {
+        // This should not happen if called after 'firebaseReady' event
         throw new Error("Firestore: User ID is not ready.");
     }
-    // Veriler, /artifacts/{appId}/users/{userId}/{collectionName} yolunda saklanacak.
     return `artifacts/${appId}/users/${userId}/${collectionName}`;
 }
 
-// --- Firestore Veri İşlemleri Fonksiyonları ---
+// --- Firestore Data Operations Functions ---
 
 /**
- * Yeni bir kelimeyi Firestore'a kaydeder.
- * @param {object} wordData - Kelime verisi (word, meaning, exampleSentence, etc.)
+ * Saves a new word to Firestore.
+ * @param {object} wordData - Word data (word, meaning, exampleSentence, etc.)
  */
 async function saveLearnedWord(wordData) {
     if (!db) {
@@ -88,7 +88,7 @@ async function saveLearnedWord(wordData) {
     }
     try {
         const collectionRef = collection(db, getUserCollectionPath('learnedWords'));
-        // Firestore doküman ID'si olarak kelimenin kendisini (küçük harfli) kullan
+        // Use the word itself (lowercase) as the document ID for easy lookup and uniqueness
         const docId = wordData.word.toLowerCase();
         const docRef = doc(collectionRef, docId);
         
@@ -96,38 +96,37 @@ async function saveLearnedWord(wordData) {
             ...wordData,
             createdAt: serverTimestamp(),
             userId: userId,
-            // Daha önce kaydedilmişse üzerine yazılır ve güncellenir.
-        }, { merge: true }); 
+        }, { merge: true }); // Merge ensures it updates if it already exists
         
         console.log(`💾 Learned word saved: ${wordData.word}`);
+        showNotification(`'${wordData.word}' kelimesi kaydedildi!`, "info");
         
     } catch (error) {
         console.error("❌ Error saving learned word:", error);
-        // Hata durumunda kullanıcıya görsel bir bildirim göster
         showNotification("Kelime kaydedilirken bir hata oluştu.", "error");
     }
 }
 
 /**
- * Kullanıcının kaydettiği kelimeleri gerçek zamanlı olarak dinler.
- * @param {function} callback - Yeni veriler geldiğinde çalıştırılacak fonksiyon
- * @returns {function} Dinlemeyi durdurma fonksiyonu (unsubscribe)
+ * Listens for the user's saved words in real-time.
+ * @param {function} callback - Function to execute when new data arrives
+ * @returns {function} Unsubscribe function
  */
 function listenForLearnedWords(callback) {
     if (!db) {
         console.error("❌ Firestore not initialized. Cannot listen.");
-        return () => {}; // Boş bir durdurucu döndür
+        return () => {}; // Return a no-op function
     }
     
     const collectionRef = collection(db, getUserCollectionPath('learnedWords'));
-    // En son kaydedilen kelimeleri görmek için 'createdAt' alanına göre sıralama
+    // Query ordered by creation time
     const q = query(collectionRef, orderBy('createdAt', 'desc'));
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
         const words = snapshot.docs.map(doc => ({ 
             id: doc.id, 
             ...doc.data(),
-            // Firestore Timestamp'i okunabilir hale getir
+            // Convert Firestore Timestamp to Date object for easier use
             createdAt: doc.data().createdAt?.toDate() || new Date()
         }));
         callback(words);
@@ -139,42 +138,42 @@ function listenForLearnedWords(callback) {
     return unsubscribe;
 }
 
-// --- Yardımcı Fonksiyonlar ---
+// --- Helper Functions ---
 
-// Kelime formatlama fonksiyonu (Mevcut common.js dosyanızdan)
+// Word formatting function (from your original common.js)
 function formatWord(word) {
     if (!word) return '';
     return word.replace(/_/g, ' ');
 }
 
-// Basit Bildirim (Alert yerine kullanılacak)
+// Simple Notification Display (replaces alert/confirm)
 function showNotification(message, type = 'info') {
-    // Burada özel bir modal veya toast bildirim oluşturmanız gerekir.
-    // Şimdilik sadece console.log kullanılıyor:
-    console.log(`[Bildirim - ${type.toUpperCase()}]: ${message}`);
-    // Gerçek uygulamada, bu fonksiyon bir DOM öğesi oluşturmalıdır.
     const notificationContainer = document.getElementById('notification-container');
     if (!notificationContainer) return;
     
     const div = document.createElement('div');
-    div.className = `p-3 mb-2 rounded shadow-lg text-white ${type === 'error' ? 'bg-red-500' : 'bg-green-500'}`;
+    // Styling adapted for Tailwind and dynamic visibility
+    div.className = `p-3 mb-2 rounded shadow-lg text-white font-semibold transform transition-transform duration-300 ease-out translate-y-0 opacity-100 ${type === 'error' ? 'bg-red-500' : 'bg-green-500'} max-w-xs`;
     div.textContent = message;
+    
+    // Add to container
     notificationContainer.appendChild(div);
 
-    setTimeout(() => div.remove(), 4000);
+    // Fade out and remove after 3.5 seconds
+    setTimeout(() => {
+        div.classList.replace('translate-y-0', 'translate-y-4');
+        div.classList.replace('opacity-100', 'opacity-0');
+        div.addEventListener('transitionend', () => div.remove());
+    }, 3500);
 }
 
 
-// Sayfa yüklendiğinde Firebase'i başlat
+// Initialize Firebase when the page loads
 document.addEventListener('DOMContentLoaded', initializeFirebase);
 
 
-// Bu fonksiyonları window objesine ata ki diğer scriptler erişebilsin
+// Attach functions to the window object so they can be accessed by other scripts
 window.formatWord = formatWord;
 window.saveLearnedWord = saveLearnedWord;
 window.listenForLearnedWords = listenForLearnedWords;
 window.showNotification = showNotification;
-
-// Mevcut common.js dosyanızdaki diğer fonksiyonlar buraya eklenebilir.
-// Örneğin: loadData, initializeUserProgress (artık Firestore'a göre güncellenmeli)
-// Ancak bu entegrasyon için sadece bu temel Firestore fonksiyonları yeterlidir.

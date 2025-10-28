@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gemini İngilizce Konuşma Arkadaşı</title>
     <!-- KRİTİK CSP DÜZELTMESİ: Worker'ınızın workers.dev adresine bağlanmasına izin veriyoruz. -->
+    <!-- Lütfen "https://gemini-api-key.gokcekag.workers.dev" kısmını kendi Worker adresinizle değiştirin. -->
     <meta http-equiv="Content-Security-Policy" content="connect-src 'self' https://gemini-api-key.gokcekag.workers.dev data: blob:;">
 
     <!-- Tailwind CSS Yüklemesi -->
@@ -37,7 +38,7 @@
             </div>
         </div>
         
-        <!-- ROL GÖSTERGESİ (Eksik eleman buydu) -->
+        <!-- ROL GÖSTERGESİ -->
         <div id="role-display" class="bg-indigo-50 border-t border-indigo-200 text-indigo-800 p-3 text-sm text-center font-medium cursor-pointer transition hover:bg-indigo-100">
             Aktif Rol: Genel İngilizce Öğretmeni (Gramatik düzeltmelerle)
         </div>
@@ -57,7 +58,7 @@
 
     <!-- BAĞLANTI HATASI VE ROL MODALLARI -->
     
-    <!-- BAĞLANTI HATASI MODALI (Eksik eleman buydu) -->
+    <!-- BAĞLANTI HATASI MODALI -->
     <div id="csp-warning" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
         <div class="bg-white p-6 rounded-xl shadow-2xl max-w-sm w-full">
             <h3 class="text-lg font-bold text-red-600 mb-3">Bağlantı Hatası veya Worker Hatası</h3>
@@ -68,7 +69,7 @@
         </div>
     </div>
 
-    <!-- ROL SEÇİM MODALI (Eksik eleman buydu) -->
+    <!-- ROL SEÇİM MODALI -->
     <div id="role-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
         <div class="bg-white p-6 rounded-xl shadow-2xl max-w-md w-full">
             <h3 class="text-xl font-bold text-indigo-700 mb-4">Konuşma Rolünü Seçin</h3>
@@ -79,3 +80,239 @@
             <button id="close-role-modal" class="mt-6 w-full bg-gray-200 text-gray-700 py-2 rounded-xl font-semibold hover:bg-gray-300 transition">Kapat</button>
         </div>
     </div>
+
+<script type="module">
+    // Sabitler ve Ayarlar
+    // KRİTİK: Worker'ınızın workers.dev adresini kullanıyoruz.
+    // Lütfen API_URL'yi KENDİ WORKER ADRESİNİZLE değiştirin (Örn: "https://<SizinWorkerAdiniz>.workers.dev")
+    const API_URL = "https://gemini-api-key.gokcekag.workers.dev"; // Güncel Worker adresi
+    const MODEL_NAME = "gemini-2.5-flash-preview-09-2025";
+    const MAX_HISTORY_LENGTH = 10; // Tarihte tutulacak maksimum mesaj sayısı
+
+    // Rol Tanımları (System Instructions)
+    let currentRole = "Sen bir İngilizce öğretmenisin. Samimi, sabırlı ve her zaman pozitif bir tona sahipsin. Kullanıcının tüm konuşmalarını İngilizce olarak yanıtla. Kullanıcının her mesajının sonunda, gramer, kelime dağarcığı veya telaffuz (telaffuz kelimelerini italik yap) hakkında bir geri bildirim ve bir sonraki sohbete başlaması için bir soru sor. Geri bildirimlerini asla Türkçeye çevirme.";
+    
+    const roles = [
+        { 
+            name: 'Genel İngilizce Öğretmeni', 
+            role: currentRole, 
+            description: 'Konuşmanızı düzeltir, yeni kelimeler önerir ve akıcı konuşmanızı sağlar.' 
+        },
+        { 
+            name: 'İş İngilizcesi Koçu', 
+            role: 'Sen bir Kurumsal İş İngilizcesi Koçusun. Yüksek düzeyde resmi ve profesyonel bir tona sahipsin. İş toplantıları, e-posta yazışmaları ve sunumlar hakkında pratik yaptır. Kullanıcının her mesajını kurumsal bir dille yanıtla ve iş dünyası ile ilgili geri bildirimler ver.', 
+            description: 'Profesyonel toplantılar ve iş yazışmaları için pratik yapar.' 
+        },
+        { 
+            name: 'Günlük Sohbet Arkadaşı', 
+            role: 'Sen 20 yaşında, üniversitede okuyan bir arkadaşsın. Samimi, günlük (casual) ve güncel bir dil kullan. Ciddi gramer düzeltmeleri yapma, sadece sohbeti doğal bir şekilde sürdür. Kısaltmalar ve popüler İngilizce ifadeler kullan.', 
+            description: 'Güncel, samimi ve doğal sohbet için idealdir.' 
+        }
+    ];
+
+    let chatHistory = [];
+    let isWaitingForResponse = false;
+    let currentRoleName = 'Genel İngilizce Öğretmeni'; // Rol adını tutmak için
+
+    // DOM Elementleri
+    const chatMessages = document.getElementById('chat-messages');
+    const userInput = document.getElementById('user-input');
+    const sendButton = document.getElementById('send-button');
+    const sendIcon = document.getElementById('send-icon');
+    const loadingSpinner = document.getElementById('loading-spinner');
+    const roleDisplay = document.getElementById('role-display');
+    const roleModal = document.getElementById('role-modal');
+    const closeRoleModalButton = document.getElementById('close-role-modal');
+    const roleOptionsContainer = document.getElementById('role-options');
+    const cspWarning = document.getElementById('csp-warning');
+    const closeWarningButton = document.getElementById('close-warning');
+    const errorDetails = document.getElementById('error-details');
+
+
+    // Yardımcı Fonksiyonlar
+
+    // Gönderme Durumunu Ayarlar (Buton ve Giriş Alanı)
+    function setSendingState(isSending) {
+        isWaitingForResponse = isSending;
+        userInput.disabled = isSending;
+        sendButton.disabled = isSending;
+        if (isSending) {
+            sendIcon.classList.add('hidden');
+            loadingSpinner.classList.remove('hidden');
+        } else {
+            sendIcon.classList.remove('hidden');
+            loadingSpinner.classList.add('hidden');
+        }
+    }
+
+    // Mesajı Sohbet Alanına Ekler
+    function displayMessage(role, message) {
+        const messageElement = document.createElement('div');
+        
+        const isUser = role === 'user';
+        
+        // Tailwind sınıfları ile stil oluşturma
+        messageElement.className = `flex ${isUser ? 'justify-end' : 'justify-start'}`;
+        
+        const messageBubble = document.createElement('div');
+        messageBubble.className = `p-3 rounded-xl max-w-xs md:max-w-md shadow text-sm ${
+            isUser 
+            ? 'bg-indigo-600 text-white rounded-tr-none' 
+            : 'bg-gray-100 text-gray-800 rounded-tl-none'
+        }`;
+        
+        // Markdown'ı temel HTML'e çevirme
+        const formattedMessage = message.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Kalınlaştırma
+                                        .replace(/\*(.*?)\*/g, '<em>$1</em>') // İtalikleştirme
+                                        .replace(/\n/g, '<br>'); // Yeni satırları koruma
+
+        messageBubble.innerHTML = formattedMessage;
+        messageElement.appendChild(messageBubble);
+        chatMessages.appendChild(messageElement);
+
+        // Otomatik kaydırma
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    // Rolü Günceller
+    function setRole(name, roleInstruction) {
+        currentRole = roleInstruction;
+        currentRoleName = name;
+        roleDisplay.textContent = `Aktif Rol: ${currentRoleName}`;
+        roleModal.classList.add('hidden');
+        
+        // Rol değiştiğinde geçmişi sıfırla
+        chatHistory = [];
+        chatMessages.innerHTML = ''; // Sohbeti temizle
+        displayMessage('bot', `Harika! Rolünüzü şimdi **${currentRoleName}** olarak ayarladım. Hazır olduğunuzda yeni konuya başlayın.`);
+    }
+
+    // Ana Mesaj Gönderme Fonksiyonu
+    async function sendMessage() {
+        if (isWaitingForResponse) return;
+
+        const userMessage = userInput.value.trim();
+        if (userMessage === '') return;
+
+        displayMessage('user', userMessage);
+        setSendingState(true);
+        userInput.value = '';
+
+        // Geçmişi yönet (kullanıcı mesajını ekle)
+        chatHistory.push({ role: 'user', parts: [{ text: userMessage }] });
+
+        // Geçmişi kısalt
+        if (chatHistory.length > MAX_HISTORY_LENGTH) {
+            // İlk sistem talimatını koruyarak en eski kullanıcı/model çiftini kaldır
+            chatHistory = chatHistory.slice(chatHistory.length - MAX_HISTORY_LENGTH);
+        }
+
+        const payload = {
+            contents: chatHistory,
+            systemInstruction: {
+                parts: [{ text: currentRole }]
+            }
+        };
+
+        const MAX_RETRIES = 5;
+        let responseData;
+        let fetchFailed = false; 
+
+        for (let i = 0; i < MAX_RETRIES; i++) {
+            try {
+                // KRİTİK İSTEK: Kendi Worker URL'nize (Route) POST yapın
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    // 429 (Çok Fazla İstek) alırsak yeniden deneriz
+                    if (response.status === 429 && i < MAX_RETRIES - 1) {
+                        const delay = Math.pow(2, i) * 1000;
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                        continue;
+                    }
+                    // Diğer tüm hatalar için hata fırlat
+                    throw new Error(`Worker returned error status: ${response.status} ${response.statusText}`);
+                }
+
+                responseData = await response.json();
+                break; // Başarılı, döngüden çık
+            } catch (error) {
+                fetchFailed = true;
+                if (i === MAX_RETRIES - 1 || error.message.includes('Refused to connect') || error.message.includes('Failed to fetch')) {
+                    // Son deneme veya CSP/Bağlantı Hatası: Uyarıyı göster
+                    const details = `İstek URL: ${API_URL}. Hata: ${error.message}`;
+                    errorDetails.textContent = details;
+                    cspWarning.classList.remove('hidden');
+                    console.error("API Call Error:", error);
+                    break;
+                }
+            }
+        }
+
+        // Yanıtı İşleme
+        if (!fetchFailed && responseData && responseData.candidates && responseData.candidates.length > 0) {
+            const botResponsePart = responseData.candidates[0].content.parts[0].text;
+            
+            displayMessage('bot', botResponsePart);
+
+            // Geçmişi yönet (bot mesajını ekle)
+            chatHistory.push({ role: 'model', parts: [{ text: botResponsePart }] });
+        } else if (!fetchFailed) {
+             // API'den boş yanıt gelirse
+             displayMessage('bot', 'Üzgünüm, Gemini API\'sinden geçerli bir yanıt alamadım.');
+        }
+
+        setSendingState(false);
+    }
+    
+    // Rol Butonlarını Oluşturma
+    function initializeRoleOptions() {
+        roleOptionsContainer.innerHTML = ''; // Temizle
+        roles.forEach(role => {
+            const button = document.createElement('button');
+            button.className = 'w-full text-left p-3 border border-gray-300 rounded-xl hover:bg-indigo-50 transition shadow-sm';
+            button.innerHTML = `
+                <span class="font-semibold text-indigo-700 block">${role.name}</span>
+                <span class="text-xs text-gray-500">${role.description}</span>
+            `;
+            button.onclick = () => setRole(role.name, role.role);
+            roleOptionsContainer.appendChild(button);
+        });
+    }
+
+    // Uygulama Başlangıcı ve Olay Dinleyicileri (Buton Çalışmama Sorunu İçin DOMContentLoaded içine alındı)
+    document.addEventListener('DOMContentLoaded', () => {
+        // Olay Dinleyicileri
+        sendButton.addEventListener('click', sendMessage);
+        userInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        // Rol modalını aç/kapat
+        roleDisplay.addEventListener('click', () => {
+            roleModal.classList.remove('hidden');
+        });
+        closeRoleModalButton.addEventListener('click', () => {
+            roleModal.classList.add('hidden');
+        });
+        
+        // Hata uyarısını kapat
+        closeWarningButton.addEventListener('click', () => {
+            cspWarning.classList.add('hidden');
+        });
+
+        setRole('Genel İngilizce Öğretmeni', roles[0].role); // Başlangıç rolünü ayarla
+        initializeRoleOptions(); // Rol seçeneklerini oluştur
+    });
+
+</script>
+
+</body>
+</html>

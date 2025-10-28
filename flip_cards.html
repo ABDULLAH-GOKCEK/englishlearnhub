@@ -4,50 +4,102 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kelime Kartları - Flashcards</title>
-    <!-- Tailwind CSS (Gerekirse Kendi CSS'nizi buraya bağlayın) -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css"> 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
         body { font-family: 'Inter', sans-serif; background-color: #f7f7f7; }
-        .card-container { perspective: 1000px; }
-        .card { width: 100%; height: 300px; position: relative; transform-style: preserve-3d; transition: transform 0.6s; cursor: pointer; }
+        .card-container { 
+            perspective: 1000px; 
+            min-height: 350px; 
+        }
+        .card { 
+            width: 100%; 
+            height: 350px; 
+            position: relative; 
+            transform-style: preserve-3d; 
+            transition: transform 0.8s cubic-bezier(0.4, 0.0, 0.2, 1); 
+            cursor: pointer; 
+        }
         .card.flipped { transform: rotateY(180deg); }
-        .card-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; display: flex; flex-direction: column; justify-content: center; align-items: center; border-radius: 1rem; padding: 1.5rem; box-shadow: 0 10px 15px rgba(0,0,0,0.1); }
-        .card-front { background-color: #4f46e5; color: white; z-index: 2; }
-        .card-back { background-color: #fff; color: #1f2937; transform: rotateY(180deg); border: 2px solid #4f46e5; }
-        .example-sentence { margin-top: 1rem; font-style: italic; color: #6b7280; border-top: 1px dashed #e5e7eb; padding-top: 0.5rem; }
+        .card-face { 
+            position: absolute; 
+            width: 100%; 
+            height: 100%; 
+            backface-visibility: hidden; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            border-radius: 1rem; 
+            padding: 1.5rem; 
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1); 
+        }
+        .card-front { 
+            background-color: #4f46e5; 
+            color: white; 
+            z-index: 2; 
+            border: 4px solid #3730a3;
+        }
+        .card-back { 
+            background-color: #fff; 
+            color: #1f2937; 
+            transform: rotateY(180deg); 
+            border: 4px solid #4f46e5; 
+            text-align: center;
+        }
+        .example-sentence { 
+            margin-top: 1rem; 
+            font-style: italic; 
+            color: #4b5563; 
+            border-top: 1px dashed #e5e7eb; 
+            padding-top: 0.75rem; 
+            max-height: 100px;
+            overflow-y: auto;
+        }
     </style>
 </head>
 <body>
-    <div id="notification-container" class="fixed top-4 right-4 z-50"></div>
+    <!-- Bildirimler için konteyner -->
+    <div id="notification-container" class="fixed top-4 right-4 z-50 flex flex-col items-end"></div>
 
     <header class="bg-indigo-700 text-white shadow-lg">
         <div class="container mx-auto px-4 py-4 flex justify-between items-center">
             <h1 class="text-2xl font-bold">Kelime Kartları</h1>
-            <a href="index.html" class="bg-indigo-500 hover:bg-indigo-600 px-4 py-2 rounded-lg transition duration-200">🏠 Ana Sayfa</a>
+            <a href="index.html" class="bg-indigo-500 hover:bg-indigo-600 px-4 py-2 rounded-lg transition duration-200 shadow-md">🏠 Ana Sayfa</a>
         </div>
     </header>
 
     <main class="container mx-auto px-4 py-8">
         <h2 class="text-3xl font-semibold text-gray-800 mb-6 border-b pb-2">Kaydettiğin Kelimeler</h2>
         
-        <div id="loadingMessage" class="text-center py-10 text-gray-500 text-xl">
-            <i class="fas fa-spinner fa-spin mr-2"></i> Kelimeler Yükleniyor...
+        <div id="loadingMessage" class="text-center py-16 text-gray-500 text-xl">
+            <i class="fas fa-spinner fa-spin mr-3 text-2xl"></i> Kelimeler Yükleniyor...
         </div>
         
-        <div id="flashcardList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div id="flashcardList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             <!-- Kelimeler buraya JS ile yüklenecek -->
         </div>
 
-        <div id="noWordsMessage" class="hidden text-center py-10 text-gray-500 text-xl">
-            Kaydedilmiş hiçbir kelime bulunamadı. Sohbet sayfasında kelimeleri kaydetmeye başlayın!
+        <div id="noWordsMessage" class="hidden text-center py-16 text-gray-500 text-xl">
+            <i class="fas fa-box-open mr-2 text-3xl"></i>
+            Kaydedilmiş hiçbir kelime bulunamadı. Lütfen "Konuşma Arkadaşı" sayfasından kelime kaydetmeye başlayın!
         </div>
     </main>
+    
+    <footer>
+        <div class="container">
+            <p>© 2024 İngilizce Öğrenme Platformu - Tüm hakları saklıdır</p>
+            <p class="footer-info">🚀 Kişiselleştirilmiş İngilizce Öğrenme Deneyimi</p>
+        </div>
+    </footer>
 
-    <!-- Font Awesome (common.js'de de var ama burada da kalsın) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
-    <!-- common.js (Firebase ve Firestore fonksiyonları burada) -->
-    <script type="module" src="common.js"></script>
+
+    <!-- common.js YÜKLEMESİ - PATH GÜNCELLENDİ -->
+    <script type="module" src="./common.js"></script>
 
     <script type="module">
         // Firebase ve Firestore hazır olduğunda bu event tetiklenir (common.js'den)
@@ -62,7 +114,6 @@
 
         /**
          * Firestore'dan gelen kelime listesini HTML'e render eder.
-         * @param {Array<Object>} words - Kaydedilmiş kelime listesi
          */
         function renderFlashcards(words) {
             const listElement = document.getElementById('flashcardList');
@@ -87,8 +138,6 @@
 
         /**
          * Tek bir kelime için interaktif kart öğesi oluşturur.
-         * @param {Object} wordData 
-         * @returns {HTMLElement}
          */
         function createCard(wordData) {
             const container = document.createElement('div');
@@ -102,19 +151,27 @@
             const front = document.createElement('div');
             front.className = 'card-face card-front';
             front.innerHTML = `
-                <i class="fas fa-language text-4xl mb-3"></i>
-                <h3 class="text-4xl font-bold">${window.formatWord(wordData.word)}</h3>
-                <p class="text-lg mt-2">${wordData.partOfSpeech || 'Kelime Türü Belirtilmemiş'}</p>
+                <i class="fas fa-language text-5xl mb-4 opacity-75"></i>
+                <h3 class="text-4xl font-extrabold tracking-wide">${window.formatWord(wordData.word)}</h3>
+                <p class="text-xl mt-3 font-medium">${wordData.partOfSpeech || 'Kelime Türü Belirtilmemiş'}</p>
+                <p class="absolute bottom-4 text-sm font-light opacity-80">Çevirmek için tıkla</p>
             `;
 
             // Arka Yüz (Anlamı ve Örnek Cümle)
             const back = document.createElement('div');
             back.className = 'card-face card-back';
+            const createdAtDate = wordData.createdAt ? wordData.createdAt.toLocaleDateString('tr-TR', { year: 'numeric', month: 'short', day: 'numeric' }) : 'Bilinmiyor';
+
             back.innerHTML = `
                 <h3 class="text-3xl font-bold text-indigo-700">${wordData.meaning || 'Anlamı Belirtilmemiş'}</h3>
-                <p class="text-sm text-gray-600 mt-2">${wordData.meaningContext || ''}</p>
-                ${wordData.exampleSentence ? `<p class="example-sentence text-base">Örnek: <strong>${wordData.exampleSentence}</strong></p>` : ''}
-                <div class="absolute bottom-4 right-4 text-xs text-gray-400">Kaydedilme: ${wordData.createdAt.toLocaleDateString()}</div>
+                <p class="text-base text-gray-600 mt-2">${wordData.meaningContext || ''}</p>
+                ${wordData.exampleSentence ? `
+                    <div class="example-sentence w-full mt-4">
+                        <p class="text-sm font-semibold text-gray-500 mb-1">Örnek Cümle:</p>
+                        <p class="text-base">"${wordData.exampleSentence}"</p>
+                    </div>` : ''}
+                <div class="absolute bottom-4 right-4 text-xs text-gray-400">Kaydedilme: ${createdAtDate}</div>
+                <div class="absolute bottom-4 left-4 text-xs text-gray-400">ID: ${wordData.id.substring(0, 8)}...</div>
             `;
 
             card.appendChild(front);

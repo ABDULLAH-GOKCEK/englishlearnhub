@@ -3,183 +3,424 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kelime Kartları - Flashcards</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Awesome -->
+    <title>İngilizce-Türkçe Kelimeler - İngilizce Öğrenme Platformu</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/flip_cards.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/style.css"> 
+    
+    <!-- Yeni Modal Stilleri -->
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #f7f7f7; }
-        .card-container { 
-            perspective: 1000px; 
-            min-height: 350px; 
+        /* Kart Büyütme Modalı */
+        .card-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            backdrop-filter: blur(5px);
         }
-        .card { 
-            width: 100%; 
-            height: 350px; 
-            position: relative; 
-            transform-style: preserve-3d; 
-            transition: transform 0.8s cubic-bezier(0.4, 0.0, 0.2, 1); 
-            cursor: pointer; 
+
+        .modal-content-card {
+            position: relative;
+            width: 95%;
+            max-width: 500px;
+            perspective: 1000px;
         }
-        .card.flipped { transform: rotateY(180deg); }
-        .card-face { 
-            position: absolute; 
-            width: 100%; 
-            height: 100%; 
-            backface-visibility: hidden; 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: center; 
-            align-items: center; 
-            border-radius: 1rem; 
-            padding: 1.5rem; 
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1); 
+
+        .modal-card {
+            width: 100%;
+            height: 350px;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
         }
-        .card-front { 
-            background-color: #4f46e5; 
-            color: white; 
-            z-index: 2; 
-            border: 4px solid #3730a3;
+
+        .modal-card.flipped {
+            transform: rotateY(180deg);
         }
-        .card-back { 
-            background-color: #fff; 
-            color: #1f2937; 
-            transform: rotateY(180deg); 
-            border: 4px solid #4f46e5; 
+
+        .modal-card-front,
+        .modal-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 30px;
+            box-sizing: border-box;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .modal-card-front {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .modal-card-back {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            transform: rotateY(180deg);
+        }
+
+        .modal-card-image {
+            width: 200px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+        }
+
+        .modal-card-word {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
             text-align: center;
         }
-        .example-sentence { 
-            margin-top: 1rem; 
-            font-style: italic; 
-            color: #4b5563; 
-            border-top: 1px dashed #e5e7eb; 
-            padding-top: 0.75rem; 
-            max-height: 100px;
-            overflow-y: auto;
+
+        .modal-card-translation {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .modal-card-category {
+            font-size: 1rem;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .modal-card-level {
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        .voice-controls {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .voice-btn {
+            padding: 12px 25px;
+            background: rgba(255,255,255,0.2);
+            border: 2px solid white;
+            border-radius: 25px;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .voice-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: white;
+            font-size: 30px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            z-index: 10001;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .close-modal:hover {
+            background: rgba(255,255,255,0.2);
+            transform: rotate(90deg);
+        }
+
+        /* Mevcut kartlara tıklanabilirlik efekti */
+        .flashcard {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .flashcard:hover {
+            transform: translateY(-5px);
+        }
+
+        /* Responsive tasarım */
+        @media (max-width: 768px) {
+            .modal-card {
+                height: 300px;
+            }
+            
+            .modal-card-word {
+                font-size: 2rem;
+            }
+            
+            .modal-card-translation {
+                font-size: 1.5rem;
+            }
+            
+            .modal-card-image {
+                width: 150px;
+                height: 120px;
+            }
+            
+            .voice-btn {
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .modal-card {
+                height: 250px;
+            }
+            
+            .modal-card-word {
+                font-size: 1.5rem;
+            }
+            
+            .modal-card-translation {
+                font-size: 1.2rem;
+            }
+            
+            .voice-controls {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .voice-btn {
+                padding: 8px 15px;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Bildirimler için konteyner -->
-    <div id="notification-container" class="fixed top-4 right-4 z-50 flex flex-col items-end"></div>
-
-    <header class="bg-indigo-700 text-white shadow-lg">
-        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
-            <h1 class="text-2xl font-bold">Kelime Kartları</h1>
-            <a href="index.html" class="bg-indigo-500 hover:bg-indigo-600 px-4 py-2 rounded-lg transition duration-200 shadow-md">🏠 Ana Sayfa</a>
+    <header>
+        <div class="container">
+            <h1>İngilizce Öğrenme Platformu</h1>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Ana Sayfa</a></li>
+                    <li><a href="teaching.html">Kelime Öğrenme</a></li>
+                    <li><a href="flip_cards.html" class="active">İngilizce-Türkçe Kelimeler</a></li>
+                    <li><a href="daily.html">Günlük Cümle Öğrenme</a></li>
+                    <li><a href="reading.html">Okuma-Anlama</a></li>
+                    <li><a href="word_games.html">Kelime Oyunları</a></li>
+                    <li><a href="flashcards_with_sentence_activity.html">Cümle Kurma Çalışması</a></li>
+                    <li><a href="exam.html">Sınav</a></li>
+                </ul>
+            </nav>
         </div>
     </header>
 
-    <main class="container mx-auto px-4 py-8">
-        <h2 class="text-3xl font-semibold text-gray-800 mb-6 border-b pb-2">Kaydettiğin Kelimeler</h2>
+    <!-- Cihaz Bilgisi Göstergesi -->
+    <div class="device-indicator">
+        <span id="deviceInfo"></span>
+    </div>
+
+    <main class="container">
+        <h2>*Kategori seçerek kartları İngilizce telafuz ile dinleyin, karta tıklayınca Türkçe karşılığını görün</h2>
         
-        <div id="loadingMessage" class="text-center py-16 text-gray-500 text-xl">
-            <i class="fas fa-spinner fa-spin mr-3 text-2xl"></i> Kelimeler Yükleniyor...
+        <div class="controls">
+            <select id="categorySelect">
+                <option value="all">Tüm Kategoriler</option>
+                <!-- JavaScript ile dinamik olarak eklenecek -->
+            </select>
         </div>
         
-        <div id="flashcardList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            <!-- Kelimeler buraya JS ile yüklenecek -->
+        <div class="pagination-controls">
+            <button id="prevPage" class="btn secondary" disabled>
+                <i class="fas fa-chevron-left"></i> Önceki
+            </button>
+            <span id="pageInfo">Sayfa 1 / 1</span>
+            <button id="nextPage" class="btn secondary" disabled>
+                Sonraki <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+        
+        <div class="flashcards-container" id="flashcardsContainer">
+            <!-- Kartlar JavaScript ile buraya eklenecek -->
         </div>
 
-        <div id="noWordsMessage" class="hidden text-center py-16 text-gray-500 text-xl">
-            <i class="fas fa-box-open mr-2 text-3xl"></i>
-            Kaydedilmiş hiçbir kelime bulunamadı. Lütfen "Konuşma Arkadaşı" sayfasından kelime kaydetmeye başlayın!
+        <div class="stats">
+            <h3>Toplam Kart: <span id="totalCards">0</span></h3>
+        </div>
+
+        <!-- Eski Resim Büyütme Modalı (backup için saklı) -->
+        <div id="imageModal" class="image-modal">
+            <div class="modal-content">
+                <div class="modal-image-container">
+                    <img id="modalImage" src="" alt="Büyütülmüş resim">
+                </div>
+                <div class="modal-word-info">
+                    <div class="modal-word-container">
+                        <div class="modal-speaker-icon" title="Seslendir">
+                            <i class="fas fa-volume-up"></i>
+                        </div>
+                        <div class="modal-flip-icon" title="Kartı Çevir">
+                            <i class="fas fa-sync-alt"></i>
+                        </div>
+                        <div class="modal-word"></div>
+                        <div class="modal-close-icon" title="Kapat">
+                            <i class="fas fa-times"></i>
+                        </div>
+                    </div>
+                    <div class="modal-category"></div>
+                    <div class="modal-level"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Yeni Kart Büyütme Modalı -->
+        <div id="cardModal" class="card-modal">
+            <button class="close-modal">&times;</button>
+            <div class="modal-content-card">
+                <div class="modal-card">
+                    <div class="modal-card-front">
+                        <img id="modalCardImage" src="" alt="" class="modal-card-image">
+                        <div class="modal-card-word" id="modalCardWord"></div>
+                        <div class="modal-card-category" id="modalCardCategory"></div>
+                        <div class="modal-card-level" id="modalCardLevel"></div>
+                        <div class="voice-controls">
+                            <button class="voice-btn" onclick="speakModalWord('en')">
+                                <i class="fas fa-volume-up"></i> English
+                            </button>
+                        </div>
+                    </div>
+                    <div class="modal-card-back">
+                        <div class="modal-card-translation" id="modalCardTranslation"></div>
+                        <div class="modal-card-category">Türkçe Çeviri</div>
+                        <div class="modal-card-level" id="modalCardLevelBack"></div>
+                        <div class="voice-controls">
+                            <button class="voice-btn" onclick="speakModalWord('tr')">
+                                <i class="fas fa-volume-up"></i> Turkish
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </main>
-    
+
     <footer>
         <div class="container">
-            <p>© 2024 İngilizce Öğrenme Platformu - Tüm hakları saklıdır</p>
-            <p class="footer-info">🚀 Kişiselleştirilmiş İngilizce Öğrenme Deneyimi</p>
+            <p>© <span id="currentDate"></span> İngilizce Öğrenme Platformu</p>
         </div>
     </footer>
 
-
-    <!-- common.js YÜKLEMESİ - PATH GÜNCELLENDİ -->
-    <script type="module" src="./common.js"></script>
-
-    <script type="module">
-        // Firebase ve Firestore hazır olduğunda bu event tetiklenir (common.js'den)
-        document.addEventListener('firebaseReady', (e) => {
-            console.log('🔥 Firebase ve Firestore hazır. Kelimeler yükleniyor.');
-            // Kelimeleri dinlemeyi başlat
-            const unsubscribe = window.listenForLearnedWords(renderFlashcards);
+    <script>
+        function formatTurkishDate() {
+            const now = new Date();
+            const options = { 
+                day: '2-digit', 
+                month: '2-digit', 
+                year: 'numeric' 
+            };
             
-            // Sayfadan ayrılırken dinlemeyi durdur (bellek sızıntısını önler)
-            window.addEventListener('beforeunload', unsubscribe);
+            return now.toLocaleDateString('tr-TR', options);
+        }
+        
+        document.getElementById('currentDate').textContent = formatTurkishDate();
+        
+        // Cihaz bilgisini göster
+        document.addEventListener('DOMContentLoaded', function() {
+            const deviceInfo = document.getElementById('deviceInfo');
+            if (deviceInfo) {
+                if (document.documentElement.classList.contains('mobile')) {
+                    deviceInfo.textContent = '📱 Mobil Görünüm';
+                } else if (document.documentElement.classList.contains('tablet')) {
+                    deviceInfo.textContent = '📟 Tablet Görünüm';
+                } else {
+                    deviceInfo.textContent = '🖥️ Masaüstü Görünüm';
+                }
+            }
         });
 
-        /**
-         * Firestore'dan gelen kelime listesini HTML'e render eder.
-         */
-        function renderFlashcards(words) {
-            const listElement = document.getElementById('flashcardList');
-            const loadingMessage = document.getElementById('loadingMessage');
-            const noWordsMessage = document.getElementById('noWordsMessage');
+        // Yeni Modal Fonksiyonları
+        const cardModal = document.getElementById('cardModal');
+        const modalCard = document.querySelector('.modal-card');
+        const closeModalBtn = document.querySelector('.close-modal');
+
+        // Modalı açma fonksiyonu
+        function openCardModal(cardData) {
+            document.getElementById('modalCardImage').src = cardData.image;
+            document.getElementById('modalCardWord').textContent = cardData.english;
+            document.getElementById('modalCardTranslation').textContent = cardData.turkish;
+            document.getElementById('modalCardCategory').textContent = cardData.category;
+            document.getElementById('modalCardLevel').textContent = `Seviye: ${cardData.level}`;
+            document.getElementById('modalCardLevelBack').textContent = `Level: ${cardData.level}`;
             
-            loadingMessage.classList.add('hidden'); // Yükleniyor mesajını gizle
+            cardModal.style.display = 'flex';
+            modalCard.classList.remove('flipped');
+        }
 
-            if (words && words.length > 0) {
-                noWordsMessage.classList.add('hidden');
-                listElement.innerHTML = ''; // Önceki kartları temizle
+        // Modalı kapatma
+        closeModalBtn.addEventListener('click', function() {
+            cardModal.style.display = 'none';
+        });
 
-                words.forEach(word => {
-                    const cardHtml = createCard(word);
-                    listElement.appendChild(cardHtml);
-                });
-            } else {
-                listElement.innerHTML = '';
-                noWordsMessage.classList.remove('hidden');
+        // Dışarı tıklayınca kapatma
+        cardModal.addEventListener('click', function(e) {
+            if (e.target === cardModal) {
+                cardModal.style.display = 'none';
             }
+        });
+
+        // Kart çevirme
+        modalCard.addEventListener('click', function(e) {
+            if (!e.target.classList.contains('voice-btn')) {
+                this.classList.toggle('flipped');
+            }
+        });
+
+        // ESC tuşu ile kapatma
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                cardModal.style.display = 'none';
+            }
+        });
+
+        // Seslendirme fonksiyonu
+        function speakModalWord(lang) {
+            const word = lang === 'en' 
+                ? document.getElementById('modalCardWord').textContent
+                : document.getElementById('modalCardTranslation').textContent;
+            
+            // Mevcut seslendirmeyi durdur
+            speechSynthesis.cancel();
+            
+            const utterance = new SpeechSynthesisUtterance(word);
+            utterance.lang = lang === 'en' ? 'en-US' : 'tr-TR';
+            utterance.rate = 0.8;
+            utterance.pitch = 1;
+            utterance.volume = 1;
+            
+            speechSynthesis.speak(utterance);
         }
-
-        /**
-         * Tek bir kelime için interaktif kart öğesi oluşturur.
-         */
-        function createCard(wordData) {
-            const container = document.createElement('div');
-            container.className = 'card-container';
-
-            const card = document.createElement('div');
-            card.className = 'card';
-            card.onclick = () => card.classList.toggle('flipped');
-
-            // Ön Yüz (İngilizce Kelime)
-            const front = document.createElement('div');
-            front.className = 'card-face card-front';
-            front.innerHTML = `
-                <i class="fas fa-language text-5xl mb-4 opacity-75"></i>
-                <h3 class="text-4xl font-extrabold tracking-wide">${window.formatWord(wordData.word)}</h3>
-                <p class="text-xl mt-3 font-medium">${wordData.partOfSpeech || 'Kelime Türü Belirtilmemiş'}</p>
-                <p class="absolute bottom-4 text-sm font-light opacity-80">Çevirmek için tıkla</p>
-            `;
-
-            // Arka Yüz (Anlamı ve Örnek Cümle)
-            const back = document.createElement('div');
-            back.className = 'card-face card-back';
-            const createdAtDate = wordData.createdAt ? wordData.createdAt.toLocaleDateString('tr-TR', { year: 'numeric', month: 'short', day: 'numeric' }) : 'Bilinmiyor';
-
-            back.innerHTML = `
-                <h3 class="text-3xl font-bold text-indigo-700">${wordData.meaning || 'Anlamı Belirtilmemiş'}</h3>
-                <p class="text-base text-gray-600 mt-2">${wordData.meaningContext || ''}</p>
-                ${wordData.exampleSentence ? `
-                    <div class="example-sentence w-full mt-4">
-                        <p class="text-sm font-semibold text-gray-500 mb-1">Örnek Cümle:</p>
-                        <p class="text-base">"${wordData.exampleSentence}"</p>
-                    </div>` : ''}
-                <div class="absolute bottom-4 right-4 text-xs text-gray-400">Kaydedilme: ${createdAtDate}</div>
-                <div class="absolute bottom-4 left-4 text-xs text-gray-400">ID: ${wordData.id.substring(0, 8)}...</div>
-            `;
-
-            card.appendChild(front);
-            card.appendChild(back);
-            container.appendChild(card);
-            return container;
-        }
-
     </script>
+
+    <script src="js/common.js"></script>
+    <script src="js/flip_cards.js"></script>
 </body>
 </html>

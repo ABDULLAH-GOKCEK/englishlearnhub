@@ -15,17 +15,21 @@ let appId;
 // --- Firebase Başlatma ve Oturum Açma ---
 
 /**
- * Initializes Firebase and signs in the user (Custom Token or Anonymous).
+ * Firebase'i başlatır ve kullanıcı oturumunu açar (Özel Token veya Anonim).
  */
 async function initializeFirebase() {
     try {
-        // Safely retrieve global variables provided by the Canvas environment
+        // Gerekli global değişkenleri güvenli bir şekilde al
         appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
         const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
         if (Object.keys(firebaseConfig).length === 0) {
             console.error("❌ Firebase Config not found. Progress tracking will not work.");
+            // Bildirim konteyneri hazırsa hata göster
+            if (document.getElementById('notification-container')) {
+                showNotification("Firebase yapılandırması eksik. Veriler kaydedilemeyecek.", "error");
+            }
             return;
         }
 
@@ -33,53 +37,49 @@ async function initializeFirebase() {
         db = getFirestore(app);
         auth = getAuth(app);
         
-        // Use the initial auth token if available, otherwise sign in anonymously
+        // Oturum açma
         if (initialAuthToken) {
             await signInWithCustomToken(auth, initialAuthToken);
         } else {
             await signInAnonymously(auth);
         }
 
-        // Listen for auth state changes and update userId
+        // Oturum açma durumunu dinle ve userId'yi güncelle
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 userId = user.uid;
                 console.log(`🔑 Firebase User ID: ${userId} (Authenticated)`);
             } else {
-                // Use a random ID for anonymous users if token fails
+                // Anonim kullanıcılar için rastgele bir ID kullanma
                 userId = crypto.randomUUID();
                 console.log(`🔑 Firebase User ID: ${userId} (Anonymous/Fallback)`);
             }
-            // Dispatch event when userId and db are ready
+            // userId ve db hazır olduğunda eventi tetikle
             document.dispatchEvent(new CustomEvent('firebaseReady', { detail: { userId: userId, db: db, appId: appId } }));
         });
 
     } catch (error) {
         console.error("❌ Firebase initialization failed:", error);
+        showNotification("Firebase başlatılırken kritik hata oluştu.", "error");
     }
 }
 
-// --- Firestore Path Management Functions ---
+// --- Firestore Yol Yönetimi Fonksiyonları ---
 
 /**
- * Returns the Firestore path for user-specific data.
- * Data is stored at /artifacts/{appId}/users/{userId}/{collectionName}
- * @param {string} collectionName - Name of the collection (e.g., 'learnedWords')
- * @returns {string} Firestore collection path
+ * Kullanıcıya özel veriler için Firestore yolunu döndürür.
  */
 function getUserCollectionPath(collectionName) {
     if (!userId || userId === 'loading') {
-        // This should not happen if called after 'firebaseReady' event
         throw new Error("Firestore: User ID is not ready.");
     }
     return `artifacts/${appId}/users/${userId}/${collectionName}`;
 }
 
-// --- Firestore Data Operations Functions ---
+// --- Firestore Veri İşlemleri Fonksiyonları ---
 
 /**
- * Saves a new word to Firestore.
- * @param {object} wordData - Word data (word, meaning, exampleSentence, etc.)
+ * Yeni bir kelimeyi Firestore'a kaydeder.
  */
 async function saveLearnedWord(wordData) {
     if (!db) {
@@ -88,7 +88,6 @@ async function saveLearnedWord(wordData) {
     }
     try {
         const collectionRef = collection(db, getUserCollectionPath('learnedWords'));
-        // Use the word itself (lowercase) as the document ID for easy lookup and uniqueness
         const docId = wordData.word.toLowerCase();
         const docRef = doc(collectionRef, docId);
         
@@ -96,7 +95,7 @@ async function saveLearnedWord(wordData) {
             ...wordData,
             createdAt: serverTimestamp(),
             userId: userId,
-        }, { merge: true }); // Merge ensures it updates if it already exists
+        }, { merge: true }); 
         
         console.log(`💾 Learned word saved: ${wordData.word}`);
         showNotification(`'${wordData.word}' kelimesi kaydedildi!`, "info");
@@ -108,25 +107,22 @@ async function saveLearnedWord(wordData) {
 }
 
 /**
- * Listens for the user's saved words in real-time.
- * @param {function} callback - Function to execute when new data arrives
- * @returns {function} Unsubscribe function
+ * Kullanıcının kaydettiği kelimeleri gerçek zamanlı olarak dinler.
  */
 function listenForLearnedWords(callback) {
     if (!db) {
         console.error("❌ Firestore not initialized. Cannot listen.");
-        return () => {}; // Return a no-op function
+        return () => {}; // Boş bir durdurucu döndür
     }
     
     const collectionRef = collection(db, getUserCollectionPath('learnedWords'));
-    // Query ordered by creation time
     const q = query(collectionRef, orderBy('createdAt', 'desc'));
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
         const words = snapshot.docs.map(doc => ({ 
             id: doc.id, 
             ...doc.data(),
-            // Convert Firestore Timestamp to Date object for easier use
+            // Firestore Timestamp'i okunabilir hale getir
             createdAt: doc.data().createdAt?.toDate() || new Date()
         }));
         callback(words);
@@ -138,28 +134,25 @@ function listenForLearnedWords(callback) {
     return unsubscribe;
 }
 
-// --- Helper Functions ---
+// --- Yardımcı Fonksiyonlar ---
 
-// Word formatting function (from your original common.js)
+// Kelime formatlama fonksiyonu
 function formatWord(word) {
     if (!word) return '';
     return word.replace(/_/g, ' ');
 }
 
-// Simple Notification Display (replaces alert/confirm)
+// Basit Bildirim
 function showNotification(message, type = 'info') {
     const notificationContainer = document.getElementById('notification-container');
     if (!notificationContainer) return;
     
     const div = document.createElement('div');
-    // Styling adapted for Tailwind and dynamic visibility
     div.className = `p-3 mb-2 rounded shadow-lg text-white font-semibold transform transition-transform duration-300 ease-out translate-y-0 opacity-100 ${type === 'error' ? 'bg-red-500' : 'bg-green-500'} max-w-xs`;
     div.textContent = message;
     
-    // Add to container
     notificationContainer.appendChild(div);
 
-    // Fade out and remove after 3.5 seconds
     setTimeout(() => {
         div.classList.replace('translate-y-0', 'translate-y-4');
         div.classList.replace('opacity-100', 'opacity-0');
@@ -168,11 +161,11 @@ function showNotification(message, type = 'info') {
 }
 
 
-// Initialize Firebase when the page loads
+// Sayfa yüklendiğinde Firebase'i başlat
 document.addEventListener('DOMContentLoaded', initializeFirebase);
 
 
-// Attach functions to the window object so they can be accessed by other scripts
+// Bu fonksiyonları window objesine ata ki diğer scriptler erişebilsin
 window.formatWord = formatWord;
 window.saveLearnedWord = saveLearnedWord;
 window.listenForLearnedWords = listenForLearnedWords;

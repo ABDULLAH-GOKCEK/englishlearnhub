@@ -1,46 +1,52 @@
 <!DOCTYPE html>
 <html lang="tr">
-<!DOCTYPE html>
-<html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Öğrenme Yolu - English Learn Hub</title>
     
     <link rel="stylesheet" href="css/style.css"> 
-    
     <link rel="stylesheet" href="css/learning-path.css"> 
     
     <style>
         /* Metin Görünürlüğünü Zorla Siyah Yapma Kuralları */
         
         body {
-            background-color: #f8f9fa; 
-            color: #212529; 
+            background-color: #f8f9fa !important; /* Arka planı açık renk yap */
+            color: #212529 !important; /* Metin rengini zorla siyah yap */
         }
         
         /* GİRİŞ BÖLÜMÜNDEKİ GÖRÜNMEYEN METİNLERİN DÜZELTİLMESİ İÇİN KRİTİK */
         .test-intro p,
         .test-info-card span, 
         .test-info-card .info-item {
-             color: #212529; 
-             background-color: #f1f3f5;
+             color: #212529 !important; 
+             background-color: #f1f3f5 !important;
         }
 
-        .test-header, .test-header h3, 
-        #currentQuestionNumber, #totalQuestionCount {
-            color: #212529;
-        }
-        
+        /* TEST BAŞLIĞI VE SAYAÇ BÖLÜMÜNÜN GÖRÜNÜRLÜĞÜ */
         .test-header {
-            background-color: #e9ecef;
+            background-color: #e9ecef !important; /* Açık Gri Arka Plan */
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 25px;
+            color: #212529 !important; /* Metin rengini zorla KOYU SİYAH yap */
         }
         
+        .test-header h3, 
+        .test-header span,
+        #currentQuestionNumber, #totalQuestionCount {
+            color: #212529 !important; /* Başlık ve sayaç metnini zorla KOYU SİYAH yap */
+            font-weight: 600 !important;
+        }
+        
+        /* Modül Görünürlüğü */
         .module-section {
             display: none;
         }
         .module-section.active {
-            display: block;
+            display: block !important;
         }
     </style>
 </head>
@@ -96,8 +102,3 @@
 
 </body>
 </html>
-
-
-
-
-

@@ -45,8 +45,7 @@ class LearningPath {
         this.userAnswers = [];
 
         // data klasörü, modules klasöründen bir üstte olduğu için:
-        const testDataUrl = '../data/level_test.json'; 
-        
+        const testDataUrl = '../data/level_test.json';
         console.log(`📡 Test verisi yükleniyor (URL: ${testDataUrl})...`);
 
         try {
@@ -246,6 +245,7 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('📄 SAYFA YÜKLENDİ - LearningPath başlatılıyor');
     window.learningPath = new LearningPath();
 });
+
 
 
 

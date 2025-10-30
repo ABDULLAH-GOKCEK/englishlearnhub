@@ -9,59 +9,16 @@
     <link rel="stylesheet" href="css/learning-path.css"> 
     
     <style>
-        /* GENEL GÖRÜNÜRLÜK VE RENK KONTROLÜ */
         body {
-            font-family: 'Arial', sans-serif !important;
-            background-color: #f8f9fa !important; /* Açık Arka Plan */
-            color: #212529 !important; /* TÜM METNİ ZORLA KOYU SİYAH YAP */
+            background-color: #f8f9fa !important; 
         }
-
-        /* Başlıklar ve normal metinler */
-        h1, h2, h3, h4, p {
-            color: #212529 !important; 
-        }
-
-        /* GİRİŞ EKRANI KONTROLÜ (Metinler burada görünmüyordu) */
-        .test-intro {
-             background-color: #ffffff !important;
-             color: #212529 !important;
-        }
-
-        .test-info-card span, 
-        .test-info-card .info-item span {
-            color: #212529 !important; /* Süre, Soru Sayısı Metnini Zorla Siyah Yap */
-            font-weight: 600 !important;
-        }
-
-        .info-item {
-            background-color: #f1f3f5 !important;
-            color: #212529 !important; 
-        }
-
-        /* TEST EKRANI SAYAÇ VE BAŞLIK KONTROLÜ */
-        .test-header {
-            background-color: #e9ecef !important; /* Sayaç Arka Planı */
-            color: #212529 !important; /* Başlık metnini Zorla Siyah Yap */
-        }
-        
-        .test-header h3, 
-        .test-header span {
-            color: #212529 !important; /* Sayaç Rakamlarını Zorla Siyah Yap */
-        }
-        
-        /* Modül Görünürlüğü */
         .module-section {
             display: none;
         }
         .module-section.active {
             display: block !important;
         }
-        
-        /* Butonlar için temel görünürlük */
-        .btn-primary {
-            background-color: #4361ee !important;
-            color: #ffffff !important;
-        }
+        /* Eğer bu hala çalışmazsa, aşağıdaki inline kodlar devreye girecektir */
     </style>
 </head>
 <body>
@@ -76,13 +33,26 @@
     <main class="container learning-path-container">
         
         <section id="levelTestIntroSection" class="module-section active">
-            <div class="test-intro">
+            <div class="test-intro" style="background-color: #ffffff; color: #212529;">
                 <h2>Seviye Belirleme Testi</h2>
                 <p>İngilizce seviyenizi doğru belirleyerek size özel bir öğrenme planı oluşturalım.</p>
+                
                 <div class="test-info-card">
-                    <div class="info-item"><div class="info-icon">⏱️</div><span>Süre: 25 Dakika</span></div>
-                    <div class="info-item"><div class="info-icon">❓</div><span>Soru: 20</span></div>
-                    <div class="info-item"><div class="info-icon">🎯</div><span>Amaç: Seviye Tespiti</span></div>
+                    
+                    <div class="info-item" style="background-color: #f1f3f5; color: #212529;">
+                        <div class="info-icon">⏱️</div>
+                        <span style="color: #212529;">Süre: 25 Dakika</span>
+                    </div>
+                    
+                    <div class="info-item" style="background-color: #f1f3f5; color: #212529;">
+                        <div class="info-icon">❓</div>
+                        <span style="color: #212529;">Soru: 20</span>
+                    </div>
+                    
+                    <div class="info-item" style="background-color: #f1f3f5; color: #212529;">
+                        <div class="info-icon">🎯</div>
+                        <span style="color: #212529;">Amaç: Seviye Tespiti</span>
+                    </div>
                 </div>
                 <button id="startTestBtn" class="btn btn-primary large">Testi Başlat</button>
             </div>
@@ -90,8 +60,12 @@
 
         <section id="levelTestSection" class="module-section">
             
-            <div class="test-header">
-                <h3>Seviye Testi: <span id="currentQuestionNumber">0</span>/<span id="totalQuestionCount">0</span></h3>
+            <div class="test-header" style="background-color: #e9ecef; color: #212529;">
+                <h3 style="color: #212529;">
+                    Seviye Testi: 
+                    <span id="currentQuestionNumber" style="color: #212529;">0</span>/
+                    <span id="totalQuestionCount" style="color: #212529;">0</span>
+                </h3>
                 <div class="progress-bar"><div id="testProgressBar" class="progress-fill"></div></div>
             </div>
             
@@ -105,7 +79,6 @@
         </section>
 
         <section id="resultsSection" class="module-section"></section>
-        
         <section id="learningPathSection" class="module-section"></section>
         
     </main>

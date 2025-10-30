@@ -1,3 +1,16 @@
+test-header {
+    /* Bu zorlama kuralını ekle, önceki versiyonlarda vardı ama kaybolmuş olabilir */
+    color: #2b2d42 !important; 
+}
+
+.test-header h3 {
+    color: #2b2d42 !important; /* Sayaçların bulunduğu başlığı zorla koyu yap */
+}
+
+/* Sayfa arka planını zorla açık yap, böylece koyu metin görünür olur */
+body {
+    background: #f8f9fa !important;
+}
 /* learning-path.css - Arayüz Görünürlüğü İçin Güçlendirilmiş Stiller */
 
 /* CSS Değişkenleri (styles.css'ten alınmış, yedek olarak burada da tutulabilir) */
@@ -165,3 +178,4 @@
 .level-b1 { background-color: #ffc107; color: #333; } 
 .level-b2 { background-color: #fd7e14; }
 .level-c1 { background-color: #dc3545; }
+

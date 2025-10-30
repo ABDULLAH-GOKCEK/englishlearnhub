@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="../styles/learning-path.css"> 
     
     <style>
-        /* Arayüz yedeği */
+        /* [Arayüz yedeği - Aynı kalmalı] */
         :root {
             --primary-color: #4361ee;
             --secondary-color: #3a0ca3;
@@ -54,9 +54,7 @@
                 <h3>Seviye Testi: <span id="currentQuestionNumber"></span>/<span id="totalQuestionCount"></span></h3>
                 <div class="progress-bar"><div id="testProgressBar" class="progress-fill"></div></div>
             </div>
-            <div id="questionContainer" class="question-container">
-                Yükleniyor...
-            </div>
+            <div id="questionContainer" class="question-container">Yükleniyor...</div>
             <div class="test-navigation">
                 <button id="prevQuestionBtn" class="btn btn-secondary" style="display: none;">&larr; Önceki</button>
                 <button id="nextQuestionBtn" class="btn btn-primary">İlerle &rarr;</button>
@@ -64,14 +62,11 @@
             </div>
         </section>
 
-        <section id="resultsSection" class="module-section" style="display: none;">
-            </section>
-        
-        <section id="learningPathSection" class="module-section" style="display: none;">
-            </section>
+        <section id="resultsSection" class="module-section" style="display: none;"></section>
+        <section id="learningPathSection" class="module-section" style="display: none;"></section>
     </main>
 
-    <script src="../scripts/common.js"></script>
-    <script src="./learning-path.js"></script> 
+    <script src="../common.js"></script>
+    <script src="../learning-path.js"></script> 
 </body>
 </html>

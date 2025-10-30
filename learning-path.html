@@ -46,22 +46,21 @@
             color: var(--white);
             border: none;
             border-radius: 8px;
-            cursor: pointer;
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
         .restart-btn:hover { background-color: #5d0793; }
         
-        /* GÖRSELDE KAYBOLAN STATİK METİNLER İÇİN KESİN ÇÖZÜM */
+        /* GÖRÜNÜRLÜK GARANTİSİ İÇİN KESİN ÇÖZÜM */
         .test-intro h2, 
         .test-intro p,
-        .test-info-card span, /* SÜRE, SORU, AMAÇ metinleri */
+        .test-info-card span, 
         .info-item {
             color: var(--text-dark) !important; 
             visibility: visible !important;
             opacity: 1 !important;
         }
         .test-info-card .info-item {
-            background: var(--white); /* Arka planı beyaz yap */
+            background: var(--white); 
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
     </style>
@@ -87,7 +86,7 @@
             </div>
         </section>
 
-        <section id="levelTestSection" class="module-section" style="display: none;">
+        <section id="levelTestSection" class="module-section">
             <div class="test-header">
                 <h3>Seviye Testi: <span id="currentQuestionNumber">0</span>/<span id="totalQuestionCount">0</span></h3>
                 <div class="progress-bar"><div id="testProgressBar" class="progress-fill"></div></div>

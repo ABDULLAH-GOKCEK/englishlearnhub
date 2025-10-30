@@ -12,7 +12,7 @@ class LearningPath {
         console.log('🚀 LearningPath başlatılıyor...');
         this.bindEvents();
         this.showCorrectSection(); 
-        this.addRestartButton(); // Hata düzeltildi: Fonksiyon artık var
+        this.addRestartButton(); 
     }
 
     bindEvents() {
@@ -66,6 +66,7 @@ class LearningPath {
         
         const testDataUrl = '../data/level_test.json'; 
         
+        // common.js'den gelen loadData fonksiyonunun kontrolü
         if (typeof loadData !== 'function') {
             document.getElementById('questionContainer').innerHTML = `<p style="color:red;">Hata: common.js'deki yükleme fonksiyonu bulunamadı.</p>`;
             this.showSection('levelTestSection');
@@ -75,6 +76,7 @@ class LearningPath {
         try {
             console.log(`📡 Test verisi yükleniyor (URL: ${testDataUrl})...`);
             
+            // Veri yükleme başarılı
             this.testData = await loadData(testDataUrl); 
 
             if (!this.testData || !Array.isArray(this.testData) || this.testData.length === 0) {
@@ -128,6 +130,7 @@ class LearningPath {
         const question = this.testData[index];
         const container = document.getElementById('questionContainer');
         
+        // Cevap seçeneklerinin HTML'ini oluştur
         let optionsHtml = question.options.map((option, i) => `
             <button class="answer-btn btn btn-option" data-answer="${option}" data-index="${i}" ${this.userAnswers[index] === option ? 'aria-pressed="true"' : ''}>
                 ${option}
@@ -136,7 +139,7 @@ class LearningPath {
 
         container.innerHTML = `
             <div class="question-box">
-                <p class="question-text">${index + 1}. ${question.text}</p>
+                <p class="question-text">${index + 1}. ${question.questionText}</p> 
                 <div class="options-container">
                     ${optionsHtml}
                 </div>
@@ -155,7 +158,7 @@ class LearningPath {
             currentQuestionNumber.textContent = index + 1;
         }
 
-        this.updateProgressBar(); // Hata düzeltildi: Fonksiyon artık var
+        this.updateProgressBar(); 
     }
     
     // --- Cevap Seçimi ve Kayıt ---
@@ -184,7 +187,7 @@ class LearningPath {
     }
 
     // --- Navigasyon ---
-    navigateQuestion(direction) { // Hata düzeltildi: Fonksiyon artık var
+    navigateQuestion(direction) { 
         const newIndex = this.currentQuestion + direction;
         
         if (newIndex >= 0 && newIndex < this.totalQuestions) {
@@ -227,10 +230,12 @@ class LearningPath {
         }
     }
     
-    updateProgressBar() { // Hata düzeltildi: Fonksiyon artık var
+    updateProgressBar() { 
         const progressBar = document.getElementById('testProgressBar');
         if (progressBar) {
-            const progress = ((this.currentQuestion + 1) / this.totalQuestions) * 100;
+            // İlerlemeyi, sadece cevaplanan sorulara göre de hesaplayabiliriz.
+            const answeredCount = this.userAnswers.filter(ans => ans !== undefined).length;
+            const progress = (this.totalQuestions > 0) ? ((answeredCount) / this.totalQuestions) * 100 : 0;
             progressBar.style.width = `${progress}%`;
         }
     }
@@ -259,21 +264,16 @@ class LearningPath {
         this.score = 0;
         this.testData.forEach((question, index) => {
             if (this.userAnswers[index] && this.userAnswers[index] === question.correctAnswer) {
-                const weight = question.difficulty === 'hard' ? 3 : 
-                               question.difficulty === 'medium' ? 2 : 1;
-                this.score += weight;
+                // Skoru zorluğa göre hesapla (JSON'da difficulty yok, bu yüzden basit puanlama yapalım)
+                this.score += 1; // Her doğru cevap 1 puan
             }
         });
         console.log(`🎯 Nihai Skor: ${this.score}`);
     }
 
     determineLevel() {
-        const maxScore = this.testData.reduce((acc, q) => {
-            const weight = q.difficulty === 'hard' ? 3 : q.difficulty === 'medium' ? 2 : 1;
-            return acc + weight;
-        }, 0);
-        
-        const scorePercentage = this.totalQuestions > 0 ? (this.score / maxScore) * 100 : 0;
+        const totalPossibleScore = this.totalQuestions; // Her soru 1 puan
+        const scorePercentage = (this.score / totalPossibleScore) * 100;
         
         if (scorePercentage >= 85) this.level = 'C1';
         else if (scorePercentage >= 70) this.level = 'B2';
@@ -296,7 +296,7 @@ class LearningPath {
                 <div class="level-result">
                     <span class="level-badge level-${this.level.toLowerCase()}">${this.level}</span>
                     <h3>İngilizce Seviyeniz</h3>
-                    <p class="score-summary">Toplam ${this.totalQuestions} sorudan, ağırlıklı puanınız ${this.score} oldu.</p>
+                    <p class="score-summary">Toplam ${this.totalQuestions} sorudan, ${this.score} doğru cevap verdiniz.</p>
                 </div>
                 <button id="viewPathBtn" class="btn btn-primary large" style="margin-top: 20px;">Öğrenme Yolumu Gör</button>
             </div>
@@ -311,7 +311,7 @@ class LearningPath {
     // --- Öğrenme Yolu ---
     renderLearningPath() {
         const contentContainer = document.getElementById('learningPathSection');
-        contentContainer.innerHTML = `
+        const contentHTML = `
             <h2>${this.level} Seviyesi Öğrenme Yolunuz</h2>
             <p class="path-description">Seviyenizdeki boşlukları doldurmak ve bir sonraki seviyeye geçmek için önerilen öğrenme planınız aşağıdadır.</p>
             
@@ -363,7 +363,8 @@ class LearningPath {
                 <button id="restartTestBtnFooter" class="btn btn-secondary large">Testi Yeniden Başlat</button>
             </div>
         `;
-        
+        contentContainer.innerHTML = contentHTML;
+
         document.getElementById('restartTestBtnFooter').addEventListener('click', () => {
             this.resetAndStartTest();
         });
@@ -387,7 +388,6 @@ class LearningPath {
     showCorrectSection() {
         this.showSection('levelTestIntroSection');
         
-        // Diğer bölümleri başlangıçta gizle (showSection zaten gizler, bu ek bir temizliktir)
         const testSection = document.getElementById('levelTestSection');
         const resultsSection = document.getElementById('resultsSection');
         const learningPathSection = document.getElementById('learningPathSection');
@@ -397,7 +397,7 @@ class LearningPath {
         if (learningPathSection) learningPathSection.style.display = 'none';
     }
     
-    addRestartButton() { // Hata düzeltildi: Fonksiyon artık var
+    addRestartButton() { 
         if (!document.getElementById('restartTestBtn')) {
             const button = document.createElement('button');
             button.id = 'restartTestBtn';
@@ -406,6 +406,7 @@ class LearningPath {
             
             const header = document.querySelector('header');
             if (header) {
+                // Header'ın hemen altına yerleştir
                 header.parentNode.insertBefore(button, header.nextSibling); 
             }
         }

@@ -87,7 +87,7 @@ class LearningPath {
 
             // 🟢 BAŞARILI YÜKLEME SONRASI GÖRÜNÜMÜ GEÇİR
             this.showSection('levelTestSection'); 
-
+            
             this.renderQuestion(this.currentQuestion);
             this.updateNavigationButtons();
 
@@ -456,3 +456,4 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('📄 SAYFA YÜKLENDİ - LearningPath başlatılıyor');
     window.learningPath = new LearningPath();
 });
+

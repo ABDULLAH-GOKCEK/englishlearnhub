@@ -1,5 +1,16 @@
 /* learning-path.css - Arayüz Görünürlüğü İçin Güçlendirilmiş Stiller */
 
+/* CSS Değişkenleri (styles.css'ten alınmış, yedek olarak burada da tutulabilir) */
+:root {
+    --primary-color: #4361ee;
+    --secondary-color: #3a0ca3;
+    --text-dark: #2b2d42;
+    --white: #ffffff;
+    --background: #f8f9fa;
+    --card-shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+
+
 /* Genel Görünürlük Ayarı */
 .module-section {
     display: none;
@@ -30,7 +41,7 @@
     justify-content: center;
     gap: 20px;
     margin: 30px 0;
-    flex-wrap: wrap; /* Küçük ekranlar için kaydırma */
+    flex-wrap: wrap; 
 }
 
 .info-item {
@@ -42,10 +53,6 @@
     border-radius: 10px;
     color: var(--text-dark); /* Metin rengini koyu yap */
     font-weight: 500;
-}
-
-.info-icon {
-    font-size: 1.5rem;
 }
 
 /* 2. TEST EKRANI STİLLERİ */
@@ -64,6 +71,7 @@
 .test-header h3 {
     margin: 0;
     font-size: 1.5rem;
+    color: inherit;
 }
 
 /* İlerleme Çubuğu */
@@ -126,7 +134,6 @@
     background-color: var(--primary-color);
     color: var(--white);
     border-color: var(--primary-color);
-    box-shadow: 0 4px 10px rgba(67, 97, 238, 0.4);
 }
 
 /* Navigasyon */
@@ -141,59 +148,20 @@
     min-width: 150px;
 }
 
-/* 3. SONUÇ VE ÖĞRENME YOLU STİLLERİ */
-
+/* Sonuç ve Öğrenme Yolu (Sadece Görünürlük için) */
 .result-card, .learning-path-container h2 {
-    text-align: center;
-    padding: 30px;
-    background: var(--white);
-    border-radius: 10px;
-    box-shadow: var(--card-shadow);
-    margin-bottom: 25px;
+    color: var(--text-dark);
 }
 
 .level-badge {
-    display: inline-block;
-    padding: 8px 15px;
-    border-radius: 20px;
-    font-size: 1.2rem;
-    font-weight: bold;
     color: var(--white);
-    margin: 15px 0;
+    font-weight: bold;
+    padding: 5px 10px;
+    border-radius: 5px;
 }
 
 .level-a1 { background-color: #007bff; }
 .level-a2 { background-color: #28a745; }
-.level-b1 { background-color: #ffc107; color: #333; }
+.level-b1 { background-color: #ffc107; color: #333; } 
 .level-b2 { background-color: #fd7e14; }
 .level-c1 { background-color: #dc3545; }
-
-/* Öğrenme Yolu Kartları */
-.path-stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 20px;
-    margin-bottom: 40px;
-}
-
-.stat-card {
-    background: var(--white);
-    padding: 25px;
-    border-radius: 10px;
-    text-align: center;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-}
-
-.practice-cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 20px;
-}
-
-.content-card {
-    background: var(--white);
-    padding: 25px;
-    border-radius: 10px;
-    box-shadow: var(--card-shadow);
-    text-align: center;
-}

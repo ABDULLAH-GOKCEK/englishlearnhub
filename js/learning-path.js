@@ -11,28 +11,32 @@ class LearningPath {
     init() {
         console.log('🚀 LearningPath başlatılıyor...');
         this.bindEvents();
-        this.showCorrectSection();
+        // 🟢 Sayfa yüklendiğinde sadece intro ekranını göstermeyi garanti et
+        this.showCorrectSection(); 
         this.addRestartButton(); 
     }
 
     bindEvents() {
         console.log('🔗 Eventler bağlanıyor...');
 
+        // TEST BAŞLAT BUTONU
         const startTestBtn = document.getElementById('startTestBtn');
         if (startTestBtn) {
             startTestBtn.addEventListener('click', () => {
                 console.log('🧪 Test başlat butonuna tıklandı');
-                // showSection'ı kaldırıyoruz, çünkü startTest içinde çağrılacak (data yüklendikten sonra)
+                // showSection'ı kaldırıyoruz, veri yüklendikten sonra startTest içinde çağrılacak.
                 this.startTest();
             });
         }
 
+        // CEVAP BUTONLARI
         document.addEventListener('click', (e) => {
             if (e.target.classList.contains('answer-btn')) {
                 this.selectAnswer(e.target);
             }
         });
 
+        // TEST NAVIGASYON BUTONLARI
         const prevBtn = document.getElementById('prevQuestionBtn');
         const nextBtn = document.getElementById('nextQuestionBtn');
         const submitBtn = document.getElementById('submitTestBtn');
@@ -41,6 +45,7 @@ class LearningPath {
         if (nextBtn) nextBtn.addEventListener('click', () => this.navigateQuestion(1));
         if (submitBtn) submitBtn.addEventListener('click', () => this.submitTest());
         
+        // TESTİ YENİDEN BAŞLAT BUTONU (Header'daki)
         document.addEventListener('click', (e) => {
             if (e.target.id === 'restartTestBtn') {
                 this.resetAndStartTest();
@@ -48,14 +53,13 @@ class LearningPath {
         });
     }
     
-    // --- Test Başlatma ve Veri Yükleme (GÜÇLENDİRİLMİŞ) ---
+    // --- Test Başlatma ve Veri Yükleme ---
     async startTest() {
         this.currentQuestion = 0;
         this.score = 0;
         this.userAnswers = [];
         this.totalQuestions = 0;
         
-        // 🟢 KESİN JSON YOLU
         const testDataUrl = '../data/level_test.json'; 
         
         if (typeof loadData !== 'function') {
@@ -81,13 +85,12 @@ class LearningPath {
                 this.totalQuestionCountSpan.textContent = this.totalQuestions;
             }
 
-            // 🟢 Burası Önemli: Başarılı yüklemeden sonra ekranı değiştir!
+            // 🟢 BAŞARILI YÜKLEME SONRASI GÖRÜNÜMÜ GEÇİR
             this.showSection('levelTestSection'); 
 
-            // İlk soruyu render et
             this.renderQuestion(this.currentQuestion);
             this.updateNavigationButtons();
-            
+
         } catch (error) {
             console.error('❌ Test verisi yükleme hatası:', error.message);
             
@@ -102,15 +105,19 @@ class LearningPath {
     }
     
     resetAndStartTest() {
+        // Tüm section'ları gizle
         document.querySelectorAll('.module-section').forEach(sec => sec.style.display = 'none');
         
+        // Giriş ekranını göster
         this.showSection('levelTestIntroSection');
 
+        // State'leri sıfırla
         this.currentQuestion = 0;
         this.score = 0;
         this.userAnswers = [];
         this.testData = [];
         
+        // Sonuçları ve ilerleme yolunu temizle
         document.getElementById('resultsSection').innerHTML = '';
         document.getElementById('learningPathSection').innerHTML = '';
         
@@ -173,6 +180,7 @@ class LearningPath {
         
         this.highlightAnswer(button);
         
+        // Otomatik olarak bir sonraki soruya geç
         setTimeout(() => {
              this.navigateQuestion(1);
         }, 300); 
@@ -216,13 +224,12 @@ class LearningPath {
         }
         
         if (submitBtn) {
-            // Son sorudaysak veya tüm soruları cevapladıysak Bitir'i göster
             const allAnswered = this.userAnswers.length === this.totalQuestions && 
                                 this.userAnswers.every(ans => ans !== undefined);
                                 
             submitBtn.style.display = (this.currentQuestion === lastQuestionIndex || allAnswered) ? 'inline-block' : 'none';
 
-            // İlerle butonu görünüyorsa Bitir butonu görünmemeli (ikisi de son soruda görünür olmasın)
+            // İlerle butonu görünüyorsa Bitir butonu görünmemeli
             if (nextBtn && nextBtn.style.display === 'inline-block') {
                 submitBtn.style.display = 'none';
             }
@@ -389,8 +396,18 @@ class LearningPath {
         }
     }
     
+    // 🟢 DEĞİŞİKLİK BURADA: Sadece Intro'yu gösterirken, diğerlerini gizlediğimizden emin oluyoruz.
     showCorrectSection() {
         this.showSection('levelTestIntroSection');
+        
+        // Diğer bölümleri başlangıçta gizle (HTML'den style="display: none;" kaldırdığımız için JS ile gizliyoruz)
+        const testSection = document.getElementById('levelTestSection');
+        const resultsSection = document.getElementById('resultsSection');
+        const learningPathSection = document.getElementById('learningPathSection');
+        
+        if (testSection) testSection.style.display = 'none';
+        if (resultsSection) resultsSection.style.display = 'none';
+        if (learningPathSection) learningPathSection.style.display = 'none';
     }
     
     addRestartButton() {
@@ -402,6 +419,7 @@ class LearningPath {
             
             const header = document.querySelector('header');
             if (header) {
+                // Butonu header'ın hemen sonrasına, sayfada her zaman görünür olacak şekilde ekle
                 header.parentNode.insertBefore(button, header.nextSibling); 
             }
         }
@@ -438,4 +456,3 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('📄 SAYFA YÜKLENDİ - LearningPath başlatılıyor');
     window.learningPath = new LearningPath();
 });
-

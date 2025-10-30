@@ -6,33 +6,53 @@
     <title>Öğrenme Yolu - English Learn Hub</title>
     
     <link rel="stylesheet" href="../styles.css"> 
-    <link rel="stylesheet" href="../css/learning-path.css">
+    <link rel="stylesheet" href="../css/learning-path.css"> 
+    
     <style>
-    /* styles.css yüklenmezse diye Metin Rengini Zorla Siyah Yap */
-    body {
-        background-color: #f8f9fa !important; /* Arka planı açık renk yap */
-        color: #212529 !important; /* Metin rengini zorla siyah yap */
-    }
-    
-    /* Header (Başlık) ve sayaçların metin rengini siyah yap */
-    .test-header, .test-header h3, 
-    #currentQuestionNumber, #totalQuestionCount {
-        color: #212529 !important;
-    }
-    
-    .test-header {
-        background-color: #e9ecef !important; /* Sayaçların arka planını açık gri yap */
-    }
-    
-    /* Modül bölümlerini düzgünce gizleyip göster */
-    .module-section {
-        display: none;
-    }
-    .module-section.active {
-        display: block !important;
-    }
-</style>
-    
+        /* Metin Görünürlüğünü Zorla Siyah Yapma Kuralları */
+        
+        /* Sayfa arka planını kesin olarak açık renk yap */
+        body {
+            background-color: #f8f9fa !important; 
+        }
+        
+        /* TEST BAŞLIĞI VE SAYAÇ BÖLÜMÜ */
+        .test-header {
+            background-color: #e9ecef !important; /* Açık Gri Arka Plan */
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 25px;
+            
+            /* 🔴 GÖRÜNMEZLİK SORUNUNU ÇÖZEN KRİTİK KURAL */
+            color: #212529 !important; /* Metin rengini zorla KOYU SİYAH yap */
+        }
+        
+        .test-header h3, 
+        .test-header span,
+        #currentQuestionNumber, 
+        #totalQuestionCount {
+            /* Başlık ve sayaç metnini zorla KOYU SİYAH yap */
+            color: #212529 !important; 
+            font-weight: 600 !important;
+        }
+
+        /* İlerleme çubuğu dolgusunu ve arka planını görünür yap */
+        .progress-bar {
+            background-color: #dee2e6 !important;
+        }
+        .progress-fill {
+            background-color: #4361ee !important;
+        }
+
+        /* Modül Görünürlüğü (JS'in çalışmasını garanti eder) */
+        .module-section {
+            display: none;
+        }
+        .module-section.active {
+            display: block !important;
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -41,7 +61,7 @@
             <nav>
                 </nav>
         </div>
-        </header>
+    </header>
 
     <main class="container learning-path-container">
         
@@ -86,4 +106,3 @@
 
 </body>
 </html>
-

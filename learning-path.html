@@ -1,56 +1,46 @@
 <!DOCTYPE html>
 <html lang="tr">
+<!DOCTYPE html>
+<html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Öğrenme Yolu - English Learn Hub</title>
     
-    <link rel="stylesheet" href="../styles.css"> 
+    <link rel="stylesheet" href="../css/style.css"> 
+    
     <link rel="stylesheet" href="../css/learning-path.css"> 
     
     <style>
         /* Metin Görünürlüğünü Zorla Siyah Yapma Kuralları */
         
-        /* Sayfa arka planını kesin olarak açık renk yap */
         body {
-            background-color: #f8f9fa; 
+            background-color: #f8f9fa !important; 
+            color: #212529 !important; 
         }
         
-        /* TEST BAŞLIĞI VE SAYAÇ BÖLÜMÜ */
+        /* GİRİŞ BÖLÜMÜNDEKİ GÖRÜNMEYEN METİNLERİN DÜZELTİLMESİ İÇİN KRİTİK */
+        .test-intro p,
+        .test-info-card span, 
+        .test-info-card .info-item {
+             color: #212529 !important; 
+             background-color: #f1f3f5 !important;
+        }
+
+        .test-header, .test-header h3, 
+        #currentQuestionNumber, #totalQuestionCount {
+            color: #212529 !important;
+        }
+        
         .test-header {
-            background-color: #A020F0; /* Açık Gri Arka Plan */
-            padding: 15px;
-            border-radius: 8px;
-            text-align: center;
-            margin-bottom: 25px;
-            
-            /* 🔴 GÖRÜNMEZLİK SORUNUNU ÇÖZEN KRİTİK KURAL */
-            color: #212529; /* Metin rengini zorla KOYU SİYAH yap */
+            background-color: #e9ecef !important;
         }
         
-        .test-header h3, 
-        .test-header span,
-        #currentQuestionNumber, 
-        #totalQuestionCount {
-            /* Başlık ve sayaç metnini zorla KOYU SİYAH yap */
-            color: #212529; 
-            font-weight: 600;
-        }
-
-        /* İlerleme çubuğu dolgusunu ve arka planını görünür yap */
-        .progress-bar {
-            background-color: #dee2e6;
-        }
-        .progress-fill {
-            background-color: #4361ee;
-        }
-
-        /* Modül Görünürlüğü (JS'in çalışmasını garanti eder) */
         .module-section {
             display: none;
         }
         .module-section.active {
-            display: block;
+            display: block !important;
         }
     </style>
 </head>
@@ -106,5 +96,6 @@
 
 </body>
 </html>
+
 
 

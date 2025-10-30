@@ -1,1 +1,162 @@
-
+[
+  {
+    "id": 1,
+    "level": "A1",
+    "topic": "Be Fiili",
+    "questionText": "I _____ a student.",
+    "options": ["am", "is", "are", "be"],
+    "correctAnswer": "am"
+  },
+  {
+    "id": 2,
+    "level": "A1",
+    "topic": "Sahiplik",
+    "questionText": "This is _____ car.",
+    "options": ["he", "his", "him", "her"],
+    "correctAnswer": "his"
+  },
+  {
+    "id": 3,
+    "level": "A1",
+    "topic": "Basit Kelime",
+    "questionText": "What is the opposite of 'big'?",
+    "options": ["large", "small", "tall", "high"],
+    "correctAnswer": "small"
+  },
+  {
+    "id": 4,
+    "level": "A1",
+    "topic": "Şimdiki Zaman",
+    "questionText": "They _____ playing football now.",
+    "options": ["is", "am", "are", "do"],
+    "correctAnswer": "are"
+  },
+  {
+    "id": 5,
+    "level": "A1/A2",
+    "topic": "Sayılabilir/Sayılamaz",
+    "questionText": "There is not _____ water in the bottle.",
+    "options": ["many", "much", "a lot", "some"],
+    "correctAnswer": "much"
+  },
+  {
+    "id": 6,
+    "level": "A2",
+    "topic": "Basit Geçmiş Zaman",
+    "questionText": "We _____ to the cinema last night.",
+    "options": ["go", "goed", "went", "going"],
+    "correctAnswer": "went"
+  },
+  {
+    "id": 7,
+    "level": "A2",
+    "topic": "Karşılaştırma (Comparative)",
+    "questionText": "My sister is _____ than me.",
+    "options": ["taller", "tall", "the tallest", "more tall"],
+    "correctAnswer": "taller"
+  },
+  {
+    "id": 8,
+    "level": "A2",
+    "topic": "Gelecek Zaman",
+    "questionText": "I _____ visit my grandparents tomorrow.",
+    "options": ["will", "am", "do", "going to"],
+    "correctAnswer": "will"
+  },
+  {
+    "id": 9,
+    "level": "A2",
+    "topic": "Zamirler",
+    "questionText": "Did you talk to _____?",
+    "options": ["they", "their", "them", "those"],
+    "correctAnswer": "them"
+  },
+  {
+    "id": 10,
+    "level": "A2/B1",
+    "topic": "Edatlar (Prepositions)",
+    "questionText": "The book is _____ the table.",
+    "options": ["at", "on", "in", "to"],
+    "correctAnswer": "on"
+  },
+  {
+    "id": 11,
+    "level": "B1",
+    "topic": "Mişli Geçmiş (Present Perfect)",
+    "questionText": "She _____ lived here for ten years.",
+    "options": ["has", "have", "is", "did"],
+    "correctAnswer": "has"
+  },
+  {
+    "id": 12,
+    "level": "B1",
+    "topic": "Zor Kelime",
+    "questionText": "The synonym for 'significant' is _____.",
+    "options": ["small", "unimportant", "meaningful", "minor"],
+    "correctAnswer": "meaningful"
+  },
+  {
+    "id": 13,
+    "level": "B1",
+    "topic": "Pasif Yapı (Passive Voice)",
+    "questionText": "The house _____ built last year.",
+    "options": ["was", "is", "were", "are"],
+    "correctAnswer": "was"
+  },
+  {
+    "id": 14,
+    "level": "B1/B2",
+    "topic": "Gereklilik (Modals)",
+    "questionText": "You _____ smoke in the hospital.",
+    "options": ["mustn't", "shouldn't", "don't have to", "can't"],
+    "correctAnswer": "mustn't"
+  },
+  {
+    "id": 15,
+    "level": "B2",
+    "topic": "Koşul Cümleleri (Conditionals)",
+    "questionText": "If I had known, I _____ called you.",
+    "options": ["would have", "had", "will have", "would"],
+    "correctAnswer": "would have"
+  },
+  {
+    "id": 16,
+    "level": "B2",
+    "topic": "Geniş Kelime",
+    "questionText": "The company decided to _____ its operations overseas.",
+    "options": ["shrink", "expand", "cease", "limit"],
+    "correctAnswer": "expand"
+  },
+  {
+    "id": 17,
+    "level": "B2",
+    "topic": "Sıfat Cümlecikleri (Relative Clauses)",
+    "questionText": "That is the man _____ car was stolen.",
+    "options": ["who", "whom", "whose", "which"],
+    "correctAnswer": "whose"
+  },
+  {
+    "id": 18,
+    "level": "B2",
+    "topic": "Deyimler/Phrasal Verbs",
+    "questionText": "I need to _____ the facts before I make a decision.",
+    "options": ["look up to", "look into", "look forward to", "look after"],
+    "correctAnswer": "look into"
+  },
+  {
+    "id": 19,
+    "level": "B2/C1",
+    "topic": "İndirgenmiş Cümlecikler",
+    "questionText": "_____ by the noise, she couldn't sleep.",
+    "options": ["Disturbing", "Disturbed", "Disturbs", "To disturb"],
+    "correctAnswer": "Disturbed"
+  },
+  {
+    "id": 20,
+    "level": "C1",
+    "topic": "Zorlayıcı Bağlaçlar",
+    "questionText": "_____ his early retirement, he remains an influential figure in the industry.",
+    "options": ["Despite", "Although", "In spite", "Because of"],
+    "correctAnswer": "Despite"
+  }
+]

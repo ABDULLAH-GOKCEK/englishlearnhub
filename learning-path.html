@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="../css/learning-path.css"> 
     
     <style>
-        /* [Arayüz yedeği - Aynı kalmalı] */
+        /* [ANA TEMA - English Learn Hub Stili] */
         :root {
             --primary-color: #4361ee;
             --secondary-color: #3a0ca3;
@@ -24,7 +24,51 @@
 
         .container { width: 90%; max-width: 1200px; margin: 0 auto; padding: 0 15px; }
         .module-section { padding: 20px 0; }
-        .btn-primary { background-color: var(--primary-color); color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; }
+        .btn-primary { 
+            background-color: var(--primary-color); 
+            color: white; 
+            padding: 10px 20px; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .btn-primary:hover {
+            background-color: #3853c8;
+        }
+        
+        /* Yeniden Başlat Butonu */
+        .restart-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 10px 20px;
+            background-color: var(--accent-color);
+            color: var(--white);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .restart-btn:hover {
+            background-color: #5d0793;
+        }
+        
+        /* Test Girişi Görünüm Düzeltmesi (Görselde kaybolan metinler için) */
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #e9ecef; /* Hafif arka plan */
+            padding: 15px;
+            border-radius: 8px;
+            color: var(--text-dark); /* Metin rengi görünür olmalı */
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .test-intro h2, .test-intro p {
+            color: var(--text-dark);
+        }
     </style>
 </head>
 <body>
@@ -35,7 +79,6 @@
     </header>
 
     <main class="container learning-path-container">
-
         <section id="levelTestIntroSection" class="module-section active">
             <div class="test-intro">
                 <h2>Seviye Belirleme Testi</h2>
@@ -51,12 +94,10 @@
 
         <section id="levelTestSection" class="module-section" style="display: none;">
             <div class="test-header">
-                <h3>Seviye Testi: <span id="currentQuestionNumber"></span>/<span id="totalQuestionCount"></span></h3>
+                <h3>Seviye Testi: <span id="currentQuestionNumber">0</span>/<span id="totalQuestionCount">0</span></h3>
                 <div class="progress-bar"><div id="testProgressBar" class="progress-fill"></div></div>
             </div>
-            <div id="questionContainer" class="question-container">
-                Yükleniyor...
-            </div>
+            <div id="questionContainer" class="question-container">Yükleniyor...</div>
             <div class="test-navigation">
                 <button id="prevQuestionBtn" class="btn btn-secondary" style="display: none;">&larr; Önceki</button>
                 <button id="nextQuestionBtn" class="btn btn-primary">İlerle &rarr;</button>
@@ -64,15 +105,11 @@
             </div>
         </section>
 
-        <section id="resultsSection" class="module-section" style="display: none;">
-            </section>
-        
-        <section id="learningPathSection" class="module-section" style="display: none;">
-            </section>
+        <section id="resultsSection" class="module-section" style="display: none;"></section>
+        <section id="learningPathSection" class="module-section" style="display: none;"></section>
     </main>
 
     <script src="../js/common.js"></script>
     <script src="../js/learning-path.js"></script> 
 </body>
 </html>
-

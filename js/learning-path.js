@@ -53,13 +53,13 @@ class LearningPath {
     
     // --- Test Başlatma ve Veri Yükleme (GÜÇLENDİRİLMİŞ) ---
     async startTest() {
-        this.currentQuestion = 0;
-        this.score = 0;
-        this.userAnswers = [];
+    this.currentQuestion = 0;
+    this.score = 0;
+    this.userAnswers = [];
 
-        // JSON dosya yolu: js klasöründen çıkıp data klasörüne gir
-        const testDataUrl = '../data/level_test.json'; 
-        
+    // 🟢 KESİN JSON YOLU: Mutlak kök yolu (/) ile deneme
+    // data klasörünün kök dizinde olduğunu varsayar.
+    const testDataUrl = '/data/level_test.json';      
         // common.js'de tanımlanan loadData fonksiyonunu kullan
         if (typeof loadData !== 'function') {
             console.error('❌ Hata: loadData fonksiyonu bulunamadı. common.js dosyasının doğru yüklendiğinden emin olun.');
@@ -446,3 +446,4 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('📄 SAYFA YÜKLENDİ - LearningPath başlatılıyor');
     window.learningPath = new LearningPath();
 });
+

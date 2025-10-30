@@ -9,25 +9,23 @@
     <link rel="stylesheet" href="css/learning-path.css"> 
     
     <style>
-        /* ANA TEMA Değişkenleri (Kısaltıldı) */
         :root {
             --primary-color: #4361ee;
+            --secondary-color: #3a0ca3;
             --text-dark: #2b2d42;
             --background: #f8f9fa;
-            --white: #ffffff;
         }
 
-        /* Tüm bölümleri gizlemek için temel kural */
+        /* JS tarafından yönetilen ana bölümler */
         .module-section {
-             display: none; /* Varsayılan olarak JS tarafından kontrol edilecek */
+             display: none; 
         }
         
-        /* Sayfa yüklendiğinde sadece Giriş bölümünü görünür kıl */
+        /* Başlangıçta görünür olması gereken bölüm */
         #levelTestIntroSection {
             display: block; 
         }
 
-        /* Diğer temel stiller */
         .container { width: 90%; max-width: 1200px; margin: 0 auto; padding: 0 15px; }
         .module-section { padding: 20px 0; }
         .btn-primary { 
@@ -52,7 +50,7 @@
         <section id="levelTestIntroSection" class="module-section active">
             <div class="test-intro">
                 <h2>Seviye Belirleme Testi</h2>
-                <p>İngilizce seviyenizi doğru belirleyerek size özel bir öğrenme planı oluşturalım. Testi tamamlamak yaklaşık 25 dakikanızı alacaktır.</p>
+                <p>İngilizce seviyenizi doğru belirleyerek size özel bir öğrenme planı oluşturalım.</p>
                 <div class="test-info-card">
                     <div class="info-item"><div class="info-icon">⏱️</div><span>Süre: 25 Dakika</span></div>
                     <div class="info-item"><div class="info-icon">❓</div><span>Soru: 20</span></div>

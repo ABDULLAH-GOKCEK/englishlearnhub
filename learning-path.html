@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Öğrenme Yolu - English Learn Hub</title>
     
-    <link rel="stylesheet" href="../styles/style.css"> 
-    <link rel="stylesheet" href="../styles/learning-path.css"> 
+    <link rel="stylesheet" href="/styles/style.css"> 
+    <link rel="stylesheet" href="/styles/learning-path.css"> 
     
     <style>
         /* [Arayüz yedeği - Aynı kalmalı] */
@@ -54,7 +54,9 @@
                 <h3>Seviye Testi: <span id="currentQuestionNumber"></span>/<span id="totalQuestionCount"></span></h3>
                 <div class="progress-bar"><div id="testProgressBar" class="progress-fill"></div></div>
             </div>
-            <div id="questionContainer" class="question-container">Yükleniyor...</div>
+            <div id="questionContainer" class="question-container">
+                Yükleniyor...
+            </div>
             <div class="test-navigation">
                 <button id="prevQuestionBtn" class="btn btn-secondary" style="display: none;">&larr; Önceki</button>
                 <button id="nextQuestionBtn" class="btn btn-primary">İlerle &rarr;</button>
@@ -62,11 +64,14 @@
             </div>
         </section>
 
-        <section id="resultsSection" class="module-section" style="display: none;"></section>
-        <section id="learningPathSection" class="module-section" style="display: none;"></section>
+        <section id="resultsSection" class="module-section" style="display: none;">
+            </section>
+        
+        <section id="learningPathSection" class="module-section" style="display: none;">
+            </section>
     </main>
 
-    <script src="../common.js"></script>
-    <script src="../learning-path.js"></script> 
+    <script src="/common.js"></script>
+    <script src="/learning-path.js"></script> 
 </body>
 </html>

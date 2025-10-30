@@ -18,7 +18,6 @@ class LearningPath {
     bindEvents() {
         console.log('🔗 Eventler bağlanıyor...');
 
-        // TEST BAŞLAT BUTONU
         const startTestBtn = document.getElementById('startTestBtn');
         if (startTestBtn) {
             startTestBtn.addEventListener('click', () => {
@@ -27,14 +26,12 @@ class LearningPath {
             });
         }
 
-        // CEVAP BUTONLARI
         document.addEventListener('click', (e) => {
             if (e.target.classList.contains('answer-btn')) {
                 this.selectAnswer(e.target);
             }
         });
 
-        // TEST NAVIGASYON BUTONLARI
         const prevBtn = document.getElementById('prevQuestionBtn');
         const nextBtn = document.getElementById('nextQuestionBtn');
         const submitBtn = document.getElementById('submitTestBtn');
@@ -43,7 +40,6 @@ class LearningPath {
         if (nextBtn) nextBtn.addEventListener('click', () => this.navigateQuestion(1));
         if (submitBtn) submitBtn.addEventListener('click', () => this.submitTest());
         
-        // TESTİ YENİDEN BAŞLAT BUTONU (Header'daki)
         document.addEventListener('click', (e) => {
             if (e.target.id === 'restartTestBtn') {
                 this.resetAndStartTest();
@@ -53,7 +49,6 @@ class LearningPath {
     
     // --- Test Başlatma ve Veri Yükleme ---
     async startTest() {
-        // 🟢 GÜÇLENDİRME: Intro ekranını hemen gizle.
         const introSection = document.getElementById('levelTestIntroSection');
         if (introSection) {
              introSection.style.display = 'none';
@@ -64,9 +59,9 @@ class LearningPath {
         this.userAnswers = [];
         this.totalQuestions = 0;
         
+        // Veri yolu (root dizine göre)
         const testDataUrl = '../data/level_test.json'; 
         
-        // common.js'den gelen loadData fonksiyonunun kontrolü
         if (typeof loadData !== 'function') {
             document.getElementById('questionContainer').innerHTML = `<p style="color:red;">Hata: common.js'deki yükleme fonksiyonu bulunamadı.</p>`;
             this.showSection('levelTestSection');
@@ -76,11 +71,25 @@ class LearningPath {
         try {
             console.log(`📡 Test verisi yükleniyor (URL: ${testDataUrl})...`);
             
-            // Veri yükleme başarılı
-            this.testData = await loadData(testDataUrl); 
+            let loadedData = await loadData(testDataUrl); 
+            
+            // 🔴 KRİTİK KONTROL VE DÜZELTME
+            // Eğer JSON dosyası sadece bir dizi içeriyorsa, direkt onu kullan.
+            // Eğer JSON verisi bir nesne içinde bir dizi içeriyorsa (ör: { "questions": [...] }), 
+            // doğru diziyi bulmaya çalış. Bu, common.js'den gelen data yükleme mantığıyla uyumlu olmalıdır.
+            if (loadedData && Array.isArray(loadedData)) {
+                 this.testData = loadedData;
+            } else if (loadedData && loadedData.questions && Array.isArray(loadedData.questions)) {
+                 this.testData = loadedData.questions;
+            } else if (loadedData && loadedData.data && Array.isArray(loadedData.data)) {
+                 this.testData = loadedData.data;
+            } else {
+                 // Yine de deneme amaçlı, yüklü olanı kullan.
+                 this.testData = loadedData;
+            }
 
             if (!this.testData || !Array.isArray(this.testData) || this.testData.length === 0) {
-                throw new Error("Test verisi yüklendi ancak boş veya geçerli bir dizi değil.");
+                throw new Error("Test verisi yüklendi ancak boş veya geçerli bir dizi değil. Yüklenen tip: " + (Array.isArray(loadedData) ? 'Array' : typeof loadedData));
             }
 
             this.totalQuestions = this.testData.length;
@@ -89,15 +98,12 @@ class LearningPath {
                 totalQCountSpan.textContent = this.totalQuestions;
             }
 
-            // 🟢 BAŞARILI YÜKLEME SONRASI TEST EKRANINI ZORLA GÖSTER
             this.showSection('levelTestSection'); 
-
             this.renderQuestion(this.currentQuestion);
             this.updateNavigationButtons();
 
         } catch (error) {
             console.error('❌ Test verisi yükleme hatası:', error.message);
-            
             document.getElementById('questionContainer').innerHTML = 
                 `<div style="color: red; padding: 20px;"><h2>Hata! Test Başlatılamadı.</h2><p>Detay: ${error.message}</p></div>`;
             this.showSection('levelTestSection'); 
@@ -125,21 +131,26 @@ class LearningPath {
 
     // --- Soru Render Etme ---
     renderQuestion(index) {
-        if (!this.testData[index]) return;
+        if (!this.testData[index]) {
+            console.error(`Soru verisi mevcut değil: index ${index}`);
+            return;
+        }
 
         const question = this.testData[index];
         const container = document.getElementById('questionContainer');
         
-        // Cevap seçeneklerinin HTML'ini oluştur
         let optionsHtml = question.options.map((option, i) => `
             <button class="answer-btn btn btn-option" data-answer="${option}" data-index="${i}" ${this.userAnswers[index] === option ? 'aria-pressed="true"' : ''}>
                 ${option}
             </button>
         `).join('');
 
+        // 🟢 JSON dosyanızdaki "questionText" anahtarını kullanır
+        const questionText = question.questionText || 'SORU METNİ YÜKLENEMEDİ'; 
+
         container.innerHTML = `
             <div class="question-box">
-                <p class="question-text">${index + 1}. ${question.questionText}</p> 
+                <p class="question-text">${index + 1}. ${questionText}</p> 
                 <div class="options-container">
                     ${optionsHtml}
                 </div>
@@ -233,9 +244,7 @@ class LearningPath {
     updateProgressBar() { 
         const progressBar = document.getElementById('testProgressBar');
         if (progressBar) {
-            // İlerlemeyi, sadece cevaplanan sorulara göre de hesaplayabiliriz.
-            const answeredCount = this.userAnswers.filter(ans => ans !== undefined).length;
-            const progress = (this.totalQuestions > 0) ? ((answeredCount) / this.totalQuestions) * 100 : 0;
+            const progress = (this.currentQuestion + 1) / this.totalQuestions * 100;
             progressBar.style.width = `${progress}%`;
         }
     }
@@ -249,7 +258,7 @@ class LearningPath {
         
         const missingCount = this.totalQuestions - this.userAnswers.filter(ans => ans !== undefined).length;
         if (missingCount > 0) {
-            if (!confirm(`Henüz ${missingCount} soru daha cevaplanmadı. Testi yine de bitirmek istiyor musunuz?`)) {
+            if (!confirm(`Henüz ${missingCount} soru daha cevaplanmadı. Testi yine de bitirmek ister misiniz?`)) {
                 return; 
             }
         }
@@ -264,15 +273,14 @@ class LearningPath {
         this.score = 0;
         this.testData.forEach((question, index) => {
             if (this.userAnswers[index] && this.userAnswers[index] === question.correctAnswer) {
-                // Skoru zorluğa göre hesapla (JSON'da difficulty yok, bu yüzden basit puanlama yapalım)
-                this.score += 1; // Her doğru cevap 1 puan
+                this.score += 1; 
             }
         });
         console.log(`🎯 Nihai Skor: ${this.score}`);
     }
 
     determineLevel() {
-        const totalPossibleScore = this.totalQuestions; // Her soru 1 puan
+        const totalPossibleScore = this.totalQuestions; 
         const scorePercentage = (this.score / totalPossibleScore) * 100;
         
         if (scorePercentage >= 85) this.level = 'C1';
@@ -320,14 +328,8 @@ class LearningPath {
                     <h4>Mevcut Seviye</h4>
                     <span class="stat-value level-badge level-${this.level.toLowerCase()}">${this.level}</span>
                 </div>
-                <div class="stat-card">
-                    <h4>Önerilen Günlük Kelime</h4>
-                    <span class="stat-value">${this.getDailyGoal('words')} kelime</span>
-                </div>
-                <div class="stat-card">
-                    <h4>Günlük Pratik Süresi</h4>
-                    <span class="stat-value">${this.getDailyGoal('practice')} dakika</span>
-                </div>
+                <div class=\"stat-card\">\r\n<h4>Önerilen Günlük Kelime</h4>\r\n<span class=\"stat-value\">${this.getDailyGoal('words')} kelime</span>\r\n</div>
+                <div class=\"stat-card\">\r\n<h4>Günlük Pratik Süresi</h4>\r\n<span class=\"stat-value\">${this.getDailyGoal('practice')} dakika</span>\r\n</div>
             </div>
             
             <h3 style="margin-top: 30px;">Pratik Alanları</h3>
@@ -371,7 +373,6 @@ class LearningPath {
     }
 
     // --- Yardımcı Fonksiyonlar ---
-    // KRİTİK GÖRÜNÜRLÜK FONKSİYONU
     showSection(sectionId) {
         document.querySelectorAll('.module-section').forEach(sec => {
             sec.style.display = 'none';
@@ -379,7 +380,6 @@ class LearningPath {
         });
         const targetSection = document.getElementById(sectionId);
         if (targetSection) {
-            // KRİTİK: display: block !important ile zorla görünür yap.
             targetSection.style.setProperty('display', 'block', 'important'); 
             targetSection.classList.add('active');
         }
@@ -406,7 +406,6 @@ class LearningPath {
             
             const header = document.querySelector('header');
             if (header) {
-                // Header'ın hemen altına yerleştir
                 header.parentNode.insertBefore(button, header.nextSibling); 
             }
         }

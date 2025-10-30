@@ -9,36 +9,44 @@
     <link rel="stylesheet" href="css/learning-path.css"> 
     
     <style>
-        /* Metin Görünürlüğünü Zorla Siyah Yapma Kuralları */
-        
+        /* GENEL GÖRÜNÜRLÜK VE RENK KONTROLÜ */
         body {
-            background-color: #f8f9fa !important; /* Arka planı açık renk yap */
-            color: #212529 !important; /* Metin rengini zorla siyah yap */
-        }
-        
-        /* GİRİŞ BÖLÜMÜNDEKİ GÖRÜNMEYEN METİNLERİN DÜZELTİLMESİ İÇİN KRİTİK */
-        .test-intro p,
-        .test-info-card span, 
-        .test-info-card .info-item {
-             color: #212529 !important; 
-             background-color: #f1f3f5 !important;
+            font-family: 'Arial', sans-serif !important;
+            background-color: #f8f9fa !important; /* Açık Arka Plan */
+            color: #212529 !important; /* TÜM METNİ ZORLA KOYU SİYAH YAP */
         }
 
-        /* TEST BAŞLIĞI VE SAYAÇ BÖLÜMÜNÜN GÖRÜNÜRLÜĞÜ */
+        /* Başlıklar ve normal metinler */
+        h1, h2, h3, h4, p {
+            color: #212529 !important; 
+        }
+
+        /* GİRİŞ EKRANI KONTROLÜ (Metinler burada görünmüyordu) */
+        .test-intro {
+             background-color: #ffffff !important;
+             color: #212529 !important;
+        }
+
+        .test-info-card span, 
+        .test-info-card .info-item span {
+            color: #212529 !important; /* Süre, Soru Sayısı Metnini Zorla Siyah Yap */
+            font-weight: 600 !important;
+        }
+
+        .info-item {
+            background-color: #f1f3f5 !important;
+            color: #212529 !important; 
+        }
+
+        /* TEST EKRANI SAYAÇ VE BAŞLIK KONTROLÜ */
         .test-header {
-            background-color: #e9ecef !important; /* Açık Gri Arka Plan */
-            padding: 15px;
-            border-radius: 8px;
-            text-align: center;
-            margin-bottom: 25px;
-            color: #212529 !important; /* Metin rengini zorla KOYU SİYAH yap */
+            background-color: #e9ecef !important; /* Sayaç Arka Planı */
+            color: #212529 !important; /* Başlık metnini Zorla Siyah Yap */
         }
         
         .test-header h3, 
-        .test-header span,
-        #currentQuestionNumber, #totalQuestionCount {
-            color: #212529 !important; /* Başlık ve sayaç metnini zorla KOYU SİYAH yap */
-            font-weight: 600 !important;
+        .test-header span {
+            color: #212529 !important; /* Sayaç Rakamlarını Zorla Siyah Yap */
         }
         
         /* Modül Görünürlüğü */
@@ -47,6 +55,12 @@
         }
         .module-section.active {
             display: block !important;
+        }
+        
+        /* Butonlar için temel görünürlük */
+        .btn-primary {
+            background-color: #4361ee !important;
+            color: #ffffff !important;
         }
     </style>
 </head>

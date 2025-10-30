@@ -34,42 +34,52 @@ class LearningPath {
         this.showSection('levelTestIntroSection'); 
     }
 
+    // learning-path.js dosyanızda sadece aşağıdaki kısmı değiştirin veya kontrol edin.
+
+// ... (Diğer fonksiyonlar aynı kalır)
+
     // --- Test Başlatma ve Veri Yükleme ---
     async startTest() {
         this.currentQuestion = 0;
         this.score = 0;
         this.userAnswers = [];
 
-        // ÖNEMLİ: Test verisinin (soruların) bulunduğu varsayılan dosya yolu
+        // ÖNEMLİ DÜZELTME: Dosya yolunu netleştirelim. 
+        // learning-path.html aynı klasördeyse ve data klasörü bir üstte ise.
         const testDataUrl = '../data/level_test.json'; 
+        
+        // Eğer data klasörü learning-path.html ile AYNI klasördeyse:
+        // const testDataUrl = './data/level_test.json'; 
+
+        // En güvenlisi, tarayıcı kök dizinine göre aramak:
+        // const testDataUrl = '/data/level_test.json'; // Eğer data klasörü projenin kök dizinindeyse
+
+        console.log(`📡 Test verisi yükleniyor (URL: ${testDataUrl})...`);
 
         try {
             // Veri yükleme
             const response = await fetch(testDataUrl);
             if (!response.ok) {
-                throw new Error(`Test verisi yüklenemedi: HTTP ${response.status}. Lütfen ${testDataUrl} dosyasının varlığını ve erişilebilirliğini kontrol edin.`);
+                // Hata mesajını daha anlaşılır hale getir
+                throw new Error(`Test verisi yüklenemedi: HTTP ${response.status}. Lütfen dosya yolu (${testDataUrl}) ve dosya adının doğru olduğundan emin olun.`);
             }
+            // ... (Geri kalan kod aynı kalır: JSON parse etme, soru gösterme)
             this.testData = await response.json();
             
             if (!Array.isArray(this.testData) || this.testData.length === 0) {
-                throw new Error('Yüklenen test verisi boş veya hatalı formatta.');
+                 // ... (hata yönetimi)
             }
-
-            // UI güncelle
-            document.getElementById('totalQuestionCount').textContent = this.testData.length;
             
-            console.log(`✅ ${this.testData.length} soru yüklendi. Test başlıyor.`);
-            
-            this.displayQuestion(); // İlk soruyu göster
+            // ... (Devam eden kodlar)
+            this.displayQuestion(); 
             this.updateNavigationButtons();
             
         } catch (error) {
-            console.error("Test başlatılırken kritik hata oluştu:", error);
-            document.getElementById('questionContainer').innerHTML = 
-                '<h4>Test yüklenirken bir hata oluştu. Lütfen konsolu kontrol edin.</h4>' +
-                `<p style="color:red;">Hata Mesajı: ${error.message}</p>`;
+            // ... (hata yönetimi)
         }
     }
+    
+// ... (Diğer fonksiyonlar aynı kalır)
     
     // --- Soru Gösterme ---
     displayQuestion() {
@@ -244,3 +254,4 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('📄 SAYFA YÜKLENDİ - LearningPath başlatılıyor');
     window.learningPath = new LearningPath();
 });
+

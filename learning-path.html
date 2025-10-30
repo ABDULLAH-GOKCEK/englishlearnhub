@@ -47,38 +47,40 @@
     </header>
 
     <main class="container learning-path-container">
-        <section id="levelTestIntroSection" class="module-section active">
-            <div class="test-intro">
-                <h2>Seviye Belirleme Testi</h2>
-                <p>İngilizce seviyenizi doğru belirleyerek size özel bir öğrenme planı oluşturalım.</p>
-                <div class="test-info-card">
-                    <div class="info-item"><div class="info-icon">⏱️</div><span>Süre: 25 Dakika</span></div>
-                    <div class="info-item"><div class="info-icon">❓</div><span>Soru: 20</span></div>
-                    <div class="info-item"><div class="info-icon">🎯</div><span>Amaç: Seviye Tespiti</span></div>
-                </div>
-                <button id="startTestBtn" class="btn btn-primary large">Testi Başlat</button>
+    
+    <section id="levelTestIntroSection" class="module-section active">
+        <div class="test-intro">
+            <h2>Seviye Belirleme Testi</h2>
+            <p>İngilizce seviyenizi doğru belirleyerek size özel bir öğrenme planı oluşturalım.</p>
+            <div class="test-info-card">
+                <div class="info-item"><div class="info-icon">⏱️</div><span>Süre: 25 Dakika</span></div>
+                <div class="info-item"><div class="info-icon">❓</div><span>Soru: 20</span></div>
+                <div class="info-item"><div class="info-icon">🎯</div><span>Amaç: Seviye Tespiti</span></div>
             </div>
-        </section>
+            <button id="startTestBtn" class="btn btn-primary large">Testi Başlat</button>
+        </div>
+    </section>
 
-        <section id="levelTestSection" class="module-section">
-            <div class="test-header">
-                <h3>Seviye Testi: <span id="currentQuestionNumber">0</span>/<span id="totalQuestionCount">0</span></h3>
-                <div class="progress-bar"><div id="testProgressBar" class="progress-fill"></div></div>
-            </div>
-            <div id="questionContainer" class="question-container">Lütfen bekleyiniz, test yükleniyor...</div>
-            <div class="test-navigation">
-                <button id="prevQuestionBtn" class="btn btn-secondary" style="display: none;">&larr; Önceki</button>
-                <button id="nextQuestionBtn" class="btn btn-primary">İlerle &rarr;</button>
-                <button id="submitTestBtn" class="btn btn-success" style="display: none;">Testi Bitir</button>
-            </div>
-        </section>
+    <section id="levelTestSection" class="module-section">
+        <div class="test-header">
+            <h3>Seviye Testi: <span id="currentQuestionNumber">0</span>/<span id="totalQuestionCount">0</span></h3>
+            <div class="progress-bar"><div id="testProgressBar" class="progress-fill"></div></div>
+        </div>
+        <div id="questionContainer" class="question-container">Lütfen bekleyiniz, test yükleniyor...</div>
+        <div class="test-navigation">
+            <button id="prevQuestionBtn" class="btn btn-secondary" style="display: none;">&larr; Önceki</button>
+            <button id="nextQuestionBtn" class="btn btn-primary">İlerle &rarr;</button>
+            <button id="submitTestBtn" class="btn btn-success" style="display: none;">Testi Bitir</button>
+        </div>
+    </section>
 
-        <section id="resultsSection" class="module-section"></section>
-        
-        <section id="learningPathSection" class="module-section"></section>
-    </main>
+    <section id="resultsSection" class="module-section"></section>
+    
+    <section id="learningPathSection" class="module-section"></section>
+</main>
 
     <script src="js/common.js"></script>
     <script src="js/learning-path.js"></script> 
 </body>
 </html>
+

@@ -385,7 +385,7 @@ class LearningPath {
 
     // --- Yardımcı Fonksiyonlar ---
     showSection(sectionId) {
-        // Tüm section'ları gizle
+        // Tüm section'ları GİZLEMEK için sıfırla
         document.querySelectorAll('.module-section').forEach(sec => {
             sec.style.display = 'none';
             sec.classList.remove('active');
@@ -393,7 +393,7 @@ class LearningPath {
         
         const targetSection = document.getElementById(sectionId);
         if (targetSection) {
-            // 🟢 KRİTİK DEĞİŞİKLİK: display: block !important ile zorla görünür yap
+            // KRİTİK: Zorla görünür yapmak için 'display: block !important' kullan
             targetSection.style.setProperty('display', 'block', 'important'); 
             targetSection.classList.add('active');
         }
@@ -459,5 +459,6 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('📄 SAYFA YÜKLENDİ - LearningPath başlatılıyor');
     window.learningPath = new LearningPath();
 });
+
 
 

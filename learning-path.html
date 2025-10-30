@@ -6,7 +6,32 @@
     <title>Öğrenme Yolu - English Learn Hub</title>
     
     <link rel="stylesheet" href="../styles.css"> 
-    <link rel="stylesheet" href="../css/learning-path.css"> 
+    <link rel="stylesheet" href="../css/learning-path.css">
+    <style>
+    /* styles.css yüklenmezse diye Metin Rengini Zorla Siyah Yap */
+    body {
+        background-color: #f8f9fa !important; /* Arka planı açık renk yap */
+        color: #212529 !important; /* Metin rengini zorla siyah yap */
+    }
+    
+    /* Header (Başlık) ve sayaçların metin rengini siyah yap */
+    .test-header, .test-header h3, 
+    #currentQuestionNumber, #totalQuestionCount {
+        color: #212529 !important;
+    }
+    
+    .test-header {
+        background-color: #e9ecef !important; /* Sayaçların arka planını açık gri yap */
+    }
+    
+    /* Modül bölümlerini düzgünce gizleyip göster */
+    .module-section {
+        display: none;
+    }
+    .module-section.active {
+        display: block !important;
+    }
+</style>
     
 </head>
 <body>
@@ -61,3 +86,4 @@
 
 </body>
 </html>
+

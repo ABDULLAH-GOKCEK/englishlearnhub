@@ -4,9 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Öğrenme Yolu - English Learn Hub</title>
-    <link rel="stylesheet" href="../styles.css">
-    <link rel="stylesheet" href="learning-path.css"> <style>
-        /* ANA TEMA - English Learn Hub Stili (Kısa tutuldu) */
+    <link rel="stylesheet" href="../style.css"> 
+    <link rel="stylesheet" href="./learning-path.css"> 
+    
+    <style>
         :root {
             --primary-color: #4361ee;
             --secondary-color: #3a0ca3;
@@ -19,7 +20,8 @@
             --hover-shadow: 0 20px 40px rgba(0,0,0,0.15);
         }
 
-        /* Diğer stil tanımları... */
+        /* Genel CSS'i style.css'ten çekiyoruz. */
+        /* Eğer arayüz hala bozuksa, style.css ve learning-path.css içeriğini kontrol etmemiz gerekir. */
     </style>
 </head>
 <body>
@@ -34,9 +36,9 @@
         <section id="levelTestIntroSection" class="module-section active">
             <div class="test-intro">
                 <h2>Seviye Belirleme Testi</h2>
-                <p>İngilizce seviyenizi doğru belirleyerek size özel bir öğrenme planı oluşturalar. Testi tamamlamak yaklaşık 10-15 dakikanızı alacaktır.</p>
+                <p>İngilizce seviyenizi doğru belirleyerek size özel bir öğrenme planı oluşturalar. Testi tamamlamak yaklaşık 25 dakikanızı alacaktır.</p>
                 <div class="test-info-card">
-                    <div class="info-item"><div class="info-icon">⏱️</div><span>Süre: 15 Dakika</span></div>
+                    <div class="info-item"><div class="info-icon">⏱️</div><span>Süre: 25 Dakika</span></div>
                     <div class="info-item"><div class="info-icon">❓</div><span>Soru: 20</span></div>
                     <div class="info-item"><div class="info-icon">🎯</div><span>Amaç: Seviye Tespiti</span></div>
                 </div>
@@ -67,6 +69,6 @@
     </main>
 
     <script src="../common.js"></script>
-    <script src="learning-path.js"></script>
+    <script src="./learning-path.js"></script>
 </body>
 </html>

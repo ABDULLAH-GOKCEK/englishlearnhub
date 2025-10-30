@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="../css/learning-path.css"> 
     
     <style>
-        /* [ANA TEMA - English Learn Hub Stili] */
+        /* ANA TEMA Değişkenleri */
         :root {
             --primary-color: #4361ee;
             --secondary-color: #3a0ca3;
@@ -33,9 +33,7 @@
             cursor: pointer;
             transition: background-color 0.3s;
         }
-        .btn-primary:hover {
-            background-color: #3853c8;
-        }
+        .btn-primary:hover { background-color: #3853c8; }
         
         /* Yeniden Başlat Butonu */
         .restart-btn {
@@ -51,23 +49,20 @@
             cursor: pointer;
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
-        .restart-btn:hover {
-            background-color: #5d0793;
-        }
+        .restart-btn:hover { background-color: #5d0793; }
         
-        /* Test Girişi Görünüm Düzeltmesi (Görselde kaybolan metinler için) */
+        /* GÖRSELDE KAYBOLAN STATİK METİNLER İÇİN KESİN ÇÖZÜM */
+        .test-intro h2, 
+        .test-intro p,
+        .test-info-card span, /* SÜRE, SORU, AMAÇ metinleri */
         .info-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: #e9ecef; /* Hafif arka plan */
-            padding: 15px;
-            border-radius: 8px;
-            color: var(--text-dark); /* Metin rengi görünür olmalı */
-            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+            color: var(--text-dark) !important; 
+            visibility: visible !important;
+            opacity: 1 !important;
         }
-        .test-intro h2, .test-intro p {
-            color: var(--text-dark);
+        .test-info-card .info-item {
+            background: var(--white); /* Arka planı beyaz yap */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
     </style>
 </head>
@@ -97,7 +92,7 @@
                 <h3>Seviye Testi: <span id="currentQuestionNumber">0</span>/<span id="totalQuestionCount">0</span></h3>
                 <div class="progress-bar"><div id="testProgressBar" class="progress-fill"></div></div>
             </div>
-            <div id="questionContainer" class="question-container">Yükleniyor...</div>
+            <div id="questionContainer" class="question-container">Lütfen bekleyiniz, test yükleniyor...</div>
             <div class="test-navigation">
                 <button id="prevQuestionBtn" class="btn btn-secondary" style="display: none;">&larr; Önceki</button>
                 <button id="nextQuestionBtn" class="btn btn-primary">İlerle &rarr;</button>

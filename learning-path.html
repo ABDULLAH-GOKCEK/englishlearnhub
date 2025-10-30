@@ -9,19 +9,25 @@
     <link rel="stylesheet" href="css/learning-path.css"> 
     
     <style>
-        /* ANA TEMA Değişkenleri */
+        /* ANA TEMA Değişkenleri (Kısaltıldı) */
         :root {
             --primary-color: #4361ee;
-            --secondary-color: #3a0ca3;
-            --accent-color: #7209b7;
             --text-dark: #2b2d42;
-            --text-light: #6c757d;
             --background: #f8f9fa;
             --white: #ffffff;
-            --card-shadow: 0 10px 30px rgba(0,0,0,0.08);
-            --hover-shadow: 0 20px 40px rgba(0,0,0,0.15);
         }
 
+        /* Tüm bölümleri gizlemek için temel kural */
+        .module-section {
+             display: none; /* Varsayılan olarak JS tarafından kontrol edilecek */
+        }
+        
+        /* Sayfa yüklendiğinde sadece Giriş bölümünü görünür kıl */
+        #levelTestIntroSection {
+            display: block; 
+        }
+
+        /* Diğer temel stiller */
         .container { width: 90%; max-width: 1200px; margin: 0 auto; padding: 0 15px; }
         .module-section { padding: 20px 0; }
         .btn-primary { 
@@ -33,36 +39,6 @@
             cursor: pointer;
             transition: background-color 0.3s;
         }
-        .btn-primary:hover { background-color: #3853c8; }
-        
-        /* Yeniden Başlat Butonu */
-        .restart-btn {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 1000;
-            padding: 10px 20px;
-            background-color: var(--accent-color);
-            color: var(--white);
-            border: none;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-        .restart-btn:hover { background-color: #5d0793; }
-        
-        /* GÖRÜNÜRLÜK GARANTİSİ İÇİN KESİN ÇÖZÜM */
-        .test-intro h2, 
-        .test-intro p,
-        .test-info-card span, 
-        .info-item {
-            color: var(--text-dark) !important; 
-            visibility: visible !important;
-            opacity: 1 !important;
-        }
-        .test-info-card .info-item {
-            background: var(--white); 
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
     </style>
 </head>
 <body>
@@ -73,8 +49,7 @@
     </header>
 
     <main class="container learning-path-container">
-        <section id="levelTestSection" class="module-section">
-    </section>
+        <section id="levelTestIntroSection" class="module-section active">
             <div class="test-intro">
                 <h2>Seviye Belirleme Testi</h2>
                 <p>İngilizce seviyenizi doğru belirleyerek size özel bir öğrenme planı oluşturalım. Testi tamamlamak yaklaşık 25 dakikanızı alacaktır.</p>
@@ -100,15 +75,12 @@
             </div>
         </section>
 
-        <section id="resultsSection" class="module-section" style="display: none;"></section>
-        <section id="learningPathSection" class="module-section" style="display: none;"></section>
+        <section id="resultsSection" class="module-section"></section>
+        
+        <section id="learningPathSection" class="module-section"></section>
     </main>
 
-    <body>
     <script src="js/common.js"></script>
     <script src="js/learning-path.js"></script> 
-</body> 
 </body>
 </html>
-
-

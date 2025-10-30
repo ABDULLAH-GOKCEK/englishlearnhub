@@ -44,20 +44,12 @@ class LearningPath {
         this.score = 0;
         this.userAnswers = [];
 
-        // ÖNEMLİ DÜZELTME: Dosya yolunu netleştirelim. 
-        // learning-path.html aynı klasördeyse ve data klasörü bir üstte ise.
-        const testDataUrl = '/data/level_test.json'; 
+        // 🟢 KESİN YOL DÜZELTMESİ (modules klasöründen data klasörüne)
+        const testDataUrl = '../data/level_test.json'; 
         
-        // Eğer data klasörü learning-path.html ile AYNI klasördeyse:
-        // const testDataUrl = './data/level_test.json'; 
-
-        // En güvenlisi, tarayıcı kök dizinine göre aramak:
-        // const testDataUrl = '/data/level_test.json'; // Eğer data klasörü projenin kök dizinindeyse
-
         console.log(`📡 Test verisi yükleniyor (URL: ${testDataUrl})...`);
 
         try {
-            // Veri yükleme
             const response = await fetch(testDataUrl);
             if (!response.ok) {
                 // Hata mesajını daha anlaşılır hale getir
@@ -254,6 +246,7 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('📄 SAYFA YÜKLENDİ - LearningPath başlatılıyor');
     window.learningPath = new LearningPath();
 });
+
 
 
 

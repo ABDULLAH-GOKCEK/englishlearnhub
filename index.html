@@ -3,110 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>İngilizce Öğrenme Platformu</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Öğrenme Yolu - English Learn Hub</title>
+    
+    <link rel="stylesheet" href="css/style.css"> 
+    <link rel="stylesheet" href="css/learning-path.css"> 
+    
+    <style>
+        /* ANA TEMA Değişkenleri (Kısaltıldı) */
+        :root {
+            --primary-color: #4361ee;
+            --text-dark: #2b2d42;
+            --background: #f8f9fa;
+            --white: #ffffff;
+        }
+
+        /* Tüm bölümleri gizlemek için temel kural */
+        .module-section {
+             display: none; /* Varsayılan olarak JS tarafından kontrol edilecek */
+        }
+        
+        /* Sayfa yüklendiğinde sadece Giriş bölümünü görünür kıl */
+        #levelTestIntroSection {
+            display: block; 
+        }
+
+        /* Diğer temel stiller */
+        .container { width: 90%; max-width: 1200px; margin: 0 auto; padding: 0 15px; }
+        .module-section { padding: 20px 0; }
+        .btn-primary { 
+            background-color: var(--primary-color); 
+            color: white; 
+            padding: 10px 20px; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+    </style>
 </head>
 <body>
     <header>
         <div class="container">
-            <h1>İngilizce Öğrenme Platformu</h1>
-            <nav>
-                <ul>
-                    <li><a href="index.html" class="active">🏠 Ana Sayfa</a></li>
-                    <li><a href="learning-path.html">🎯 Öğrenme Yolum</a></li>
-                    <li><a href="teaching.html">📚 Kelime Öğrenme</a></li>
-                    <li><a href="flip_cards.html">🃏 İngilizce-Türkçe Kelimeler</a></li>
-                    <li><a href="daily.html">📝 Günlük Cümleler</a></li>
-                    <li><a href="reading.html">📖 Okuma-Anlama</a></li>
-                    <li><a href="word_games.html">🎮 Kelime Oyunları</a></li>
-                    <li><a href="exam.html">🧪 Sınav</a></li>
-                    <li><a href="chat.html">🧪 Chat</a></li>
-                </ul>
-            </nav>
+            <h1>Öğrenme Yolu</h1>
         </div>
     </header>
 
-    <main class="container">
-        <section class="hero">
-            <div class="hero-content">
-                <h2>İngilizce Öğrenme Yolculuğuna Hoş Geldin! 🌟</h2>
-                <p>Kişiselleştirilmiş öğrenme deneyimi ile İngilizce'ni etkili bir şekilde geliştir.</p>
-                <div class="hero-buttons">
-                    <a href="learning-path.html" class="btn primary large">
-                        <i class="fas fa-rocket"></i> Öğrenme Yolculuğuna Başla
-                    </a>
-                    <a href="teaching.html" class="btn secondary large">
-                        <i class="fas fa-play"></i> Hemen Öğrenmeye Başla
-                    </a>
+    <main class="container learning-path-container">
+        <section id="levelTestIntroSection" class="module-section active">
+            <div class="test-intro">
+                <h2>Seviye Belirleme Testi</h2>
+                <p>İngilizce seviyenizi doğru belirleyerek size özel bir öğrenme planı oluşturalım. Testi tamamlamak yaklaşık 25 dakikanızı alacaktır.</p>
+                <div class="test-info-card">
+                    <div class="info-item"><div class="info-icon">⏱️</div><span>Süre: 25 Dakika</span></div>
+                    <div class="info-item"><div class="info-icon">❓</div><span>Soru: 20</span></div>
+                    <div class="info-item"><div class="info-icon">🎯</div><span>Amaç: Seviye Tespiti</span></div>
                 </div>
+                <button id="startTestBtn" class="btn btn-primary large">Testi Başlat</button>
             </div>
         </section>
 
-        <section class="features">
-            <h2>Neden Bizimle Öğrenmelisin? 🤔</h2>
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">🎯</div>
-                    <h3>Kişiselleştirilmiş Yol</h3>
-                    <p>Seviyene göre özelleştirilmiş öğrenme yolu ve içerikler</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">📊</div>
-                    <h3>Detaylı İlerleme Takibi</h3>
-                    <p>Günlük, haftalık ve aylık ilerleme istatistikleri</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">🏆</div>
-                    <h3>Başarı Rozetleri</h3>
-                    <p>Ödül sistemi ile motive ol ve başarılarını kutla</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">🔄</div>
-                    <h3>Etkili Tekrar Sistemi</h3>
-                    <p>Akıllı tekrar algoritması ile kalıcı öğrenme</p>
-                </div>
+        <section id="levelTestSection" class="module-section">
+            <div class="test-header">
+                <h3>Seviye Testi: <span id="currentQuestionNumber">0</span>/<span id="totalQuestionCount">0</span></h3>
+                <div class="progress-bar"><div id="testProgressBar" class="progress-fill"></div></div>
+            </div>
+            <div id="questionContainer" class="question-container">Lütfen bekleyiniz, test yükleniyor...</div>
+            <div class="test-navigation">
+                <button id="prevQuestionBtn" class="btn btn-secondary" style="display: none;">&larr; Önceki</button>
+                <button id="nextQuestionBtn" class="btn btn-primary">İlerle &rarr;</button>
+                <button id="submitTestBtn" class="btn btn-success" style="display: none;">Testi Bitir</button>
             </div>
         </section>
 
-        <section class="quick-actions">
-            <h2>Hızlı Başlangıç 🚀</h2>
-            <div class="actions-grid">
-                <a href="teaching.html" class="action-card">
-                    <div class="action-icon">📚</div>
-                    <h3>Kelime Öğren</h3>
-                    <p>Yeni kelimeler öğren ve kelime dağarcığını genişlet</p>
-                    <span class="action-arrow">→</span>
-                </a>
-                <a href="flip_cards.html" class="action-card">
-                    <div class="action-icon">🃏</div>
-                    <h3>Kartlarla Tekrar</h3>
-                    <p>Flashcard sistem ile eğlenceli tekrar yap</p>
-                    <span class="action-arrow">→</span>
-                </a>
-                <a href="word_games.html" class="action-card">
-                    <div class="action-icon">🎮</div>
-                    <h3>Oyun Oyna</h3>
-                    <p>Eğlenceli oyunlar ile İngilizce'ni geliştir</p>
-                    <span class="action-arrow">→</span>
-                </a>
-                <a href="exam.html" class="action-card">
-                    <div class="action-icon">🧪</div>
-                    <h3>Bilgini Test Et</h3>
-                    <p>Seviye testleri ile bilgini ölç ve geliştir</p>
-                    <span class="action-arrow">→</span>
-                </a>
-            </div>
-        </section>
+        <section id="resultsSection" class="module-section"></section>
+        
+        <section id="learningPathSection" class="module-section"></section>
     </main>
 
-    <footer>
-        <div class="container">
-            <p>© 2024 İngilizce Öğrenme Platformu - Tüm hakları saklıdır</p>
-            <p class="footer-info">🚀 Kişiselleştirilmiş İngilizce Öğrenme Deneyimi</p>
-        </div>
-    </footer>
-
     <script src="js/common.js"></script>
+    <script src="js/learning-path.js"></script> 
 </body>
 </html>

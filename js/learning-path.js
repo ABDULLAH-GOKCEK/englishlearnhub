@@ -4,213 +4,204 @@ class LearningPath {
         this.score = 0;
         this.testData = [];
         this.userAnswers = [];
-        this.totalQuestions = 0;
         this.init();
     }
 
     init() {
         console.log('🚀 LearningPath başlatılıyor...');
         this.bindEvents();
-        this.showCorrectSection(); 
-        this.addRestartButton(); 
+        this.showCorrectSection();
     }
 
     bindEvents() {
         console.log('🔗 Eventler bağlanıyor...');
 
+        // TEST BAŞLAT BUTONU - Kesin çözüm
         const startTestBtn = document.getElementById('startTestBtn');
         if (startTestBtn) {
             startTestBtn.addEventListener('click', () => {
                 console.log('🧪 Test başlat butonuna tıklandı');
+                this.showSection('levelTestSection');
                 this.startTest();
             });
+        } else {
+            console.log('❌ startTestBtn bulunamadı!');
         }
 
+        // CEVAP BUTONLARI
         document.addEventListener('click', (e) => {
             if (e.target.classList.contains('answer-btn')) {
                 this.selectAnswer(e.target);
             }
         });
 
+        // TEST NAVIGASYON BUTONLARI
         const prevBtn = document.getElementById('prevQuestionBtn');
         const nextBtn = document.getElementById('nextQuestionBtn');
         const submitBtn = document.getElementById('submitTestBtn');
 
-        if (prevBtn) prevBtn.addEventListener('click', () => this.navigateQuestion(-1));
-        if (nextBtn) nextBtn.addEventListener('click', () => this.navigateQuestion(1));
+        if (prevBtn) prevBtn.addEventListener('click', () => this.prevQuestion());
+        if (nextBtn) nextBtn.addEventListener('click', () => this.nextQuestion());
         if (submitBtn) submitBtn.addEventListener('click', () => this.submitTest());
-        
+
+        // TESTİ YENİDEN BAŞLAT
         document.addEventListener('click', (e) => {
             if (e.target.id === 'restartTestBtn') {
-                this.resetAndStartTest();
+                this.restartTest();
             }
         });
     }
-    
-    // --- Test Başlatma ve Veri Yükleme ---
-    async startTest() {
-        const introSection = document.getElementById('levelTestIntroSection');
-        if (introSection) {
-             introSection.style.display = 'none';
-        }
 
+    // SECTION YÖNETİMİ
+    showSection(sectionId) {
+        console.log('📁 Section gösteriliyor:', sectionId);
+        
+        // Tüm section'ları gizle
+        document.querySelectorAll('.section').forEach(section => {
+            section.classList.remove('active');
+        });
+        
+        // İstenen section'ı göster
+        const targetSection = document.getElementById(sectionId);
+        if (targetSection) {
+            targetSection.classList.add('active');
+        }
+    }
+
+    showCorrectSection() {
+        const saved = localStorage.getItem('englishLearnerProfile');
+        
+        if (saved) {
+            try {
+                const profile = JSON.parse(saved);
+                if (profile.testResults) {
+                    this.showSection('learningPathSection');
+                    setTimeout(() => this.loadProfileForDisplay(), 100);
+                    return;
+                }
+            } catch (e) {
+                console.log('Profil okuma hatası:', e);
+            }
+        }
+        
+        this.showSection('welcomeSection');
+    }
+
+    // TEST İŞLEVLERİ
+    startTest() {
+        console.log('🧪 TEST BAŞLATILIYOR...');
+        this.loadTestData();
+        this.showQuestion(0);
+    }
+
+    loadTestData() {
+        this.testData = [
+            {
+                id: 1,
+                question: "Hello, how ___ you?",
+                answers: ["is", "are", "am", "be"],
+                correct: 1,
+                area: "Basic Verbs"
+            },
+            {
+                id: 2, 
+                question: "She ___ to school every day.",
+                answers: ["go", "goes", "going", "went"],
+                correct: 1,
+                area: "Present Simple"
+            },
+            {
+                id: 3,
+                question: "If I ___ time, I will call you.",
+                answers: ["have", "has", "had", "will have"],
+                correct: 0,
+                area: "Conditionals"
+            },
+            {
+                id: 4,
+                question: "They ___ watching TV when I arrived.",
+                answers: ["are", "were", "is", "was"],
+                correct: 1,
+                area: "Past Continuous"
+            },
+            {
+                id: 5,
+                question: "This is ___ book I told you about.",
+                answers: ["a", "an", "the", "-"],
+                correct: 2,
+                area: "Articles"
+            }
+        ];
+        
+        this.userAnswers = new Array(this.testData.length).fill(null);
         this.currentQuestion = 0;
         this.score = 0;
-        this.userAnswers = [];
-        this.totalQuestions = 0;
-        
-        // Veri yolu (root dizine göre)
-        const testDataUrl = '../data/level_test.json'; 
-        
-        if (typeof loadData !== 'function') {
-            document.getElementById('questionContainer').innerHTML = `<p style="color:red;">Hata: common.js'deki yükleme fonksiyonu bulunamadı.</p>`;
-            this.showSection('levelTestSection');
-            return;
-        }
-
-        try {
-            console.log(`📡 Test verisi yükleniyor (URL: ${testDataUrl})...`);
-            
-            let loadedData = await loadData(testDataUrl); 
-            
-            // 🔴 KRİTİK KONTROL VE DÜZELTME
-            // Eğer JSON dosyası sadece bir dizi içeriyorsa, direkt onu kullan.
-            // Eğer JSON verisi bir nesne içinde bir dizi içeriyorsa (ör: { "questions": [...] }), 
-            // doğru diziyi bulmaya çalış. Bu, common.js'den gelen data yükleme mantığıyla uyumlu olmalıdır.
-            if (loadedData && Array.isArray(loadedData)) {
-                 this.testData = loadedData;
-            } else if (loadedData && loadedData.questions && Array.isArray(loadedData.questions)) {
-                 this.testData = loadedData.questions;
-            } else if (loadedData && loadedData.data && Array.isArray(loadedData.data)) {
-                 this.testData = loadedData.data;
-            } else {
-                 // Yine de deneme amaçlı, yüklü olanı kullan.
-                 this.testData = loadedData;
-            }
-
-            if (!this.testData || !Array.isArray(this.testData) || this.testData.length === 0) {
-                throw new Error("Test verisi yüklendi ancak boş veya geçerli bir dizi değil. Yüklenen tip: " + (Array.isArray(loadedData) ? 'Array' : typeof loadedData));
-            }
-
-            this.totalQuestions = this.testData.length;
-            const totalQCountSpan = document.getElementById('totalQuestionCount');
-            if (totalQCountSpan) {
-                totalQCountSpan.textContent = this.totalQuestions;
-            }
-
-            this.showSection('levelTestSection'); 
-            this.renderQuestion(this.currentQuestion);
-            this.updateNavigationButtons();
-
-        } catch (error) {
-            console.error('❌ Test verisi yükleme hatası:', error.message);
-            document.getElementById('questionContainer').innerHTML = 
-                `<div style="color: red; padding: 20px;"><h2>Hata! Test Başlatılamadı.</h2><p>Detay: ${error.message}</p></div>`;
-            this.showSection('levelTestSection'); 
-        }
-    }
-    
-    resetAndStartTest() {
-        document.querySelectorAll('.module-section').forEach(sec => sec.style.display = 'none');
-        this.showSection('levelTestIntroSection');
-
-        this.currentQuestion = 0;
-        this.score = 0;
-        this.userAnswers = [];
-        this.testData = [];
-        
-        document.getElementById('resultsSection').innerHTML = '';
-        document.getElementById('learningPathSection').innerHTML = '';
-        document.getElementById('questionContainer').innerHTML = 'Lütfen bekleyiniz, test yükleniyor...';
-        
-        const currentQNum = document.getElementById('currentQuestionNumber');
-        const totalQCount = document.getElementById('totalQuestionCount');
-        if (currentQNum) currentQNum.textContent = '0';
-        if (totalQCount) totalQCount.textContent = '0';
     }
 
-    // --- Soru Render Etme ---
-    renderQuestion(index) {
-        if (!this.testData[index]) {
-            console.error(`Soru verisi mevcut değil: index ${index}`);
-            return;
+    showQuestion(questionIndex) {
+        if (questionIndex < 0 || questionIndex >= this.testData.length) return;
+        
+        this.currentQuestion = questionIndex;
+        const question = this.testData[questionIndex];
+        
+        // SORU METNİ
+        const questionElement = document.getElementById('questionText');
+        if (questionElement) {
+            questionElement.textContent = question.question;
         }
 
-        const question = this.testData[index];
-        const container = document.getElementById('questionContainer');
-        
-        let optionsHtml = question.options.map((option, i) => `
-            <button class="answer-btn btn btn-option" data-answer="${option}" data-index="${i}" ${this.userAnswers[index] === option ? 'aria-pressed="true"' : ''}>
-                ${option}
-            </button>
-        `).join('');
-
-        // 🟢 JSON dosyanızdaki "questionText" anahtarını kullanır
-        const questionText = question.questionText || 'SORU METNİ YÜKLENEMEDİ'; 
-
-        container.innerHTML = `
-            <div class="question-box">
-                <p class="question-text">${index + 1}. ${questionText}</p> 
-                <div class="options-container">
-                    ${optionsHtml}
-                </div>
-            </div>
-        `;
-        
-        if (this.userAnswers[index]) {
-            const selectedBtn = container.querySelector(`[data-answer="${this.userAnswers[index]}"]`);
-            if (selectedBtn) {
-                this.highlightAnswer(selectedBtn);
-            }
+        // CEVAPLAR
+        const answersContainer = document.getElementById('answersContainer');
+        if (answersContainer) {
+            answersContainer.innerHTML = '';
+            question.answers.forEach((answer, index) => {
+                const isSelected = this.userAnswers[questionIndex] === index;
+                const button = document.createElement('button');
+                button.className = isSelected ? 'answer-btn selected' : 'answer-btn';
+                button.textContent = answer;
+                button.dataset.index = index;
+                answersContainer.appendChild(button);
+            });
         }
         
-        const currentQuestionNumber = document.getElementById('currentQuestionNumber');
-        if (currentQuestionNumber) {
-            currentQuestionNumber.textContent = index + 1;
-        }
-
-        this.updateProgressBar(); 
+        this.updateProgress();
+        this.updateNavigationButtons();
     }
-    
-    // --- Cevap Seçimi ve Kayıt ---
+
     selectAnswer(button) {
-        const questionIndex = this.currentQuestion;
-        const answer = button.getAttribute('data-answer');
+        const answerIndex = parseInt(button.dataset.index);
+        this.userAnswers[this.currentQuestion] = answerIndex;
         
-        this.userAnswers[questionIndex] = answer;
-        
-        const container = document.getElementById('questionContainer');
-        container.querySelectorAll('.answer-btn').forEach(btn => {
+        document.querySelectorAll('.answer-btn').forEach(btn => {
             btn.classList.remove('selected');
-            btn.removeAttribute('aria-pressed');
         });
         
-        this.highlightAnswer(button);
-        
-        setTimeout(() => {
-             this.navigateQuestion(1);
-        }, 300); 
-    }
-    
-    highlightAnswer(button) {
         button.classList.add('selected');
-        button.setAttribute('aria-pressed', 'true');
     }
 
-    // --- Navigasyon ---
-    navigateQuestion(direction) { 
-        const newIndex = this.currentQuestion + direction;
+    prevQuestion() {
+        if (this.currentQuestion > 0) {
+            this.showQuestion(this.currentQuestion - 1);
+        }
+    }
+
+    nextQuestion() {
+        if (this.currentQuestion < this.testData.length - 1) {
+            this.showQuestion(this.currentQuestion + 1);
+        }
+    }
+
+    updateProgress() {
+        const progressText = document.getElementById('progressText');
+        const progressBar = document.getElementById('progressBar');
         
-        if (newIndex >= 0 && newIndex < this.totalQuestions) {
-            this.currentQuestion = newIndex;
-            this.renderQuestion(this.currentQuestion);
-            this.updateNavigationButtons();
-        } else if (newIndex === this.totalQuestions) {
-             this.updateNavigationButtons(); 
-             const submitBtn = document.getElementById('submitTestBtn');
-             if (submitBtn && submitBtn.style.display !== 'none') {
-                 this.submitTest();
-             }
+        if (progressText) {
+            progressText.textContent = `Soru ${this.currentQuestion + 1}/${this.testData.length}`;
+        }
+        
+        if (progressBar) {
+            const progress = ((this.currentQuestion + 1) / this.testData.length) * 100;
+            progressBar.style.width = `${progress}%`;
         }
     }
 
@@ -219,131 +210,216 @@ class LearningPath {
         const nextBtn = document.getElementById('nextQuestionBtn');
         const submitBtn = document.getElementById('submitTestBtn');
         
-        const lastQuestionIndex = this.totalQuestions - 1;
-
-        if (prevBtn) {
-            prevBtn.style.display = this.currentQuestion > 0 ? 'inline-block' : 'none';
-        }
-
-        if (nextBtn) {
-            nextBtn.style.display = this.currentQuestion < lastQuestionIndex ? 'inline-block' : 'none';
-        }
-        
-        if (submitBtn) {
-            const allAnswered = this.userAnswers.length === this.totalQuestions && 
-                                this.userAnswers.every(ans => ans !== undefined);
-                                
-            submitBtn.style.display = (this.currentQuestion === lastQuestionIndex || allAnswered) ? 'inline-block' : 'none';
-
-            if (nextBtn && nextBtn.style.display === 'inline-block') {
-                submitBtn.style.display = 'none';
-            }
-        }
-    }
-    
-    updateProgressBar() { 
-        const progressBar = document.getElementById('testProgressBar');
-        if (progressBar) {
-            const progress = (this.currentQuestion + 1) / this.totalQuestions * 100;
-            progressBar.style.width = `${progress}%`;
-        }
+        if (prevBtn) prevBtn.style.display = this.currentQuestion > 0 ? 'inline-block' : 'none';
+        if (nextBtn) nextBtn.style.display = this.currentQuestion < this.testData.length - 1 ? 'inline-block' : 'none';
+        if (submitBtn) submitBtn.style.display = this.currentQuestion === this.testData.length - 1 ? 'inline-block' : 'none';
     }
 
-    // --- Testi Bitirme ve Sonuçlar ---
     submitTest() {
-        if (this.totalQuestions === 0) {
-            alert("Test verisi yüklenemediği için skor hesaplanamıyor.");
-            return;
-        }
-        
-        const missingCount = this.totalQuestions - this.userAnswers.filter(ans => ans !== undefined).length;
-        if (missingCount > 0) {
-            if (!confirm(`Henüz ${missingCount} soru daha cevaplanmadı. Testi yine de bitirmek ister misiniz?`)) {
-                return; 
-            }
-        }
-        
+        // Skoru hesapla
         this.calculateScore();
-        this.determineLevel();
-        this.renderResults();
-        this.showSection('resultsSection');
+        
+        // Sonuçları hazırla
+        const results = {
+            score: Math.round((this.score / this.testData.length) * 100),
+            correctAnswers: this.score,
+            totalQuestions: this.testData.length,
+            determinedLevel: this.determineLevel(),
+            weakAreas: this.analyzeWeakAreas(),
+            levelExplanation: this.getLevelExplanation(),
+            testDate: new Date().toISOString()
+        };
+        
+        // Kaydet
+        this.saveTestResults(results);
+        
+        // Learning Path'e git
+        this.showSection('learningPathSection');
+        setTimeout(() => this.loadProfileForDisplay(), 100);
     }
 
     calculateScore() {
         this.score = 0;
         this.testData.forEach((question, index) => {
-            if (this.userAnswers[index] && this.userAnswers[index] === question.correctAnswer) {
-                this.score += 1; 
+            if (this.userAnswers[index] === question.correct) {
+                this.score++;
             }
         });
-        console.log(`🎯 Nihai Skor: ${this.score}`);
     }
 
     determineLevel() {
-        const totalPossibleScore = this.totalQuestions; 
-        const scorePercentage = (this.score / totalPossibleScore) * 100;
+        const percentage = (this.score / this.testData.length) * 100;
+        if (percentage >= 80) return 'B2';
+        if (percentage >= 60) return 'B1';
+        if (percentage >= 40) return 'A2';
+        return 'A1';
+    }
+
+    analyzeWeakAreas() {
+        const areas = {};
+        this.testData.forEach((question, index) => {
+            if (this.userAnswers[index] !== question.correct) {
+                areas[question.area] = (areas[question.area] || 0) + 1;
+            }
+        });
+        return Object.keys(areas).slice(0, 3);
+    }
+
+    getLevelExplanation() {
+        const level = this.determineLevel();
+        const explanations = {
+            'A1': 'Başlangıç seviyesindesin. Temel kelimeler ve basit cümleler üzerine odaklan.',
+            'A2': 'Temel seviyedesin. Günlük konuşmaları anlamaya başla ve basit diyaloglar kur.',
+            'B1': 'Orta seviyedesin. Kendini ifade etmeye ve daha karmaşık cümleler kurmaya çalış.',
+            'B2': 'İleri seviyedesin. Akıcı konuşma ve karmaşık metinleri anlama üzerine çalış.'
+        };
+        return explanations[level] || 'Seviye belirlendi.';
+    }
+
+    saveTestResults(results) {
+        const profile = {
+            testResults: results,
+            level: results.determinedLevel,
+            stats: {
+                totalExercises: 1,
+                totalPoints: results.score,
+                totalWords: 0
+            },
+            dailyProgress: {
+                wordsToday: 0,
+                pointsToday: results.score,
+                exercisesToday: 1,
+                date: new Date().toISOString().split('T')[0]
+            },
+            lastUpdated: new Date().toISOString()
+        };
         
-        if (scorePercentage >= 85) this.level = 'C1';
-        else if (scorePercentage >= 70) this.level = 'B2';
-        else if (scorePercentage >= 50) this.level = 'B1';
-        else if (scorePercentage >= 30) this.level = 'A2';
-        else this.level = 'A1';
-        
-        if (typeof userProfile !== 'undefined') {
-            userProfile.updateLevel(this.level);
-        } else {
-            localStorage.setItem('userLevel', this.level);
+        localStorage.setItem('englishLearnerProfile', JSON.stringify(profile));
+    }
+
+    restartTest() {
+        if (confirm('Testi yeniden başlatmak istediğinizden emin misiniz?')) {
+            localStorage.removeItem('englishLearnerProfile');
+            this.showSection('welcomeSection');
         }
     }
 
-    renderResults() {
-        const resultsSection = document.getElementById('resultsSection');
-        resultsSection.innerHTML = `
-            <div class="result-card">
-                <h2>Tebrikler! Testi Tamamladınız.</h2>
-                <div class="level-result">
-                    <span class="level-badge level-${this.level.toLowerCase()}">${this.level}</span>
-                    <h3>İngilizce Seviyeniz</h3>
-                    <p class="score-summary">Toplam ${this.totalQuestions} sorudan, ${this.score} doğru cevap verdiniz.</p>
-                </div>
-                <button id="viewPathBtn" class="btn btn-primary large" style="margin-top: 20px;">Öğrenme Yolumu Gör</button>
-            </div>
-        `;
-        
-        document.getElementById('viewPathBtn').addEventListener('click', () => {
-            this.renderLearningPath();
-            this.showSection('learningPathSection');
-        });
+    // ÖĞRENME YOLU
+    loadProfileForDisplay() {
+        try {
+            const saved = localStorage.getItem('englishLearnerProfile');
+            if (saved) {
+                const profile = JSON.parse(saved);
+                this.showLevelInfo(profile);
+                this.updateDashboard(profile);
+                this.showWeeklyPlan();
+                this.showRecommendedContent();
+                this.addRestartButton();
+            }
+        } catch (error) {
+            console.error('Profil yükleme hatası:', error);
+        }
     }
 
-    // --- Öğrenme Yolu ---
-    renderLearningPath() {
-        const contentContainer = document.getElementById('learningPathSection');
-        const contentHTML = `
-            <h2>${this.level} Seviyesi Öğrenme Yolunuz</h2>
-            <p class="path-description">Seviyenizdeki boşlukları doldurmak ve bir sonraki seviyeye geçmek için önerilen öğrenme planınız aşağıdadır.</p>
-            
-            <div class="path-stats">
-                <div class="stat-card">
-                    <h4>Mevcut Seviye</h4>
-                    <span class="stat-value level-badge level-${this.level.toLowerCase()}">${this.level}</span>
+    showLevelInfo(profile) {
+        const results = profile.testResults;
+        if (!results) return;
+
+        const levelHTML = `
+            <div class="level-explanation-card">
+                <div class="level-header">
+                    <h3 style="margin: 0; color: white;">🎓 Seviye Sonucun: <span class="level-badge">${results.determinedLevel}</span></h3>
+                    <div class="level-score">${results.score}% Başarı</div>
                 </div>
-                <div class=\"stat-card\">\r\n<h4>Önerilen Günlük Kelime</h4>\r\n<span class=\"stat-value\">${this.getDailyGoal('words')} kelime</span>\r\n</div>
-                <div class=\"stat-card\">\r\n<h4>Günlük Pratik Süresi</h4>\r\n<span class=\"stat-value\">${this.getDailyGoal('practice')} dakika</span>\r\n</div>
+                <p class="level-description">${results.levelExplanation}</p>
+                <div class="level-details">
+                    <div class="detail-item">
+                        <span class="detail-label">Doğru Cevaplar:</span>
+                        <span class="detail-value">${results.correctAnswers}/${results.totalQuestions}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Geliştirilecek Alanlar:</span>
+                        <span class="detail-value">${results.weakAreas.length > 0 ? results.weakAreas.join(', ') : 'Çok iyi! 🎉'}</span>
+                    </div>
+                </div>
             </div>
+        `;
+
+        const existing = document.querySelector('.level-explanation-card');
+        if (existing) existing.remove();
+
+        const pathHeader = document.querySelector('.path-header');
+        if (pathHeader) {
+            pathHeader.insertAdjacentHTML('afterend', levelHTML);
+        }
+    }
+
+    updateDashboard(profile) {
+        const elements = {
+            'userLevel': profile.level,
+            'dailyGoal': '10',
+            'learnedWords': profile.stats?.totalWords || '0',
+            'streakDays': '0'
+        };
+
+        Object.keys(elements).forEach(id => {
+            const element = document.getElementById(id);
+            if (element) element.textContent = elements[id];
+        });
+
+        const greeting = document.getElementById('userGreeting');
+        if (greeting) {
+            const hour = new Date().getHours();
+            const timeGreeting = hour < 12 ? 'Günaydın' : hour < 18 ? 'Tünaydın' : 'İyi akşamlar';
+            greeting.textContent = `${timeGreeting}! ${profile.level} seviyesindesin.`;
+        }
+    }
+
+    showWeeklyPlan() {
+        const planContainer = document.getElementById('weeklyPlan');
+        if (!planContainer) return;
+
+        const days = ['Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi', 'Pazar'];
+        const tasks = [
+            '5 yeni kelime öğren',
+            '3 gramer kuralı çalış',
+            'Dinleme pratiği yap',
+            'Okuma çalışması yap',
+            'Konuşma pratiği yap',
+            'Yazma alıştırması yap',
+            'Tekrar günü'
+        ];
+
+        const today = new Date().getDay();
+        const adjustedToday = today === 0 ? 6 : today - 1;
+
+        let planHTML = '<div class="weekly-plan">';
+        days.forEach((day, index) => {
+            const isToday = index === adjustedToday;
+            const dayClass = isToday ? 'day-card today' : 'day-card';
             
-            <h3 style="margin-top: 30px;">Pratik Alanları</h3>
-            <div class="practice-cards">
+            planHTML += `
+                <div class="${dayClass}">
+                    <div class="day-name">${day}</div>
+                    <div class="day-task">${tasks[index]}</div>
+                    ${isToday ? '<div class="today-badge">Bugün</div>' : ''}
+                </div>
+            `;
+        });
+        planHTML += '</div>';
+        planContainer.innerHTML = planHTML;
+    }
+
+    showRecommendedContent() {
+        const contentContainer = document.getElementById('recommendedContent');
+        if (!contentContainer) return;
+
+        const contentHTML = `
+            <div class="content-grid">
                 <div class="content-card">
                     <div class="content-icon">📚</div>
-                    <h4>Kelime Kartları</h4>
-                    <p>Seviyenize uygun temel kelimeler</p>
-                    <button class="btn-primary" onclick="window.location.href='flashcards.html?level=${this.level}'">Başla</button>
-                </div>
-                <div class="content-card">
-                    <div class="content-icon">📝</div>
-                    <h4>Grammar Exercises</h4>
-                    <p>Seviyenizdeki dilbilgisi konularını pekiştirin</p>
+                    <h4>Grammar Lessons</h4>
+                    <p>Temel gramer kurallarını öğren ve pratik yap</p>
                     <button class="btn-primary" onclick="learningPath.startActivity('grammar')">Başla</button>
                 </div>
                 <div class="content-card">
@@ -359,81 +435,26 @@ class LearningPath {
                     <button class="btn-primary" onclick="learningPath.startActivity('speaking')">Başla</button>
                 </div>
             </div>
-            
-            <div class="path-footer">
-                <p>Yeni bir seviyeye geçmeye hazır hissettiğinizde testi istediğiniz zaman yeniden başlatabilirsiniz.</p>
-                <button id="restartTestBtnFooter" class="btn btn-secondary large">Testi Yeniden Başlat</button>
-            </div>
         `;
         contentContainer.innerHTML = contentHTML;
-
-        document.getElementById('restartTestBtnFooter').addEventListener('click', () => {
-            this.resetAndStartTest();
-        });
     }
 
-    // --- Yardımcı Fonksiyonlar ---
-    showSection(sectionId) {
-        document.querySelectorAll('.module-section').forEach(sec => {
-            sec.style.display = 'none';
-            sec.classList.remove('active');
-        });
-        const targetSection = document.getElementById(sectionId);
-        if (targetSection) {
-            targetSection.style.setProperty('display', 'block', 'important'); 
-            targetSection.classList.add('active');
-        }
-    }
-    
-    showCorrectSection() {
-        this.showSection('levelTestIntroSection');
-        
-        const testSection = document.getElementById('levelTestSection');
-        const resultsSection = document.getElementById('resultsSection');
-        const learningPathSection = document.getElementById('learningPathSection');
-        
-        if (testSection) testSection.style.display = 'none';
-        if (resultsSection) resultsSection.style.display = 'none';
-        if (learningPathSection) learningPathSection.style.display = 'none';
-    }
-    
-    addRestartButton() { 
+    addRestartButton() {
         if (!document.getElementById('restartTestBtn')) {
             const button = document.createElement('button');
             button.id = 'restartTestBtn';
-            button.className = 'btn restart-btn btn-secondary';
-            button.textContent = '🔄 Ana Sayfaya Dön';
+            button.className = 'restart-btn';
+            button.textContent = '🔄 Testi Yeniden Başlat';
             
-            const header = document.querySelector('header');
-            if (header) {
-                header.parentNode.insertBefore(button, header.nextSibling); 
+            const container = document.querySelector('.learning-path-container');
+            if (container) {
+                container.appendChild(button);
             }
         }
     }
 
     startActivity(type) {
         alert(`🎯 ${type} aktivitesi başlatılıyor...\n\nBu özellik yakında eklenecek!`);
-    }
-
-    getCurrentLevel() {
-        const saved = localStorage.getItem('englishLearnerProfile');
-        if (saved) {
-            const profile = JSON.parse(saved);
-            return profile.level || 'A1';
-        }
-        return localStorage.getItem('userLevel') || 'A1';
-    }
-
-    getDailyGoal(type) {
-        const level = this.getCurrentLevel();
-        const goals = {
-            'A1': { words: 5, grammar: 2, practice: 15 },
-            'A2': { words: 8, grammar: 3, practice: 20 },
-            'B1': { words: 12, grammar: 4, practice: 25 },
-            'B2': { words: 15, grammar: 5, practice: 30 },
-            'C1': { words: 20, grammar: 6, practice: 40 }
-        };
-        return (goals[level] || goals['A1'])[type];
     }
 }
 

@@ -81,12 +81,13 @@ class LearningPath {
                 this.totalQuestionCountSpan.textContent = this.totalQuestions;
             }
 
-            // 🟢 BAŞARILI YÜKLEME SONRASI GÖRÜNÜMÜ GEÇİR
+            // 🟢 Burası Önemli: Başarılı yüklemeden sonra ekranı değiştir!
             this.showSection('levelTestSection'); 
 
+            // İlk soruyu render et
             this.renderQuestion(this.currentQuestion);
             this.updateNavigationButtons();
-
+            
         } catch (error) {
             console.error('❌ Test verisi yükleme hatası:', error.message);
             
@@ -437,3 +438,4 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('📄 SAYFA YÜKLENDİ - LearningPath başlatılıyor');
     window.learningPath = new LearningPath();
 });
+

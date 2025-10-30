@@ -18,24 +18,21 @@ class LearningPath {
     bindEvents() {
         console.log('🔗 Eventler bağlanıyor...');
 
-        // TEST BAŞLAT BUTONU
         const startTestBtn = document.getElementById('startTestBtn');
         if (startTestBtn) {
             startTestBtn.addEventListener('click', () => {
                 console.log('🧪 Test başlat butonuna tıklandı');
-                this.showSection('levelTestSection');
+                // showSection'ı kaldırıyoruz, çünkü startTest içinde çağrılacak (data yüklendikten sonra)
                 this.startTest();
             });
         }
 
-        // CEVAP BUTONLARI
         document.addEventListener('click', (e) => {
             if (e.target.classList.contains('answer-btn')) {
                 this.selectAnswer(e.target);
             }
         });
 
-        // TEST NAVIGASYON BUTONLARI
         const prevBtn = document.getElementById('prevQuestionBtn');
         const nextBtn = document.getElementById('nextQuestionBtn');
         const submitBtn = document.getElementById('submitTestBtn');
@@ -44,7 +41,6 @@ class LearningPath {
         if (nextBtn) nextBtn.addEventListener('click', () => this.navigateQuestion(1));
         if (submitBtn) submitBtn.addEventListener('click', () => this.submitTest());
         
-        // TESTİ YENİDEN BAŞLAT BUTONU
         document.addEventListener('click', (e) => {
             if (e.target.id === 'restartTestBtn') {
                 this.resetAndStartTest();
@@ -57,9 +53,9 @@ class LearningPath {
         this.currentQuestion = 0;
         this.score = 0;
         this.userAnswers = [];
-        this.totalQuestions = 0; // Sıfırla
+        this.totalQuestions = 0;
         
-        // 🟢 JSON dosya yolu: js klasöründen çıkıp data klasörüne gir (SON KESİN YOL)
+        // 🟢 KESİN JSON YOLU
         const testDataUrl = '../data/level_test.json'; 
         
         if (typeof loadData !== 'function') {
@@ -71,6 +67,7 @@ class LearningPath {
         try {
             console.log(`📡 Test verisi yükleniyor (URL: ${testDataUrl})...`);
             
+            // Veri yükleniyor...
             this.testData = await loadData(testDataUrl); 
 
             if (!this.testData || !Array.isArray(this.testData) || this.testData.length === 0) {
@@ -80,10 +77,12 @@ class LearningPath {
             this.totalQuestions = this.testData.length;
             this.totalQuestionCountSpan = document.getElementById('totalQuestionCount');
             
-            // HTML'deki soru sayısını güncelle
             if (this.totalQuestionCountSpan) {
                 this.totalQuestionCountSpan.textContent = this.totalQuestions;
             }
+
+            // 🟢 BAŞARILI YÜKLEME SONRASI GÖRÜNÜMÜ GEÇİR
+            this.showSection('levelTestSection'); 
 
             this.renderQuestion(this.currentQuestion);
             this.updateNavigationButtons();
@@ -91,7 +90,6 @@ class LearningPath {
         } catch (error) {
             console.error('❌ Test verisi yükleme hatası:', error.message);
             
-            // Kullanıcıya görünür bir hata mesajı göster
             document.getElementById('questionContainer').innerHTML = 
                 `<div style="color: red; padding: 20px; border: 1px solid red; border-radius: 8px;">
                     <h2>Hata! Test Başlatılamadı.</h2>
@@ -103,25 +101,23 @@ class LearningPath {
     }
     
     resetAndStartTest() {
-        // Tüm section'ları gizle
         document.querySelectorAll('.module-section').forEach(sec => sec.style.display = 'none');
         
-        // Giriş ekranını göster
         this.showSection('levelTestIntroSection');
 
-        // State'leri sıfırla
         this.currentQuestion = 0;
         this.score = 0;
         this.userAnswers = [];
         this.testData = [];
         
-        // Sonuçları ve ilerleme yolunu temizle
         document.getElementById('resultsSection').innerHTML = '';
         document.getElementById('learningPathSection').innerHTML = '';
         
-        // Soru/Toplam sayacı sıfırla
-        document.getElementById('currentQuestionNumber').textContent = '0';
-        document.getElementById('totalQuestionCount').textContent = '0';
+        // Sayaçları sıfırla
+        const currentQNum = document.getElementById('currentQuestionNumber');
+        const totalQCount = document.getElementById('totalQuestionCount');
+        if (currentQNum) currentQNum.textContent = '0';
+        if (totalQCount) totalQCount.textContent = '0';
     }
 
     // --- Soru Render Etme ---
@@ -176,7 +172,6 @@ class LearningPath {
         
         this.highlightAnswer(button);
         
-        // Otomatik olarak bir sonraki soruya geç
         setTimeout(() => {
              this.navigateQuestion(1);
         }, 300); 
@@ -220,13 +215,16 @@ class LearningPath {
         }
         
         if (submitBtn) {
+            // Son sorudaysak veya tüm soruları cevapladıysak Bitir'i göster
             const allAnswered = this.userAnswers.length === this.totalQuestions && 
                                 this.userAnswers.every(ans => ans !== undefined);
                                 
-            submitBtn.style.display = this.currentQuestion === lastQuestionIndex && !nextBtn.style.display ? 'inline-block' : 'none';
+            submitBtn.style.display = (this.currentQuestion === lastQuestionIndex || allAnswered) ? 'inline-block' : 'none';
 
-            // Tüm sorular cevaplandıysa ve son soruyu geçtiyse bitir butonunu göster (Ek kontrol)
-            if(allAnswered) submitBtn.style.display = 'inline-block';
+            // İlerle butonu görünüyorsa Bitir butonu görünmemeli (ikisi de son soruda görünür olmasın)
+            if (nextBtn && nextBtn.style.display === 'inline-block') {
+                submitBtn.style.display = 'none';
+            }
         }
     }
     
@@ -245,7 +243,6 @@ class LearningPath {
             return;
         }
         
-        // Eksik cevap kontrolü
         const missingCount = this.totalQuestions - this.userAnswers.filter(ans => ans !== undefined).length;
         if (missingCount > 0) {
             if (!confirm(`Henüz ${missingCount} soru daha cevaplanmadı. Testi yine de bitirmek istiyor musunuz?`)) {
@@ -262,9 +259,7 @@ class LearningPath {
     calculateScore() {
         this.score = 0;
         this.testData.forEach((question, index) => {
-            // Sadece cevaplanan soruları kontrol et
             if (this.userAnswers[index] && this.userAnswers[index] === question.correctAnswer) {
-                // Skoru zorluk seviyesine göre ağırlıklandır
                 const weight = question.difficulty === 'hard' ? 3 : 
                                question.difficulty === 'medium' ? 2 : 1;
                 this.score += weight;
@@ -287,7 +282,6 @@ class LearningPath {
         else if (scorePercentage >= 30) this.level = 'A2';
         else this.level = 'A1';
         
-        // Kullanıcı seviyesini güncelle (common.js'deki fonksiyona erişir)
         if (typeof userProfile !== 'undefined') {
             userProfile.updateLevel(this.level);
         } else {
@@ -407,7 +401,6 @@ class LearningPath {
             
             const header = document.querySelector('header');
             if (header) {
-                // Butonu header'ın hemen sonrasına, sayfada her zaman görünür olacak şekilde ekle
                 header.parentNode.insertBefore(button, header.nextSibling); 
             }
         }

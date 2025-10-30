@@ -46,7 +46,7 @@ class LearningPath {
 
         // ÖNEMLİ DÜZELTME: Dosya yolunu netleştirelim. 
         // learning-path.html aynı klasördeyse ve data klasörü bir üstte ise.
-        const testDataUrl = '../data/level_test.json'; 
+        const testDataUrl = '/data/level_test.json'; 
         
         // Eğer data klasörü learning-path.html ile AYNI klasördeyse:
         // const testDataUrl = './data/level_test.json'; 
@@ -254,4 +254,5 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('📄 SAYFA YÜKLENDİ - LearningPath başlatılıyor');
     window.learningPath = new LearningPath();
 });
+
 

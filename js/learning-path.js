@@ -211,14 +211,13 @@ const LearningPath = {
 
    // learning-path.js dosyasındaki displayLearningPath fonksiyonu
 
+    // learning-path.js dosyasındaki displayLearningPath fonksiyonu
+
     displayLearningPath: async function(level) {
+        // ... (Bu kısım aynı kalır)
         this.showSection('learningPathSection');
         const pathEl = document.getElementById('learningPathSection');
-        
-        pathEl.innerHTML = `
-            <h2>${level} Seviyesi Öğrenme Yolu</h2>
-            <p>Seviyeniz **${level}** olarak belirlendi. Size özel dersler yükleniyor...</p>
-        `;
+        // ... (Hata yönetimi ve veri çekme aynı kalır)
 
         try {
             const response = await fetch('data/learning_modules.json');
@@ -227,47 +226,71 @@ const LearningPath = {
             const modulesData = await response.json();
             const levelData = modulesData[level] || modulesData['A1']; 
             
-            // 🔴 YENİ KISIM: Genel İlerlemeyi Hesaplama
+            // Genel İlerlemeyi Hesaplama (Bu kısım aynı kalır)
             let totalProgress = 0;
             const moduleCount = levelData.modules.length;
-
             if (moduleCount > 0) {
                 const sumOfProgress = levelData.modules.reduce((sum, module) => sum + module.progress, 0);
                 totalProgress = Math.round(sumOfProgress / moduleCount);
             }
-            // learning-path.js dosyasındaki displayLearningPath fonksiyonu içinde, modulesHtml değişkeninin atandığı kısmı güncelleyin.
+            // ----------------------------------------------------
 
-            let modulesHtml = levelData.modules.map(module => `
-                <div class="module-card module-status-${module.status.toLowerCase().replace(/ /g, '-')}" 
-                     data-progress="${module.progress}">
-                    <h3>${module.name}</h3>
-                    <p>Konu: ${module.topic}</p>
-                    
-                    ${module.progress > 0 ? `
-                        <div class="module-stats-row">
-                            <span class="module-stat-item">
-                                <i class="fas fa-clock"></i> 
-                                ${module.lastDuration} dk
-                            </span>
-                            <span class="module-stat-item">
-                                <i class="fas fa-chart-line"></i> 
-                                ${module.lastScore}% Skor
-                            </span>
+            // 🔴 YENİ KISIM: Modülleri Konularına Göre Gruplama
+            const groupedModules = levelData.modules.reduce((groups, module) => {
+                const topic = module.topic;
+                if (!groups[topic]) {
+                    groups[topic] = [];
+                }
+                groups[topic].push(module);
+                return groups;
+            }, {});
+
+            let groupedHtml = '';
+
+            // Gruplar üzerinde döngü yaparak HTML'i oluşturma
+            for (const topic in groupedModules) {
+                const modulesInGroup = groupedModules[topic];
+                
+                // Konu Başlığı
+                groupedHtml += `<h3 class="module-group-title">${topic} Modülleri (${modulesInGroup.length})</h3>`;
+                
+                // Modüller Listesi
+                groupedHtml += `<div class="modules-list">`; 
+
+                groupedHtml += modulesInGroup.map(module => `
+                    <div class="module-card module-status-${module.status.toLowerCase().replace(/ /g, '-')}" 
+                         data-progress="${module.progress}">
+                        <h3>${module.name}</h3>
+                        <p>Konu: ${module.topic}</p>
+                        
+                        ${module.progress > 0 ? `
+                            <div class="module-stats-row">
+                                <span class="module-stat-item">
+                                    <i class="fas fa-clock"></i> 
+                                    ${module.lastDuration} dk
+                                </span>
+                                <span class="module-stat-item">
+                                    <i class="fas fa-chart-line"></i> 
+                                    ${module.lastScore}% Skor
+                                </span>
+                            </div>
+                        ` : ''}
+                        
+                        <div class="module-progress-container">
+                            <div class="progress-bar-small">
+                                <div class="progress-fill-small" style="width: ${module.progress}%;"></div>
+                            </div>
+                            <span class="progress-text">${module.progress}% ${module.progress === 100 ? 'Tamamlandı' : 'İlerledi'}</span>
                         </div>
-                    ` : ''}
-                    <div class="module-progress-container">
-                        <div class="progress-bar-small">
-                            <div class="progress-fill-small" style="width: ${module.progress}%;"></div>
-                        </div>
-                        <span class="progress-text">${module.progress}% ${module.progress === 100 ? 'Tamamlandı' : 'İlerledi'}</span>
+
+                        <span class="module-status-badge">${module.status}</span>
+                        <button class="btn btn-primary btn-sm" onclick="LearningPath.startModule('${module.id}')">${module.progress === 100 ? 'Tekrar Et' : 'İncele/Devam Et'}</button>
                     </div>
-
-                    <span class="module-status-badge">${module.status}</span>
-                    <button class="btn btn-primary btn-sm" onclick="LearningPath.startModule('${module.id}')">${module.progress === 100 ? 'Tekrar Et' : 'İncele/Devam Et'}</button>
-                </div>
-            `).join('');
-
-            // ... (Fonksiyonun geri kalanı aynı kalır)
+                `).join('');
+                
+                groupedHtml += `</div>`; // modules-list div'ini kapat
+            }
+            // ----------------------------------------------------
 
             // İçeriği güncelle
             pathEl.innerHTML = `
@@ -288,20 +311,15 @@ const LearningPath = {
                         <p>Bu seviyede toplam ${moduleCount} modül bulunmaktadır. Devam edin!</p>
                     </div>
                 </div>
-                <div class="modules-list">
-                    ${modulesHtml}
+                <div class="grouped-modules-container">
+                    ${groupedHtml}
                 </div>
-
+                
                 <button class="btn btn-secondary mt-4" onclick="LearningPath.resetTest()">Teste Geri Dön/Yeniden Başlat</button>
             `;
 
         } catch (error) {
-            console.error('❌ Öğrenme Modülleri yüklenirken hata:', error);
-            pathEl.innerHTML = `
-                 <h2>Hata</h2>
-                 <p>Öğrenme modülleri yüklenemedi. Lütfen konsol hatalarını kontrol edin.</p>
-                 <button class="btn btn-secondary mt-4" onclick="LearningPath.resetTest()">Giriş Ekranına Dön</button>
-            `;
+            // ... (Hata yönetimi aynı kalır)
         }
     },
 
@@ -350,6 +368,7 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('📄 SAYFA YÜKLENDİ - LearningPath başlatılıyor');
     LearningPath.init();
 });
+
 
 
 

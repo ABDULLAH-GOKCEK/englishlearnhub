@@ -341,4 +341,35 @@
     gap: 20px;
     /* Eski margin-top'u sildik, başlıklar zaten yeterli boşluğu sağlıyor */
 }
+/* learning-path.css dosyasının sonuna eklenecek stiller */
+
+/* Seviye Tamamlama Kartı Stilleri */
+.level-complete-card {
+    text-align: center;
+    background: #e6ffec; /* Açık yeşil arka plan */
+    border: 2px solid #28a745;
+    padding: 30px;
+    margin: 30px 0;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(40, 167, 69, 0.2);
+}
+
+.level-complete-title {
+    color: #28a745;
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+    text-shadow: 1px 1px 1px rgba(0,0,0,0.05);
+}
+
+.level-complete-card p {
+    font-size: 1.1rem;
+    color: #333;
+    margin-bottom: 25px;
+}
+
+.btn-lg {
+    padding: 12px 25px;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
 

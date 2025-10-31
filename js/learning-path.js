@@ -1,6 +1,6 @@
 /**
  * learning-path.js
- * Seviye Testi ve Öğrenme Yolu Modülünün Ana Logic'i
+ * Seviye Testi ve Öğrenme Yolu Modülünün Ana Logic'i (TAMAMEN GÜNCEL)
  */
 
 console.log('🚀 LearningPath başlatılıyor...');
@@ -18,19 +18,46 @@ const LearningPath = {
 
     init: function() {
         console.log('🔗 Eventler bağlanıyor...');
+        // startTestBtn, test bittiğinde sıfırlama mekanizması ile tekrar aktif edilir.
         document.getElementById('startTestBtn').addEventListener('click', this.startTest.bind(this));
+        
         document.getElementById('nextQuestionBtn').addEventListener('click', this.navigateTest.bind(this, 1));
         document.getElementById('prevQuestionBtn').addEventListener('click', this.navigateTest.bind(this, -1));
         document.getElementById('submitTestBtn').addEventListener('click', this.submitTest.bind(this));
+
+        // Sayfa yüklendiğinde her zaman giriş ekranını göster
+        this.resetTest(); 
+    },
+    
+    // =================================================================
+    // 2. TESTİ SIFIRLAMA VE BAŞLATMA (YENİ EKLEME)
+    // =================================================================
+    
+    resetTest: function() {
+        this.allQuestions = []; 
+        this.userAnswers = []; 
+        this.currentQuestionIndex = 0;
+        this.totalQuestions = 0;
+        this.testStarted = false; // KRİTİK: Test durumu sıfırlandı
+        
+        // Arayüzdeki göstergeleri temizle ve Giriş ekranına dön
+        document.getElementById('currentQuestionNumber').textContent = '0';
+        document.getElementById('totalQuestionCount').textContent = '0';
+        document.getElementById('testProgressBar').style.width = '0%';
+        document.getElementById('questionContainer').innerHTML = 'Lütfen bekleyiniz, test yükleniyor...';
+
+        console.log('🔄 Test başarıyla sıfırlandı. Giriş ekranı gösteriliyor.');
+        this.showSection('levelTestIntroSection'); 
     },
 
-    // =================================================================
-    // 2. TESTİ BAŞLATMA VE VERİ YÜKLEME
-    // =================================================================
-
     startTest: async function() {
-        if (this.testStarted) return;
-        this.testStarted = true;
+        // Eğer zaten başlamış ve bitmemişse (koruma)
+        if (this.testStarted && this.allQuestions.length > 0 && this.currentQuestionIndex < this.totalQuestions) {
+             return; 
+        }
+
+        this.resetTest(); // Başlamadan önce sıfırla
+        this.testStarted = true; // Başladı olarak işaretle
 
         this.showSection('levelTestSection');
         
@@ -57,7 +84,7 @@ const LearningPath = {
         } catch (error) {
             console.error('❌ Sorular yüklenirken hata oluştu:', error);
             document.getElementById('questionContainer').innerHTML = 
-                `<p class="text-danger">Sorular yüklenemedi. Konsol hatalarını kontrol edin. (${error.message})</p>`;
+                `<p class="text-danger">Sorular yüklenemedi. Lütfen dosya yolunu (data/level_test.json) kontrol edin. (${error.message})</p>`;
         }
     },
 
@@ -84,10 +111,8 @@ const LearningPath = {
             </div>
         `;
 
-        // Seçenek butonlarına tıklama eventlerini bağla
+        // Tıklama event'i sadece kullanıcı tıkladığında çalışır (Otomatik cevaplamayı önler)
         document.querySelectorAll('.answer-btn').forEach(button => {
-            // Tıklama event'ini sadece butonun kendisine bağlıyoruz.
-            // Bu, otomatik cevaplamayı önler.
             button.addEventListener('click', this.handleAnswerSelection.bind(this)); 
         });
 
@@ -101,21 +126,18 @@ const LearningPath = {
 
         const answer = selectedButton.dataset.answer;
         
-        // Görsel güncellemeler: Sadece aynı options-container içindeki diğer seçimleri kaldır
+        // Görsel güncellemeler
         selectedButton.closest('.options-container').querySelectorAll('.answer-btn').forEach(btn => {
             btn.classList.remove('selected');
         });
         selectedButton.classList.add('selected');
 
-        // Cevabı kaydet (Bu fonksiyon, sadece kullanıcı tıkladığında çalışır)
+        // Cevabı kaydet
         this.userAnswers[this.currentQuestionIndex] = answer;
         console.log(`📝 Soru ${this.currentQuestionIndex + 1} için cevap kaydedildi: ${answer}`);
-        
-        // 🔴 KRİTİK NOT: Buraya otomatik ilerleme kodu eklenmedi. İlerleme butona bağlıdır.
     },
 
     navigateTest: function(direction) {
-        // Geçerli bir cevap seçilmemişse ileri gitmeyi engelle
         if (direction === 1 && this.userAnswers[this.currentQuestionIndex] === null) {
             alert('Lütfen bu soruyu cevaplayın.');
             return;
@@ -133,48 +155,8 @@ const LearningPath = {
     },
 
     // =================================================================
-    // 4. ARAYÜZ GÜNCELLEMELERİ VE DİĞER FONKSİYONLAR
+    // 4. TESTİ BİTİRME VE SONUÇLANDIRMA
     // =================================================================
-
-    updateTestHeader: function() {
-        // ... (Aynı kalır)
-        const currentNumEl = document.getElementById('currentQuestionNumber');
-        const totalCountEl = document.getElementById('totalQuestionCount');
-        const progressBar = document.getElementById('testProgressBar');
-
-        currentNumEl.textContent = this.currentQuestionIndex + 1;
-        totalCountEl.textContent = this.totalQuestions;
-
-        const progress = ((this.currentQuestionIndex + 1) / this.totalQuestions) * 100;
-        progressBar.style.width = `${progress}%`;
-    },
-
-    updateNavigationButtons: function() {
-        // ... (Aynı kalır)
-        const prevBtn = document.getElementById('prevQuestionBtn');
-        const nextBtn = document.getElementById('nextQuestionBtn');
-        const submitBtn = document.getElementById('submitTestBtn');
-
-        prevBtn.style.display = this.currentQuestionIndex > 0 ? 'inline-block' : 'none';
-
-        if (this.currentQuestionIndex === this.totalQuestions - 1) {
-            nextBtn.style.display = 'none';
-            submitBtn.style.display = 'inline-block';
-        } else {
-            nextBtn.style.display = 'inline-block';
-            submitBtn.style.display = 'none';
-        }
-    },
-
-    showSection: function(sectionId) {
-        // ... (Aynı kalır)
-        document.querySelectorAll('.module-section').forEach(section => {
-            section.classList.remove('active');
-        });
-        document.getElementById(sectionId).classList.add('active');
-    },
-
-    // ... (submitTest, calculateLevel, displayResults, displayLearningPath fonksiyonları aynı kalır)
 
     submitTest: function() {
         if (this.userAnswers[this.totalQuestions - 1] === null) {
@@ -182,9 +164,10 @@ const LearningPath = {
             return;
         }
         
-        this.showSection('resultsSection');
         const userLevel = this.calculateLevel();
-        this.displayResults(userLevel);
+        
+        // Sonuçları göster ve sistemi sıfırlamaya hazırla
+        this.displayResults(userLevel); 
         
         if (typeof updateUserLevel === 'function') {
              updateUserLevel(userLevel);
@@ -208,10 +191,12 @@ const LearningPath = {
         return 'A1';
     },
 
-    // learning-path.js içindeki displayResults ve displayLearningPath fonksiyonlarını bu şekilde değiştirin.
-
     displayResults: function(level) {
         const resultsEl = document.getElementById('resultsSection');
+        
+        // Test bittiğinde sonuçları gösterirken, Giriş ekranını aktif etmiyoruz.
+        this.showSection('resultsSection'); 
+
         resultsEl.innerHTML = `
             <div class="result-card">
                 <h2>Seviye Tespit Sonucu</h2>
@@ -219,15 +204,10 @@ const LearningPath = {
                 <p>Tespit edilen İngilizce seviyeniz:</p>
                 <div class="level-badge level-${level.toLowerCase()}">${level}</div>
                 <p class="mt-3">Bu seviyeye göre size özel hazırlanan öğrenme yolunu aşağıda görebilirsiniz.</p>
-                
                 <button class="btn btn-primary mt-3" onclick="LearningPath.displayLearningPath('${level}')">Öğrenme Yolunu Gör</button>
             </div>
         `;
     },
-
-    // learning-path.js dosyasındaki bu fonksiyonları güncelleyin.
-
-    // ... (Diğer tüm fonksiyonlar aynı kalır: startTest, renderQuestion, submitTest, calculateLevel, displayResults)
 
     displayLearningPath: async function(level) {
         this.showSection('learningPathSection');
@@ -239,12 +219,12 @@ const LearningPath = {
         `;
 
         try {
-            // 🔴 Yeni JSON dosyasını çekiyoruz
+            // Modül verisini çekme
             const response = await fetch('data/learning_modules.json');
             if (!response.ok) throw new Error(`Modül verisi yüklenemedi: ${response.status}`);
             
             const modulesData = await response.json();
-            const levelData = modulesData[level] || modulesData['A1']; // Seviye bulunamazsa A1'i göster
+            const levelData = modulesData[level] || modulesData['A1']; 
 
             let modulesHtml = levelData.modules.map(module => `
                 <div class="module-card module-status-${module.status.toLowerCase()}">
@@ -264,6 +244,7 @@ const LearningPath = {
                 <div class="modules-list">
                     ${modulesHtml}
                 </div>
+                <button class="btn btn-secondary mt-4" onclick="LearningPath.resetTest()">Teste Geri Dön/Yeniden Başlat</button>
             `;
 
         } catch (error) {
@@ -271,19 +252,54 @@ const LearningPath = {
             pathEl.innerHTML = `
                  <h2>Hata</h2>
                  <p>Öğrenme modülleri yüklenemedi. Lütfen konsol hatalarını kontrol edin.</p>
+                 <button class="btn btn-secondary mt-4" onclick="LearningPath.resetTest()">Giriş Ekranına Dön</button>
             `;
         }
     },
     
-    // Yeni fonksiyon: Bir modüle tıklandığında çalışır
     startModule: function(moduleId) {
         alert(`Modül ID: ${moduleId} ile ders içeriği yükleniyor...`);
-        // İleride bu fonksiyon, modül içeriğini yükleyen başka bir sayfa/fonksiyona yönlendirme yapacaktır.
-    }
-};
-// Not: document.addEventListener('DOMContentLoaded', ...) kısmı dosyanın en altında aynı kalmalıdır.
+    },
 
-// Not: Diğer fonksiyonlar (init, startTest vb.) aynı kalmalıdır.
+
+    // =================================================================
+    // 5. ARAYÜZ GÜNCELLEMELERİ
+    // =================================================================
+
+    updateTestHeader: function() {
+        const currentNumEl = document.getElementById('currentQuestionNumber');
+        const totalCountEl = document.getElementById('totalQuestionCount');
+        const progressBar = document.getElementById('testProgressBar');
+
+        currentNumEl.textContent = this.currentQuestionIndex + 1;
+        totalCountEl.textContent = this.totalQuestions;
+
+        const progress = ((this.currentQuestionIndex + 1) / this.totalQuestions) * 100;
+        progressBar.style.width = `${progress}%`;
+    },
+
+    updateNavigationButtons: function() {
+        const prevBtn = document.getElementById('prevQuestionBtn');
+        const nextBtn = document.getElementById('nextQuestionBtn');
+        const submitBtn = document.getElementById('submitTestBtn');
+
+        prevBtn.style.display = this.currentQuestionIndex > 0 ? 'inline-block' : 'none';
+
+        if (this.currentQuestionIndex === this.totalQuestions - 1) {
+            nextBtn.style.display = 'none';
+            submitBtn.style.display = 'inline-block';
+        } else {
+            nextBtn.style.display = 'inline-block';
+            submitBtn.style.display = 'none';
+        }
+    },
+
+    showSection: function(sectionId) {
+        document.querySelectorAll('.module-section').forEach(section => {
+            section.classList.remove('active');
+        });
+        document.getElementById(sectionId).classList.add('active');
+    }
 };
 
 // Sayfa yüklendiğinde başlat
@@ -291,6 +307,3 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('📄 SAYFA YÜKLENDİ - LearningPath başlatılıyor');
     LearningPath.init();
 });
-
-
-

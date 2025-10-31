@@ -321,4 +321,24 @@
 .module-stat-item i {
     color: var(--primary-color);
 }
+/* learning-path.css dosyasının sonuna eklenecek stiller */
+
+/* Modül Gruplama Başlıkları Stilleri */
+.module-group-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-top: 40px;
+    margin-bottom: 15px;
+    padding-bottom: 5px;
+    border-bottom: 2px solid #e9ecef;
+}
+
+/* modules-list'in eski tanımını biraz değiştirelim ki grup başlıklarının altında düzgün dursun */
+.modules-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    /* Eski margin-top'u sildik, başlıklar zaten yeterli boşluğu sağlıyor */
+}
 

@@ -297,4 +297,28 @@
 .summary-info p {
     color: #6c757d;
 }
+/* learning-path.css dosyasının sonuna eklenecek stiller */
+
+/* Modül İstatistikleri Stilleri */
+.module-stats-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    margin-bottom: 5px;
+    border-top: 1px dashed #e9ecef; /* Ayırıcı çizgi */
+    border-bottom: 1px dashed #e9ecef;
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.module-stat-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-weight: 500;
+}
+
+.module-stat-item i {
+    color: var(--primary-color);
+}
 

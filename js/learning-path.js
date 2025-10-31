@@ -209,7 +209,7 @@ const LearningPath = {
         `;
     },
 
-    // learning-path.js dosyasındaki displayLearningPath fonksiyonu
+   // learning-path.js dosyasındaki displayLearningPath fonksiyonu
 
     displayLearningPath: async function(level) {
         this.showSection('learningPathSection');
@@ -221,12 +221,21 @@ const LearningPath = {
         `;
 
         try {
-            // Modül verisini çekme
             const response = await fetch('data/learning_modules.json');
             if (!response.ok) throw new Error(`Modül verisi yüklenemedi: ${response.status}`);
             
             const modulesData = await response.json();
             const levelData = modulesData[level] || modulesData['A1']; 
+            
+            // 🔴 YENİ KISIM: Genel İlerlemeyi Hesaplama
+            let totalProgress = 0;
+            const moduleCount = levelData.modules.length;
+
+            if (moduleCount > 0) {
+                const sumOfProgress = levelData.modules.reduce((sum, module) => sum + module.progress, 0);
+                totalProgress = Math.round(sumOfProgress / moduleCount);
+            }
+            // ----------------------------------------------------
 
             let modulesHtml = levelData.modules.map(module => `
                 <div class="module-card module-status-${module.status.toLowerCase().replace(/ /g, '-')}" 
@@ -252,9 +261,23 @@ const LearningPath = {
                     <h2>${level} Seviyesi Öğrenme Yolu: ${levelData.title}</h2>
                     <p>${levelData.description}</p>
                 </div>
+
+                <div class="summary-card">
+                    <div class="summary-progress">
+                        <span class="summary-percentage">${totalProgress}%</span>
+                        <div class="summary-bar-wrapper">
+                            <div class="summary-bar-fill" style="width: ${totalProgress}%;"></div>
+                        </div>
+                    </div>
+                    <div class="summary-info">
+                        <h3>${levelData.title} Genel İlerleme</h3>
+                        <p>Bu seviyede toplam ${moduleCount} modül bulunmaktadır. Devam edin!</p>
+                    </div>
+                </div>
                 <div class="modules-list">
                     ${modulesHtml}
                 </div>
+
                 <button class="btn btn-secondary mt-4" onclick="LearningPath.resetTest()">Teste Geri Dön/Yeniden Başlat</button>
             `;
 
@@ -267,7 +290,6 @@ const LearningPath = {
             `;
         }
     },
-
 
     // =================================================================
     // 5. ARAYÜZ GÜNCELLEMELERİ
@@ -314,4 +336,5 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('📄 SAYFA YÜKLENDİ - LearningPath başlatılıyor');
     LearningPath.init();
 });
+
 

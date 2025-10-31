@@ -209,6 +209,8 @@ const LearningPath = {
         `;
     },
 
+    // learning-path.js dosyasındaki displayLearningPath fonksiyonu
+
     displayLearningPath: async function(level) {
         this.showSection('learningPathSection');
         const pathEl = document.getElementById('learningPathSection');
@@ -227,11 +229,20 @@ const LearningPath = {
             const levelData = modulesData[level] || modulesData['A1']; 
 
             let modulesHtml = levelData.modules.map(module => `
-                <div class="module-card module-status-${module.status.toLowerCase()}">
+                <div class="module-card module-status-${module.status.toLowerCase().replace(/ /g, '-')}" 
+                     data-progress="${module.progress}">
                     <h3>${module.name}</h3>
                     <p>Konu: ${module.topic}</p>
+                    
+                    <div class="module-progress-container">
+                        <div class="progress-bar-small">
+                            <div class="progress-fill-small" style="width: ${module.progress}%;"></div>
+                        </div>
+                        <span class="progress-text">${module.progress}% ${module.progress === 100 ? 'Tamamlandı' : 'İlerledi'}</span>
+                    </div>
+
                     <span class="module-status-badge">${module.status}</span>
-                    <button class="btn btn-primary btn-sm" onclick="LearningPath.startModule('${module.id}')">İncele</button>
+                    <button class="btn btn-primary btn-sm" onclick="LearningPath.startModule('${module.id}')">${module.progress === 100 ? 'Tekrar Et' : 'İncele/Devam Et'}</button>
                 </div>
             `).join('');
 
@@ -255,10 +266,6 @@ const LearningPath = {
                  <button class="btn btn-secondary mt-4" onclick="LearningPath.resetTest()">Giriş Ekranına Dön</button>
             `;
         }
-    },
-    
-    startModule: function(moduleId) {
-        alert(`Modül ID: ${moduleId} ile ders içeriği yükleniyor...`);
     },
 
 
@@ -307,3 +314,4 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('📄 SAYFA YÜKLENDİ - LearningPath başlatılıyor');
     LearningPath.init();
 });
+

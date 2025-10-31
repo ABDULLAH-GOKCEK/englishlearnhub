@@ -25,7 +25,7 @@ const LearningPath = {
     },
 
     // =================================================================
-    // 2. TESTİ BAŞLATMA VE VERİ YÜKLEME (KRİTİK BÖLÜM)
+    // 2. TESTİ BAŞLATMA VE VERİ YÜKLEME
     // =================================================================
 
     startTest: async function() {
@@ -34,12 +34,11 @@ const LearningPath = {
 
         this.showSection('levelTestSection');
         
-        // Soru sayısını göstermek için hazırlık
         const totalCountEl = document.getElementById('totalQuestionCount');
-        totalCountEl.textContent = '20'; // JSON'da 20 soru var
+        totalCountEl.textContent = '20'; 
 
         try {
-            // 🔴 KRİTİK DÜZELTME: Dosya yolu artık 'data/level_test.json'
+            // Dosya yolu: 'data/level_test.json'
             const response = await fetch('data/level_test.json'); 
             if (!response.ok) {
                 throw new Error(`HTTP hata kodu: ${response.status}`);
@@ -47,12 +46,10 @@ const LearningPath = {
             this.allQuestions = await response.json();
             this.totalQuestions = this.allQuestions.length;
             
-            // Tüm sorular için boş cevapları ve ilerleme durumunu hazırla
             this.userAnswers = new Array(this.totalQuestions).fill(null);
             
             console.log(`✅ ${this.totalQuestions} soru yüklendi.`);
 
-            // İlk soruyu göster
             this.currentQuestionIndex = 0;
             this.renderQuestion();
             this.updateTestHeader();
@@ -60,7 +57,7 @@ const LearningPath = {
         } catch (error) {
             console.error('❌ Sorular yüklenirken hata oluştu:', error);
             document.getElementById('questionContainer').innerHTML = 
-                `<p class="text-danger">Sorular yüklenemedi. Lütfen konsol hatalarını kontrol edin. (${error.message})</p>`;
+                `<p class="text-danger">Sorular yüklenemedi. Konsol hatalarını kontrol edin. (${error.message})</p>`;
         }
     },
 
@@ -75,7 +72,6 @@ const LearningPath = {
         const container = document.getElementById('questionContainer');
         const currentAnswer = this.userAnswers[this.currentQuestionIndex];
 
-        // Soru yapısını oluştur
         container.innerHTML = `
             <p class="question-text">${this.currentQuestionIndex + 1}. ${question.questionText}</p>
             <div class="options-container" id="optionsContainer">
@@ -90,22 +86,32 @@ const LearningPath = {
 
         // Seçenek butonlarına tıklama eventlerini bağla
         document.querySelectorAll('.answer-btn').forEach(button => {
-            button.addEventListener('click', (e) => this.handleAnswerSelection(e.target));
+            // Tıklama event'ini sadece butonun kendisine bağlıyoruz.
+            // Bu, otomatik cevaplamayı önler.
+            button.addEventListener('click', this.handleAnswerSelection.bind(this)); 
         });
 
         this.updateNavigationButtons();
     },
 
-    handleAnswerSelection: function(selectedButton) {
+    handleAnswerSelection: function(e) {
+        // Tıklanan eleman veya onun ebeveyni olan .answer-btn'i bul
+        const selectedButton = e.target.closest('.answer-btn');
+        if (!selectedButton) return;
+
         const answer = selectedButton.dataset.answer;
         
-        // Görsel güncellemeler
-        document.querySelectorAll('.answer-btn').forEach(btn => btn.classList.remove('selected'));
+        // Görsel güncellemeler: Sadece aynı options-container içindeki diğer seçimleri kaldır
+        selectedButton.closest('.options-container').querySelectorAll('.answer-btn').forEach(btn => {
+            btn.classList.remove('selected');
+        });
         selectedButton.classList.add('selected');
 
-        // Cevabı kaydet
+        // Cevabı kaydet (Bu fonksiyon, sadece kullanıcı tıkladığında çalışır)
         this.userAnswers[this.currentQuestionIndex] = answer;
         console.log(`📝 Soru ${this.currentQuestionIndex + 1} için cevap kaydedildi: ${answer}`);
+        
+        // 🔴 KRİTİK NOT: Buraya otomatik ilerleme kodu eklenmedi. İlerleme butona bağlıdır.
     },
 
     navigateTest: function(direction) {
@@ -127,10 +133,11 @@ const LearningPath = {
     },
 
     // =================================================================
-    // 4. ARAYÜZ GÜNCELLEMELERİ
+    // 4. ARAYÜZ GÜNCELLEMELERİ VE DİĞER FONKSİYONLAR
     // =================================================================
 
     updateTestHeader: function() {
+        // ... (Aynı kalır)
         const currentNumEl = document.getElementById('currentQuestionNumber');
         const totalCountEl = document.getElementById('totalQuestionCount');
         const progressBar = document.getElementById('testProgressBar');
@@ -143,6 +150,7 @@ const LearningPath = {
     },
 
     updateNavigationButtons: function() {
+        // ... (Aynı kalır)
         const prevBtn = document.getElementById('prevQuestionBtn');
         const nextBtn = document.getElementById('nextQuestionBtn');
         const submitBtn = document.getElementById('submitTestBtn');
@@ -159,15 +167,14 @@ const LearningPath = {
     },
 
     showSection: function(sectionId) {
+        // ... (Aynı kalır)
         document.querySelectorAll('.module-section').forEach(section => {
             section.classList.remove('active');
         });
         document.getElementById(sectionId).classList.add('active');
     },
 
-    // =================================================================
-    // 5. TESTİ BİTİRME VE SONUÇLANDIRMA
-    // =================================================================
+    // ... (submitTest, calculateLevel, displayResults, displayLearningPath fonksiyonları aynı kalır)
 
     submitTest: function() {
         if (this.userAnswers[this.totalQuestions - 1] === null) {
@@ -179,7 +186,6 @@ const LearningPath = {
         const userLevel = this.calculateLevel();
         this.displayResults(userLevel);
         
-        // Kullanıcı profilini güncelle (user-profile.js'den gelen fonksiyon varsayılır)
         if (typeof updateUserLevel === 'function') {
              updateUserLevel(userLevel);
         }
@@ -187,18 +193,14 @@ const LearningPath = {
     
     calculateLevel: function() {
         let correctCount = 0;
-        let incorrectQuestions = [];
 
         this.allQuestions.forEach((question, index) => {
             const userAnswer = this.userAnswers[index];
             if (userAnswer === question.correctAnswer) {
                 correctCount++;
-            } else {
-                incorrectQuestions.push(question);
             }
         });
 
-        // Skorlama mantığı
         if (correctCount >= 17) return 'C1';
         if (correctCount >= 14) return 'B2';
         if (correctCount >= 10) return 'B1';

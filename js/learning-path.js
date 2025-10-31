@@ -226,59 +226,10 @@ const LearningPath = {
                 totalProgress = Math.round(sumOfProgress / moduleCount);
             }
             
-            // Modülleri Konularına Göre Gruplama
-            const groupedModules = levelData.modules.reduce((groups, module) => {
-                const topic = module.topic;
-                if (!groups[topic]) {
-                    groups[topic] = [];
-                }
-                groups[topic].push(module);
-                return groups;
-            }, {});
-
-            let groupedHtml = '';
-
-            for (const topic in groupedModules) {
-                const modulesInGroup = groupedModules[topic];
-                
-                groupedHtml += `<h3 class="module-group-title">${topic} Modülleri (${modulesInGroup.length})</h3>`;
-                groupedHtml += `<div class="modules-list">`; 
-
-                groupedHtml += modulesInGroup.map(module => `
-                    <div class="module-card module-status-${module.status.toLowerCase().replace(/ /g, '-')}" 
-                         data-progress="${module.progress}">
-                        <h3>${module.name}</h3>
-                        <p>Konu: ${module.topic}</p>
-                        
-                        ${module.progress > 0 ? `
-                            <div class="module-stats-row">
-                                <span class="module-stat-item">
-                                    <i class="fas fa-clock"></i> 
-                                    ${module.lastDuration} dk
-                                </span>
-                                <span class="module-stat-item">
-                                    <i class="fas fa-chart-line"></i> 
-                                    ${module.lastScore}% Skor
-                                </span>
-                            </div>
-                        ` : ''}
-                        
-                        <div class="module-progress-container">
-                            <div class="progress-bar-small">
-                                <div class="progress-fill-small" style="width: ${module.progress}%;"></div>
-                            </div>
-                            <span class="progress-text">${module.progress}% ${module.progress === 100 ? 'Tamamlandı' : 'İlerledi'}</span>
-                        </div>
-
-                        <span class="module-status-badge">${module.status}</span>
-                        <button class="btn btn-primary btn-sm" onclick="LearningPath.startModule('${module.id}')">${module.progress === 100 ? 'Tekrar Et' : 'İncele/Devam Et'}</button>
-                    </div>
-                `).join('');
-                
-                groupedHtml += `</div>`;
-            }
-
-            // İçeriği güncelle
+            // Tüm benzersiz konu başlıklarını al (Filtreler için)
+            const allTopics = levelData.modules.map(m => m.topic).filter((value, index, self) => self.indexOf(value) === index);
+            
+            // Ana HTML Yapısını oluştur
             pathEl.innerHTML = `
                 <div class="level-path-header">
                     <h2>${level} Seviyesi Öğrenme Yolu: ${levelData.title}</h2>
@@ -292,34 +243,31 @@ const LearningPath = {
                             <div class="summary-bar-fill" style="width: ${totalProgress}%;"></div>
                         </div>
                     </div>
-                    // ... (summary-card div'i burada biter)
-
-    <div class="filter-controls">
-        <select id="topicFilter" onchange="LearningPath.applyFilters()">
-            <option value="all">Tüm Konular</option>
-            ${Object.keys(groupedModules).map(topic => `<option value="${topic}">${topic}</option>`).join('')}
-        </select>
-        
-        <select id="statusFilter" onchange="LearningPath.applyFilters()">
-            <option value="all">Tüm Durumlar</option>
-            <option value="Yeni">Yeni</option>
-            <option value="Devam Ediyor">Devam Ediyor</option>
-            <option value="Tamamlandı">Tamamlandı</option>
-        </select>
-
-        <select id="sortOrder" onchange="LearningPath.applyFilters()">
-            <option value="default">Sırala: Varsayılan</option>
-            <option value="progressAsc">İlerleme: % Düşükten</option>
-            <option value="progressDesc">İlerleme: % Yüksekten</option>
-            <option value="nameAsc">İsim: A-Z</option>
-        </select>
-    </div>
-    ${totalProgress === 100 ? `
-// ... (Seviye tamamlama kartı burada devam eder)
                     <div class="summary-info">
                         <h3>${levelData.title} Genel İlerleme</h3>
                         <p>Bu seviyede toplam ${moduleCount} modül bulunmaktadır. Devam edin!</p>
                     </div>
+                </div>
+                
+                <div class="filter-controls">
+                    <select id="topicFilter" onchange="LearningPath.applyFilters()">
+                        <option value="all">Tüm Konular</option>
+                        ${allTopics.map(topic => `<option value="${topic}">${topic}</option>`).join('')}
+                    </select>
+                    
+                    <select id="statusFilter" onchange="LearningPath.applyFilters()">
+                        <option value="all">Tüm Durumlar</option>
+                        <option value="Yeni">Yeni</option>
+                        <option value="Devam Ediyor">Devam Ediyor</option>
+                        <option value="Tamamlandı">Tamamlandı</option>
+                    </select>
+
+                    <select id="sortOrder" onchange="LearningPath.applyFilters()">
+                        <option value="default">Sırala: Varsayılan</option>
+                        <option value="progressAsc">İlerleme: % Düşükten</option>
+                        <option value="progressDesc">İlerleme: % Yüksekten</option>
+                        <option value="nameAsc">İsim: A-Z</option>
+                    </select>
                 </div>
 
                 ${totalProgress === 100 ? `
@@ -333,11 +281,13 @@ const LearningPath = {
                 ` : ''}
 
                 <div class="grouped-modules-container">
-                    ${groupedHtml}
-                </div>
+                    </div>
                 
                 <button class="btn btn-secondary mt-4" onclick="LearningPath.resetTest()">Teste Geri Dön/Yeniden Başlat</button>
             `;
+
+            // Modülleri filtre ve sıralama olmadan ilk kez yükle
+            this.renderModules(level);
 
         } catch (error) {
             console.error('❌ Öğrenme Modülleri yüklenirken hata:', error);
@@ -349,6 +299,116 @@ const LearningPath = {
         }
     },
     
+    // Filtreleme ve Sıralama Kontrollerinden Çağrılır
+    applyFilters: function() {
+        // Seviyeyi DOM'dan çek
+        const levelElement = document.querySelector('.level-path-header h2');
+        if (!levelElement) return;
+
+        const currentLevelMatch = levelElement.textContent.match(/([A-Z][0-9])/);
+        const currentLevel = currentLevelMatch ? currentLevelMatch[0] : 'A1';
+
+        const topicFilter = document.getElementById('topicFilter').value;
+        const statusFilter = document.getElementById('statusFilter').value;
+        const sortOrder = document.getElementById('sortOrder').value;
+
+        this.renderModules(currentLevel, topicFilter, statusFilter, sortOrder);
+    },
+
+    // Modülleri Filtreleyerek, Sıralayarak ve Gruplayarak Yeniden Çizer
+    renderModules: async function(level, topicFilter = 'all', statusFilter = 'all', sortOrder = 'default') {
+        // Veriyi tekrar çekme
+        const response = await fetch('data/learning_modules.json');
+        const modulesData = await response.json();
+        const levelData = modulesData[level] || modulesData['A1']; 
+        
+        let filteredModules = levelData.modules;
+        
+        // 1. Filtreleme Uygulama
+        if (topicFilter !== 'all') {
+            filteredModules = filteredModules.filter(m => m.topic === topicFilter);
+        }
+
+        if (statusFilter !== 'all') {
+            filteredModules = filteredModules.filter(m => m.status === statusFilter);
+        }
+
+        // 2. Sıralama Uygulama
+        filteredModules.sort((a, b) => {
+            if (sortOrder === 'progressAsc') {
+                return a.progress - b.progress;
+            } else if (sortOrder === 'progressDesc') {
+                return b.progress - a.progress;
+            } else if (sortOrder === 'nameAsc') {
+                return a.name.localeCompare(b.name);
+            }
+            return 0; // Varsayılan
+        });
+        
+        // 3. Filtrelenmiş ve Sıralanmış Modülleri Gruplama
+        const groupedModules = filteredModules.reduce((groups, module) => {
+            const topic = module.topic;
+            if (!groups[topic]) {
+                groups[topic] = [];
+            }
+            groups[topic].push(module);
+            return groups;
+        }, {});
+
+        // 4. HTML Oluşturma
+        let groupedHtml = '';
+        for (const topic in groupedModules) {
+            const modulesInGroup = groupedModules[topic];
+            
+            // Konu başlığı
+            groupedHtml += `<h3 class="module-group-title">${topic} Modülleri (${modulesInGroup.length})</h3>`;
+            groupedHtml += `<div class="modules-list">`; 
+
+            groupedHtml += modulesInGroup.map(module => `
+                <div class="module-card module-status-${module.status.toLowerCase().replace(/ /g, '-')}" 
+                    data-progress="${module.progress}">
+                    <h3>${module.name}</h3>
+                    <p>Konu: ${module.topic}</p>
+                    
+                    ${module.progress > 0 ? `
+                        <div class="module-stats-row">
+                            <span class="module-stat-item">
+                                <i class="fas fa-clock"></i> 
+                                ${module.lastDuration} dk
+                            </span>
+                            <span class="module-stat-item">
+                                <i class="fas fa-chart-line"></i> 
+                                ${module.lastScore}% Skor
+                            </span>
+                        </div>
+                    ` : ''}
+                    
+                    <div class="module-progress-container">
+                        <div class="progress-bar-small">
+                            <div class="progress-fill-small" style="width: ${module.progress}%;"></div>
+                        </div>
+                        <span class="progress-text">${module.progress}% ${module.progress === 100 ? 'Tamamlandı' : 'İlerledi'}</span>
+                    </div>
+
+                    <span class="module-status-badge">${module.status}</span>
+                    <button class="btn btn-primary btn-sm" onclick="LearningPath.startModule('${module.id}')">${module.progress === 100 ? 'Tekrar Et' : 'İncele/Devam Et'}</button>
+                </div>
+            `).join('');
+            
+            groupedHtml += `</div>`;
+        }
+
+        // Sadece modül listesi kısmını güncelle
+        const container = document.querySelector('.grouped-modules-container');
+        if (container) {
+            container.innerHTML = groupedHtml;
+            
+            if (groupedHtml === '') {
+                container.innerHTML = `<p style="text-align: center; margin-top: 30px; font-size: 1.2rem; color: #6c757d;">Seçili filtre ve sıralama kriterlerine uyan modül bulunamadı.</p>`;
+            }
+        }
+    },
+
     startModule: function(moduleId) {
         alert(`Modül ID: ${moduleId} ile ders içeriği yükleniyor...`);
     },
@@ -414,4 +474,3 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('📄 SAYFA YÜKLENDİ - LearningPath başlatılıyor');
     LearningPath.init();
 });
-

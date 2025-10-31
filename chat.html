@@ -80,6 +80,27 @@
             <button id="close-role-modal" class="mt-6 w-full bg-gray-200 text-gray-700 py-2 rounded-xl font-semibold hover:bg-gray-300 transition">Kapat</button>
         </div>
     </div>
+    <div id="moduleContentSection" class="module-section">
+    <div class="container py-5">
+        
+        <div class="module-content-header mb-4">
+            <button class="btn btn-secondary" onclick="LearningPath.showSection('learningPathSection')">
+                <i class="fas fa-arrow-left"></i> Öğrenme Yoluna Geri Dön
+            </button>
+            <h1 id="moduleTitle">Modül Başlığı Yükleniyor...</h1>
+        </div>
+
+        <div class="module-content-body" id="moduleContentBody">
+            </div>
+
+        <div class="module-content-footer mt-4 text-center">
+            <button class="btn btn-success btn-lg" onclick="LearningPath.completeModule()">
+                Modülü Tamamla ve Puanını Kaydet
+            </button>
+        </div>
+
+    </div>
+</div>
 
 <script type="module">
     // Sabitler ve Ayarlar
@@ -316,3 +337,4 @@
 
 </body>
 </html>
+

@@ -225,43 +225,63 @@ const LearningPath = {
         `;
     },
 
-    // learning-path.js dosyasındaki displayLearningPath fonksiyonunu bu şekilde değiştirin.
+    // learning-path.js dosyasındaki bu fonksiyonları güncelleyin.
 
-    displayLearningPath: function(level) {
+    // ... (Diğer tüm fonksiyonlar aynı kalır: startTest, renderQuestion, submitTest, calculateLevel, displayResults)
+
+    displayLearningPath: async function(level) {
         this.showSection('learningPathSection');
         const pathEl = document.getElementById('learningPathSection');
         
-        // Bu bölüm, JS ile atanacak sınıfları kullanmak için hazırlanmıştır.
         pathEl.innerHTML = `
             <h2>${level} Seviyesi Öğrenme Yolu</h2>
-            <p>Seviyeniz **${level}** olarak belirlendi. Artık bu seviyeye uygun dersleri görebilirsiniz:</p>
-            
-            <div class="learning-modules">
-                <h3>${level} Başlangıç Modülü</h3>
-                <ul>
-                    <li>Geniş Zaman (Simple Present) tekrarı</li>
-                    <li>Günlük Konuşma Kalıpları</li>
-                    <li>Temel Kelime Alıştırmaları</li>
-                </ul>
-                
-                <button class="btn btn-success" onclick="LearningPath.goToDashboard('${level}')">Derslere Başla</button>
-            </div>
+            <p>Seviyeniz **${level}** olarak belirlendi. Size özel dersler yükleniyor...</p>
         `;
+
+        try {
+            // 🔴 Yeni JSON dosyasını çekiyoruz
+            const response = await fetch('data/learning_modules.json');
+            if (!response.ok) throw new Error(`Modül verisi yüklenemedi: ${response.status}`);
+            
+            const modulesData = await response.json();
+            const levelData = modulesData[level] || modulesData['A1']; // Seviye bulunamazsa A1'i göster
+
+            let modulesHtml = levelData.modules.map(module => `
+                <div class="module-card module-status-${module.status.toLowerCase()}">
+                    <h3>${module.name}</h3>
+                    <p>Konu: ${module.topic}</p>
+                    <span class="module-status-badge">${module.status}</span>
+                    <button class="btn btn-primary btn-sm" onclick="LearningPath.startModule('${module.id}')">İncele</button>
+                </div>
+            `).join('');
+
+            // İçeriği güncelle
+            pathEl.innerHTML = `
+                <div class="level-path-header">
+                    <h2>${level} Seviyesi Öğrenme Yolu: ${levelData.title}</h2>
+                    <p>${levelData.description}</p>
+                </div>
+                <div class="modules-list">
+                    ${modulesHtml}
+                </div>
+            `;
+
+        } catch (error) {
+            console.error('❌ Öğrenme Modülleri yüklenirken hata:', error);
+            pathEl.innerHTML = `
+                 <h2>Hata</h2>
+                 <p>Öğrenme modülleri yüklenemedi. Lütfen konsol hatalarını kontrol edin.</p>
+            `;
+        }
     },
     
-    // Yeni eklenecek fonksiyon: Kullanıcıyı ana sayfaya yönlendirir.
-    goToDashboard: function(level) {
-        alert(`Tebrikler! ${level} seviyesindeki eğitim yoluna başlıyorsunuz.`);
-        
-        // Normalde bu noktada kullanıcıyı ana sayfaya yönlendirmeniz gerekir.
-        // Örnek: window.location.href = 'dashboard.html?level=' + level;
-        // Ancak bu sadece bir deneme projesi olduğu için alert ile gösterelim.
-
-        // Eğer projenizin ana sayfası varsa, yönlendirmeyi aktif edebilirsiniz.
-        // window.location.href = 'index.html'; 
-        
-        // Şimdilik sadece sonuç ekranına dönelim (veya hiçbir şey yapmayalım)
+    // Yeni fonksiyon: Bir modüle tıklandığında çalışır
+    startModule: function(moduleId) {
+        alert(`Modül ID: ${moduleId} ile ders içeriği yükleniyor...`);
+        // İleride bu fonksiyon, modül içeriğini yükleyen başka bir sayfa/fonksiyona yönlendirme yapacaktır.
     }
+};
+// Not: document.addEventListener('DOMContentLoaded', ...) kısmı dosyanın en altında aynı kalmalıdır.
 
 // Not: Diğer fonksiyonlar (init, startTest vb.) aynı kalmalıdır.
 };
@@ -271,5 +291,6 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('📄 SAYFA YÜKLENDİ - LearningPath başlatılıyor');
     LearningPath.init();
 });
+
 
 

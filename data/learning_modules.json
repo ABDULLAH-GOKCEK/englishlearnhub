@@ -1,14 +1,17 @@
 {
+  // data/learning_modules.json dosyası içinde A1 seviyesi modüllerini güncelleyin:
+
   "A1": {
     "title": "A1 Başlangıç Seviyesi",
     "description": "Günlük hayatınızda basit cümlelerle kendinizi ifade etmeyi ve temel dil bilgisi kurallarını öğreneceksiniz.",
     "modules": [
-      {"id": "a1_m1", "name": "Temel Fiiller ve 'Be' Fiili", "topic": "Grammar", "status": "Yeni", "progress": 0, "lastDuration": 0, "lastScore": 0},
-      {"id": "a1_m2", "name": "Geniş Zaman (Simple Present)", "topic": "Grammar", "status": "Devam Ediyor", "progress": 40, "lastDuration": 8, "lastScore": 75},
-      {"id": "a1_m3", "name": "Sayılar ve Günlük Kelimeler", "topic": "Vocabulary", "status": "Yeni", "progress": 0, "lastDuration": 0, "lastScore": 0},
-      {"id": "a1_m4", "name": "Soru Sorma Temelleri", "topic": "Practice", "status": "Tamamlandı", "progress": 100, "lastDuration": 12, "lastScore": 90} 
+      {"id": "a1_m1", "name": "Temel Fiiller ve 'Be' Fiili", "topic": "Grammar", "status": "Tamamlandı", "progress": 100, "lastDuration": 10, "lastScore": 95},
+      {"id": "a1_m2", "name": "Geniş Zaman (Simple Present)", "topic": "Grammar", "status": "Tamamlandı", "progress": 100, "lastDuration": 8, "lastScore": 90},
+      {"id": "a1_m3", "name": "Sayılar ve Günlük Kelimeler", "topic": "Vocabulary", "status": "Tamamlandı", "progress": 100, "lastDuration": 12, "lastScore": 92},
+      {"id": "a1_m4", "name": "Soru Sorma Temelleri", "topic": "Practice", "status": "Tamamlandı", "progress": 100, "lastDuration": 15, "lastScore": 88} 
     ]
   },
+// ... (Diğer seviyeler B1 ve C1 aynı kalır)
   "B1": {
     "title": "B1 Orta Seviye (Intermediate)",
     "description": "Daha karmaşık metinleri anlamayı, fikirlerinizi gerekçelendirmeyi ve çeşitli konularda akıcı konuşmayı hedefleyeceksiniz.",
@@ -30,3 +33,4 @@
     ]
   }
 }
+

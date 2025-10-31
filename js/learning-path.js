@@ -463,3 +463,19 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('📄 SAYFA YÜKLENDİ - LearningPath başlatılıyor');
     window.learningPath = new LearningPath();
 });
+// learning-path.js dosyasının en sonuna ekleyin
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. Giriş ekranındaki süre/soru/amaç metinlerini zorla siyah yap
+    const infoSpans = document.querySelectorAll('.test-info-card span');
+    infoSpans.forEach(span => {
+        span.style.color = '#212529'; // KOYU SİYAH
+        span.style.setProperty('color', '#212529', 'important'); // DAHA DA ZORLAMA
+    });
+
+    // 2. Sayaç (0/0) metinlerini zorla siyah yap
+    const headerElements = document.querySelectorAll('.test-header h3, .test-header span');
+    headerElements.forEach(el => {
+        el.style.color = '#212529'; // KOYU SİYAH
+        el.style.setProperty('color', '#212529', 'important'); // DAHA DA ZORLAMA
+    });
+});

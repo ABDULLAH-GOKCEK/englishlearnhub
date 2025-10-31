@@ -188,4 +188,61 @@
     font-size: 0.9rem;
     margin-top: 10px;
 }
+/* learning-path.css dosyasının sonuna eklenecek stiller */
+
+/* Modül Kartı İlerleme Çubuğu Stilleri */
+.module-progress-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 10px 0;
+}
+
+.progress-bar-small {
+    flex-grow: 1; /* Alandaki tüm boşluğu kullan */
+    height: 6px;
+    background-color: #e9ecef;
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.progress-fill-small {
+    height: 100%;
+    background-color: var(--primary-color);
+    transition: width 0.3s ease;
+}
+
+.progress-text {
+    font-size: 0.9rem;
+    font-weight: 500;
+    width: 90px; /* Metin için sabit alan ayırır */
+    text-align: right;
+    color: #495057;
+}
+
+/* Durum Etiketi Renkleri ve Kart Renklendirmesi */
+.module-status-yeni {
+    border-left-color: #ffc107 !important; /* Sarı */
+}
+
+.module-status-devam-ediyor {
+    border-left-color: var(--primary-color) !important; /* Mavi (Ana Renk) */
+}
+
+.module-status-tamamlandı {
+    border-left-color: #28a745 !important; /* Yeşil */
+}
+
+.module-status-yeni .module-status-badge {
+    background-color: #ffc107;
+    color: #333 !important;
+}
+
+.module-status-devam-ediyor .module-status-badge {
+    background-color: var(--primary-color);
+}
+
+.module-status-tamamlandı .module-status-badge {
+    background-color: #28a745;
+}
 

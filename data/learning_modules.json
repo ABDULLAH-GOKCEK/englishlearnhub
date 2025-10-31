@@ -1,39 +1,32 @@
-// learning-path.js dosyasındaki displayLearningPath fonksiyonunu bu şekilde değiştirin.
-
-    displayLearningPath: function(level) {
-        this.showSection('learningPathSection');
-        const pathEl = document.getElementById('learningPathSection');
-        
-        // Bu bölüm, JS ile atanacak sınıfları kullanmak için hazırlanmıştır.
-        pathEl.innerHTML = `
-            <h2>${level} Seviyesi Öğrenme Yolu</h2>
-            <p>Seviyeniz **${level}** olarak belirlendi. Artık bu seviyeye uygun dersleri görebilirsiniz:</p>
-            
-            <div class="learning-modules">
-                <h3>${level} Başlangıç Modülü</h3>
-                <ul>
-                    <li>Geniş Zaman (Simple Present) tekrarı</li>
-                    <li>Günlük Konuşma Kalıpları</li>
-                    <li>Temel Kelime Alıştırmaları</li>
-                </ul>
-                
-                <button class="btn btn-success" onclick="LearningPath.goToDashboard('${level}')">Derslere Başla</button>
-            </div>
-        `;
-    },
-    
-    // Yeni eklenecek fonksiyon: Kullanıcıyı ana sayfaya yönlendirir.
-    goToDashboard: function(level) {
-        alert(`Tebrikler! ${level} seviyesindeki eğitim yoluna başlıyorsunuz.`);
-        
-        // Normalde bu noktada kullanıcıyı ana sayfaya yönlendirmeniz gerekir.
-        // Örnek: window.location.href = 'dashboard.html?level=' + level;
-        // Ancak bu sadece bir deneme projesi olduğu için alert ile gösterelim.
-
-        // Eğer projenizin ana sayfası varsa, yönlendirmeyi aktif edebilirsiniz.
-        // window.location.href = 'index.html'; 
-        
-        // Şimdilik sadece sonuç ekranına dönelim (veya hiçbir şey yapmayalım)
-    }
-
-// Not: Diğer fonksiyonlar (init, startTest vb.) aynı kalmalıdır.
+{
+  "A1": {
+    "title": "A1 Başlangıç Seviyesi",
+    "description": "Günlük hayatınızda basit cümlelerle kendinizi ifade etmeyi ve temel dil bilgisi kurallarını öğreneceksiniz.",
+    "modules": [
+      {"id": "a1_m1", "name": "Temel Fiiller ve 'Be' Fiili", "topic": "Grammar", "status": "Yeni"},
+      {"id": "a1_m2", "name": "Geniş Zaman (Simple Present)", "topic": "Grammar", "status": "Yeni"},
+      {"id": "a1_m3", "name": "Sayılar ve Günlük Kelimeler", "topic": "Vocabulary", "status": "Yeni"},
+      {"id": "a1_m4", "name": "Soru Sorma Temelleri", "topic": "Practice", "status": "Yeni"}
+    ]
+  },
+  "B1": {
+    "title": "B1 Orta Seviye (Intermediate)",
+    "description": "Daha karmaşık metinleri anlamayı, fikirlerinizi gerekçelendirmeyi ve çeşitli konularda akıcı konuşmayı hedefleyeceksiniz.",
+    "modules": [
+      {"id": "b1_m1", "name": "Zamanların Karşılaştırılması", "topic": "Grammar", "status": "Yeni"},
+      {"id": "b1_m2", "name": "Pasif Yapı (Passive Voice)", "topic": "Grammar", "status": "Yeni"},
+      {"id": "b1_m3", "name": "Bağlaçlar (Conjunctions)", "topic": "Grammar", "status": "Yeni"},
+      {"id": "b1_m4", "name": "Resmi ve Gayriresmi Dil", "topic": "Speaking", "status": "Yeni"}
+    ]
+  },
+  "C1": {
+    "title": "C1 İleri Seviye (Advanced)",
+    "description": "Zorlu, uzun metinleri anlamayı, anlam kaymalarını fark etmeyi ve akademik konular üzerine detaylı konuşmayı öğreneceksiniz.",
+    "modules": [
+      {"id": "c1_m1", "name": "İndirgenmiş Cümlecikler", "topic": "Grammar", "status": "Yeni"},
+      {"id": "c1_m2", "name": "Deyimsel Fiiller (Phrasal Verbs)", "topic": "Vocabulary", "status": "Yeni"},
+      {"id": "c1_m3", "name": "Karmaşık Koşul Cümleleri", "topic": "Grammar", "status": "Yeni"},
+      {"id": "c1_m4", "name": "Akademik Yazma Teknikleri", "topic": "Writing", "status": "Yeni"}
+    ]
+  }
+}

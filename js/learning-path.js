@@ -409,8 +409,9 @@ const LearningPath = {
         }
     },
 
-    // Modül Başlatma Fonksiyonu: İçeriği yükler ve ekrana basar
+    // 🔴 Modül Başlatma Fonksiyonu (HATA BURADA OLABİLİR)
     startModule: async function(moduleId) {
+        // Bu fonksiyon, yeni moduleContentSection'ı aktif eder.
         this.showSection('moduleContentSection');
         
         const titleEl = document.getElementById('moduleTitle');
@@ -448,7 +449,6 @@ const LearningPath = {
                 } else if (item.type === 'quiz_intro') {
                     contentHtml += `<p class="quiz-intro">${item.text}</p>`;
                 } else if (item.type === 'quiz') {
-                    // Basit bir quiz yapısı (gerçek quizler için daha karmaşık yapı gerekir)
                     contentHtml += `
                         <div class="module-quiz-card">
                             <p><strong>Soru:</strong> ${item.question}</p>
@@ -465,22 +465,33 @@ const LearningPath = {
         } catch (error) {
             console.error('❌ Modül içeriği yüklenirken hata:', error);
             titleEl.textContent = 'Hata';
-            contentBodyEl.innerHTML = '<p class="text-danger">Ders içeriği yüklenirken bir hata oluştu.</p>';
+            contentBodyEl.innerHTML = '<p class="text-danger">Ders içeriği yüklenirken bir hata oluştu. (Konsolu kontrol edin)</p>';
         }
     },
     
     // Yeni: Modülü Tamamlama Fonksiyonu (Simülasyon)
     completeModule: function() {
-        // Burada normalde kullanıcının testi çözdüğü ve skor aldığı simüle edilir.
         alert('Modülü tamamladınız! Skorunuz kaydedildi. Öğrenme yoluna geri dönülüyor.');
-        
-        // Şimdilik sadece öğrenme yoluna geri dönüyoruz.
         this.showSection('learningPathSection'); 
-        
-        // Gerçek uygulamada:
-        // 1. Kullanıcının son modül bilgisini günceller.
-        // 2. displayLearningPath'i mevcut seviye ile yeniden çağırır.
     },
+
+    // Seviye Atlatma Mantığı
+    advanceLevel: function(currentLevel) {
+        const levels = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
+        const currentIndex = levels.indexOf(currentLevel);
+        
+        if (currentIndex < 0 || currentIndex >= levels.length - 1) {
+            alert('Tebrikler! Şu anda son seviyedesiniz. Öğrenmeye devam edin!');
+            return;
+        }
+
+        const nextLevel = levels[currentIndex + 1];
+        
+        alert(`Tebrikler! ${currentLevel} seviyesini başarıyla tamamladınız. Yeni seviyeniz: ${nextLevel}. Şimdi bu seviyeye ait derslere başlayabilirsiniz!`);
+        
+        this.resetTest(); 
+    },
+
     // =================================================================
     // 6. ARAYÜZ GÜNCELLEMELERİ
     // =================================================================
@@ -525,4 +536,3 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('📄 SAYFA YÜKLENDİ - LearningPath başlatılıyor');
     LearningPath.init();
 });
-

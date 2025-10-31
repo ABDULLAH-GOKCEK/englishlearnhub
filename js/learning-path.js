@@ -235,7 +235,7 @@ const LearningPath = {
                 const sumOfProgress = levelData.modules.reduce((sum, module) => sum + module.progress, 0);
                 totalProgress = Math.round(sumOfProgress / moduleCount);
             }
-            // ----------------------------------------------------
+            // learning-path.js dosyasındaki displayLearningPath fonksiyonu içinde, modulesHtml değişkeninin atandığı kısmı güncelleyin.
 
             let modulesHtml = levelData.modules.map(module => `
                 <div class="module-card module-status-${module.status.toLowerCase().replace(/ /g, '-')}" 
@@ -243,6 +243,18 @@ const LearningPath = {
                     <h3>${module.name}</h3>
                     <p>Konu: ${module.topic}</p>
                     
+                    ${module.progress > 0 ? `
+                        <div class="module-stats-row">
+                            <span class="module-stat-item">
+                                <i class="fas fa-clock"></i> 
+                                ${module.lastDuration} dk
+                            </span>
+                            <span class="module-stat-item">
+                                <i class="fas fa-chart-line"></i> 
+                                ${module.lastScore}% Skor
+                            </span>
+                        </div>
+                    ` : ''}
                     <div class="module-progress-container">
                         <div class="progress-bar-small">
                             <div class="progress-fill-small" style="width: ${module.progress}%;"></div>
@@ -254,6 +266,8 @@ const LearningPath = {
                     <button class="btn btn-primary btn-sm" onclick="LearningPath.startModule('${module.id}')">${module.progress === 100 ? 'Tekrar Et' : 'İncele/Devam Et'}</button>
                 </div>
             `).join('');
+
+            // ... (Fonksiyonun geri kalanı aynı kalır)
 
             // İçeriği güncelle
             pathEl.innerHTML = `
@@ -336,5 +350,6 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('📄 SAYFA YÜKLENDİ - LearningPath başlatılıyor');
     LearningPath.init();
 });
+
 
 

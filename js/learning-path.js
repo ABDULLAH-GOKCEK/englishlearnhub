@@ -208,6 +208,8 @@ const LearningPath = {
         return 'A1';
     },
 
+    // learning-path.js içindeki displayResults ve displayLearningPath fonksiyonlarını bu şekilde değiştirin.
+
     displayResults: function(level) {
         const resultsEl = document.getElementById('resultsSection');
         resultsEl.innerHTML = `
@@ -217,6 +219,7 @@ const LearningPath = {
                 <p>Tespit edilen İngilizce seviyeniz:</p>
                 <div class="level-badge level-${level.toLowerCase()}">${level}</div>
                 <p class="mt-3">Bu seviyeye göre size özel hazırlanan öğrenme yolunu aşağıda görebilirsiniz.</p>
+                
                 <button class="btn btn-primary mt-3" onclick="LearningPath.displayLearningPath('${level}')">Öğrenme Yolunu Gör</button>
             </div>
         `;
@@ -225,11 +228,25 @@ const LearningPath = {
     displayLearningPath: function(level) {
         this.showSection('learningPathSection');
         const pathEl = document.getElementById('learningPathSection');
+        
+        // Bu bölüm, JS ile atanacak sınıfları kullanmak için hazırlanmıştır.
         pathEl.innerHTML = `
             <h2>${level} Seviyesi Öğrenme Yolu</h2>
-            <p>Seviyeniz **${level}** olarak belirlendi. Size özel dersler ve alıştırmalar hazırlanıyor...</p>
+            <p>Seviyeniz **${level}** olarak belirlendi. Artık bu seviyeye uygun dersleri görebilirsiniz:</p>
+            
+            <div class="learning-modules">
+                <h3>${level} Başlangıç Modülü</h3>
+                <ul>
+                    <li>Geniş Zaman (Simple Present) tekrarı</li>
+                    <li>Günlük Konuşma Kalıpları</li>
+                    <li>Temel Kelime Alıştırmaları</li>
+                </ul>
+                <button class="btn btn-success">Derslere Başla</button>
+            </div>
         `;
     }
+    
+// Not: LearningPath.init() ve document.addEventListener('DOMContentLoaded') kodları, dosyanın en altında aynı kalmalıdır.
 };
 
 // Sayfa yüklendiğinde başlat
@@ -237,3 +254,4 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('📄 SAYFA YÜKLENDİ - LearningPath başlatılıyor');
     LearningPath.init();
 });
+

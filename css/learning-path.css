@@ -357,3 +357,29 @@
     text-align: right;
     color: #495057;
 }
+/* learning-path.css dosyasının sonuna eklenecek stiller */
+
+/* Filtreleme ve Sıralama Kontrolleri */
+.filter-controls {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+}
+
+.filter-controls select {
+    padding: 10px 15px;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    background-color: var(--white);
+    color: var(--text-dark);
+    font-size: 1rem;
+    cursor: pointer;
+    flex-grow: 1; /* Alanda eşit yayılmasını sağlar */
+    min-width: 180px;
+}
+
+.grouped-modules-container {
+    /* Filtreleme ve sıralamadan sonraki modül listesinin ana kapsayıcısı */
+    min-height: 200px; /* İçerik yoksa bile boşluk bırakır */
+}

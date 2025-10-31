@@ -292,6 +292,30 @@ const LearningPath = {
                             <div class="summary-bar-fill" style="width: ${totalProgress}%;"></div>
                         </div>
                     </div>
+                    // ... (summary-card div'i burada biter)
+
+    <div class="filter-controls">
+        <select id="topicFilter" onchange="LearningPath.applyFilters()">
+            <option value="all">Tüm Konular</option>
+            ${Object.keys(groupedModules).map(topic => `<option value="${topic}">${topic}</option>`).join('')}
+        </select>
+        
+        <select id="statusFilter" onchange="LearningPath.applyFilters()">
+            <option value="all">Tüm Durumlar</option>
+            <option value="Yeni">Yeni</option>
+            <option value="Devam Ediyor">Devam Ediyor</option>
+            <option value="Tamamlandı">Tamamlandı</option>
+        </select>
+
+        <select id="sortOrder" onchange="LearningPath.applyFilters()">
+            <option value="default">Sırala: Varsayılan</option>
+            <option value="progressAsc">İlerleme: % Düşükten</option>
+            <option value="progressDesc">İlerleme: % Yüksekten</option>
+            <option value="nameAsc">İsim: A-Z</option>
+        </select>
+    </div>
+    ${totalProgress === 100 ? `
+// ... (Seviye tamamlama kartı burada devam eder)
                     <div class="summary-info">
                         <h3>${levelData.title} Genel İlerleme</h3>
                         <p>Bu seviyede toplam ${moduleCount} modül bulunmaktadır. Devam edin!</p>
@@ -390,3 +414,4 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('📄 SAYFA YÜKLENDİ - LearningPath başlatılıyor');
     LearningPath.init();
 });
+

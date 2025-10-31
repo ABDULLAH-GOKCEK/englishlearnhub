@@ -1,6 +1,5 @@
 {
   // data/learning_modules.json dosyası içinde A1 seviyesi modüllerini güncelleyin:
-
   "A1": {
     "title": "A1 Başlangıç Seviyesi",
     "description": "Günlük hayatınızda basit cümlelerle kendinizi ifade etmeyi ve temel dil bilgisi kurallarını öğreneceksiniz.",
@@ -33,4 +32,5 @@
     ]
   }
 }
+
 

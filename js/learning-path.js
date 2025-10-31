@@ -409,27 +409,78 @@ const LearningPath = {
         }
     },
 
-    startModule: function(moduleId) {
-        alert(`Modül ID: ${moduleId} ile ders içeriği yükleniyor...`);
+    // Modül Başlatma Fonksiyonu: İçeriği yükler ve ekrana basar
+    startModule: async function(moduleId) {
+        this.showSection('moduleContentSection');
+        
+        const titleEl = document.getElementById('moduleTitle');
+        const contentBodyEl = document.getElementById('moduleContentBody');
+        
+        titleEl.textContent = 'Yükleniyor...';
+        contentBodyEl.innerHTML = '<div class="text-center mt-5"><i class="fas fa-spinner fa-spin fa-3x"></i></div>';
+
+        try {
+            const response = await fetch('data/module_content.json');
+            if (!response.ok) throw new Error(`Modül içeriği yüklenemedi: ${response.status}`);
+            
+            const contentData = await response.json();
+            const module = contentData[moduleId];
+
+            if (!module) {
+                titleEl.textContent = 'Hata';
+                contentBodyEl.innerHTML = '<p class="text-danger">Bu modüle ait içerik bulunamadı.</p>';
+                return;
+            }
+
+            titleEl.textContent = module.title;
+            let contentHtml = '';
+
+            // İçerik tiplerini işleme
+            module.content.forEach(item => {
+                if (item.type === 'heading') {
+                    contentHtml += `<h3>${item.text}</h3>`;
+                } else if (item.type === 'paragraph') {
+                    contentHtml += `<p>${item.text}</p>`;
+                } else if (item.type === 'code_block') {
+                    contentHtml += `<pre class="code-block">${item.text}</pre>`;
+                } else if (item.type === 'example') {
+                    contentHtml += `<div class="example-box">${item.text.replace(/\n/g, '<br>')}</div>`;
+                } else if (item.type === 'quiz_intro') {
+                    contentHtml += `<p class="quiz-intro">${item.text}</p>`;
+                } else if (item.type === 'quiz') {
+                    // Basit bir quiz yapısı (gerçek quizler için daha karmaşık yapı gerekir)
+                    contentHtml += `
+                        <div class="module-quiz-card">
+                            <p><strong>Soru:</strong> ${item.question}</p>
+                            <div class="quiz-options-simulated">
+                                ${item.options.map(opt => `<span class="quiz-option-item">${opt}</span>`).join('')}
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+
+            contentBodyEl.innerHTML = contentHtml;
+
+        } catch (error) {
+            console.error('❌ Modül içeriği yüklenirken hata:', error);
+            titleEl.textContent = 'Hata';
+            contentBodyEl.innerHTML = '<p class="text-danger">Ders içeriği yüklenirken bir hata oluştu.</p>';
+        }
     },
     
-    // Seviye Atlatma Mantığı
-    advanceLevel: function(currentLevel) {
-        const levels = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
-        const currentIndex = levels.indexOf(currentLevel);
+    // Yeni: Modülü Tamamlama Fonksiyonu (Simülasyon)
+    completeModule: function() {
+        // Burada normalde kullanıcının testi çözdüğü ve skor aldığı simüle edilir.
+        alert('Modülü tamamladınız! Skorunuz kaydedildi. Öğrenme yoluna geri dönülüyor.');
         
-        if (currentIndex < 0 || currentIndex >= levels.length - 1) {
-            alert('Tebrikler! Şu anda son seviyedesiniz. Öğrenmeye devam edin!');
-            return;
-        }
-
-        const nextLevel = levels[currentIndex + 1];
+        // Şimdilik sadece öğrenme yoluna geri dönüyoruz.
+        this.showSection('learningPathSection'); 
         
-        alert(`Tebrikler! ${currentLevel} seviyesini başarıyla tamamladınız. Yeni seviyeniz: ${nextLevel}. Şimdi bu seviyeye ait derslere başlayabilirsiniz!`);
-        
-        this.resetTest(); 
+        // Gerçek uygulamada:
+        // 1. Kullanıcının son modül bilgisini günceller.
+        // 2. displayLearningPath'i mevcut seviye ile yeniden çağırır.
     },
-
     // =================================================================
     // 6. ARAYÜZ GÜNCELLEMELERİ
     // =================================================================
@@ -474,3 +525,4 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('📄 SAYFA YÜKLENDİ - LearningPath başlatılıyor');
     LearningPath.init();
 });
+

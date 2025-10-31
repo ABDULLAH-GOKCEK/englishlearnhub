@@ -225,6 +225,8 @@ const LearningPath = {
         `;
     },
 
+    // learning-path.js dosyasındaki displayLearningPath fonksiyonunu bu şekilde değiştirin.
+
     displayLearningPath: function(level) {
         this.showSection('learningPathSection');
         const pathEl = document.getElementById('learningPathSection');
@@ -241,12 +243,27 @@ const LearningPath = {
                     <li>Günlük Konuşma Kalıpları</li>
                     <li>Temel Kelime Alıştırmaları</li>
                 </ul>
-                <button class="btn btn-success">Derslere Başla</button>
+                
+                <button class="btn btn-success" onclick="LearningPath.goToDashboard('${level}')">Derslere Başla</button>
             </div>
         `;
-    }
+    },
     
-// Not: LearningPath.init() ve document.addEventListener('DOMContentLoaded') kodları, dosyanın en altında aynı kalmalıdır.
+    // Yeni eklenecek fonksiyon: Kullanıcıyı ana sayfaya yönlendirir.
+    goToDashboard: function(level) {
+        alert(`Tebrikler! ${level} seviyesindeki eğitim yoluna başlıyorsunuz.`);
+        
+        // Normalde bu noktada kullanıcıyı ana sayfaya yönlendirmeniz gerekir.
+        // Örnek: window.location.href = 'dashboard.html?level=' + level;
+        // Ancak bu sadece bir deneme projesi olduğu için alert ile gösterelim.
+
+        // Eğer projenizin ana sayfası varsa, yönlendirmeyi aktif edebilirsiniz.
+        // window.location.href = 'index.html'; 
+        
+        // Şimdilik sadece sonuç ekranına dönelim (veya hiçbir şey yapmayalım)
+    }
+
+// Not: Diğer fonksiyonlar (init, startTest vb.) aynı kalmalıdır.
 };
 
 // Sayfa yüklendiğinde başlat
@@ -254,4 +271,5 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('📄 SAYFA YÜKLENDİ - LearningPath başlatılıyor');
     LearningPath.init();
 });
+
 

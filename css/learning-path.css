@@ -383,3 +383,86 @@
     /* Filtreleme ve sıralamadan sonraki modül listesinin ana kapsayıcısı */
     min-height: 200px; /* İçerik yoksa bile boşluk bırakır */
 }
+/* learning-path.css dosyasının sonuna eklenecek stiller */
+
+/* -------------------------------------- */
+/* 4. MODÜL İÇERİĞİ EKRANI STİLLERİ       */
+/* -------------------------------------- */
+
+.module-content-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 15px 0;
+    border-bottom: 2px solid #e9ecef;
+}
+
+.module-content-header h1 {
+    font-size: 2rem;
+    color: var(--text-dark);
+    margin: 0;
+    font-weight: 700;
+}
+
+.module-content-body {
+    background: var(--white);
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    line-height: 1.8;
+}
+
+.module-content-body h3 {
+    color: var(--primary-color);
+    margin-top: 30px;
+    margin-bottom: 15px;
+    font-size: 1.6rem;
+    padding-bottom: 5px;
+    border-bottom: 1px dashed #ced4da;
+}
+
+.code-block {
+    background: #2b2d42;
+    color: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    font-family: monospace;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+
+.example-box {
+    background: #f0f3ff; 
+    border-left: 5px solid #4361ee;
+    padding: 15px;
+    margin: 20px 0;
+    border-radius: 5px;
+    font-style: italic;
+}
+
+.quiz-intro {
+    font-weight: 600;
+    color: #28a745;
+    margin-top: 30px;
+}
+
+.module-quiz-card {
+    background: #fffbe6;
+    border: 1px solid #ffc107;
+    padding: 20px;
+    border-radius: 8px;
+    margin-top: 15px;
+}
+
+.quiz-options-simulated .quiz-option-item {
+    display: inline-block;
+    padding: 8px 15px;
+    margin-right: 10px;
+    margin-top: 10px;
+    border: 1px solid #ffc107;
+    border-radius: 5px;
+    background: #ffffff;
+    cursor: default;
+}
+

@@ -1,5 +1,4 @@
 {
-  // data/learning_modules.json dosyası içinde A1 seviyesi modüllerini güncelleyin:
   "A1": {
     "title": "A1 Başlangıç Seviyesi",
     "description": "Günlük hayatınızda basit cümlelerle kendinizi ifade etmeyi ve temel dil bilgisi kurallarını öğreneceksiniz.",
@@ -10,7 +9,6 @@
       {"id": "a1_m4", "name": "Soru Sorma Temelleri", "topic": "Practice", "status": "Tamamlandı", "progress": 100, "lastDuration": 15, "lastScore": 88} 
     ]
   },
-// ... (Diğer seviyeler B1 ve C1 aynı kalır)
   "B1": {
     "title": "B1 Orta Seviye (Intermediate)",
     "description": "Daha karmaşık metinleri anlamayı, fikirlerinizi gerekçelendirmeyi ve çeşitli konularda akıcı konuşmayı hedefleyeceksiniz.",
@@ -32,5 +30,3 @@
     ]
   }
 }
-
-

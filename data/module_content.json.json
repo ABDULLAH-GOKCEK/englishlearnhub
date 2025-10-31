@@ -1,0 +1,24 @@
+{
+  "a1_m1": {
+    "title": "Temel Fiiller ve 'Be' Fiili",
+    "topic": "Grammar",
+    "content": [
+      {"type": "heading", "text": "Giriş: İngilizcenin Temelleri"},
+      {"type": "paragraph", "text": "İngilizcede cümle kurmanın temeli olan 'to be' (olmak) fiili, en çok kullanılan fiildir. Şimdiki zamanda üç ana formu vardır: am, is, are."},
+      {"type": "code_block", "text": "I → am\nYou / We / They → are\nHe / She / It → is"},
+      {"type": "example", "text": "I am a teacher. (Ben bir öğretmenim.)\nShe is happy. (O mutlu.)\nWe are students. (Biz öğrenciyiz.)"},
+      {"type": "quiz_intro", "text": "Aşağıdaki kısa alıştırmayı çözerek konuyu pekiştirin."},
+      {"type": "quiz", "question": "The dog ___ fast.", "options": ["am", "is", "are"], "answer": "is"}
+    ]
+  },
+  "a1_m2": {
+    "title": "Geniş Zaman (Simple Present)",
+    "topic": "Grammar",
+    "content": [
+      {"type": "heading", "text": "Geniş Zaman (Simple Present) Kullanımı"},
+      {"type": "paragraph", "text": "Geniş zaman, genel gerçekleri ve düzenli yapılan alışkanlıkları ifade etmek için kullanılır."},
+      {"type": "example", "text": "I drink coffee every morning. (Her sabah kahve içerim.)\nShe works in a bank. (O bir bankada çalışır.) - Üçüncü tekil şahısta fiil 's' takısı alır."}
+    ]
+  }
+  // Diğer modüller (b1_m1, c1_m1 vb.) buraya benzer yapıyla eklenebilir.
+}

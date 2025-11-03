@@ -329,10 +329,10 @@ const LearningPath = {
     // 🟢 Modül Başlatma Fonksiyonu (Tüm Hata Düzeltmeleri Uygulandı)
     startModule: async function(moduleId) {
         // Hata Düzeltme 1: Hangi modülün açık olduğunu kaydet
-        LearningPath.currentModuleId = moduleId; 
-        
+        LearningPath.currentModuleId = moduleId;
+        // 🆕 Quiz skorunu sıfırla
+        this.moduleQuizScore = { total: 0, correct: 0, answered: false }; 
         this.showSection('moduleContentSection');
-        
         const titleEl = document.getElementById('moduleTitle');
         const contentBodyEl = document.getElementById('moduleContentBody');
         
@@ -495,5 +495,6 @@ const LearningPath = {
 
 // Sayfa yüklendiğinde init fonksiyonunu çağır
 document.addEventListener('DOMContentLoaded', () => LearningPath.init());
+
 
 

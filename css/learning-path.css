@@ -1,4 +1,4 @@
-/* learning-path.css - Test Arayüzü İçin Kritik Stiller */
+/* learning-path.css - Test Arayüzü, Öğrenme Yolu ve Modül İçeriği Stilleri */
 
 :root {
     --primary-color: #4361ee;
@@ -52,8 +52,6 @@
 }
 
 /* 2. TEST EKRANI STİLLERİ */
-
-/* Başlık ve Sayaç */
 .test-header {
     text-align: center;
     margin-bottom: 25px;
@@ -70,7 +68,6 @@
     color: var(--text-dark); 
 }
 
-/* İlerleme Çubuğu */
 .progress-bar {
     width: 100%;
     height: 10px;
@@ -87,7 +84,6 @@
     transition: width 0.3s ease;
 }
 
-/* Soru ve Seçenekler Kapsayıcısı */
 .question-container {
     background: var(--white);
     padding: 30px;
@@ -102,14 +98,12 @@
     color: var(--text-dark);
 }
 
-/* Seçenekler Listesi */
 .options-container {
     display: flex;
     flex-direction: column;
     gap: 15px;
 }
 
-/* CEVAP BUTONU STİLLERİ */
 .answer-btn {
     width: 100%;
     padding: 15px 20px; 
@@ -129,7 +123,6 @@
     border-color: var(--primary-color);
 }
 
-/* TIKLANDIĞINDA ÇALIŞAN GÖRSEL STİL */
 .answer-btn.selected {
     background-color: var(--primary-color);
     color: var(--white);
@@ -137,7 +130,6 @@
     box-shadow: 0 4px 10px rgba(67, 97, 238, 0.4);
 }
 
-/* Navigasyon */
 .test-navigation {
     display: flex;
     justify-content: space-between;
@@ -149,7 +141,6 @@
 /* 3. ÖĞRENME YOLU EKRANI STİLLERİ        */
 /* -------------------------------------- */
 
-/* Genel İlerleme Kartı Stilleri */
 .summary-card {
     display: flex;
     align-items: center;
@@ -191,16 +182,6 @@
     transition: width 0.5s ease-in-out;
 }
 
-.summary-info h3 {
-    margin-top: 0;
-    color: var(--text-dark);
-}
-
-.summary-info p {
-    color: #6c757d;
-}
-
-/* Seviye Tamamlama Kartı Stilleri */
 .level-complete-card {
     text-align: center;
     background: #e6ffec; 
@@ -218,20 +199,32 @@
     text-shadow: 1px 1px 1px rgba(0,0,0,0.05);
 }
 
-.level-complete-card p {
-    font-size: 1.1rem;
-    color: #333;
-    margin-bottom: 25px;
-}
-
 .btn-lg {
     padding: 12px 25px;
     font-size: 1.2rem;
     font-weight: bold;
 }
 
+/* Filtreleme ve Sıralama Kontrolleri */
+.filter-controls {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+}
 
-/* Modül Gruplama Başlıkları Stilleri */
+.filter-controls select {
+    padding: 10px 15px;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    background-color: var(--white);
+    color: var(--text-dark);
+    font-size: 1rem;
+    cursor: pointer;
+    flex-grow: 1; 
+    min-width: 180px;
+}
+
 .module-group-title {
     font-size: 1.5rem;
     font-weight: 600;
@@ -242,7 +235,6 @@
     border-bottom: 2px solid #e9ecef;
 }
 
-/* Modüller Listesi Stilleri */
 .modules-list {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -305,7 +297,6 @@
     margin-top: 10px;
 }
 
-/* Modül İstatistikleri Stilleri */
 .module-stats-row {
     display: flex;
     justify-content: space-between;
@@ -328,7 +319,6 @@
     color: var(--primary-color);
 }
 
-/* Modül Kartı İlerleme Çubuğu Stilleri */
 .module-progress-container {
     display: flex;
     align-items: center;
@@ -357,33 +347,6 @@
     text-align: right;
     color: #495057;
 }
-/* learning-path.css dosyasının sonuna eklenecek stiller */
-
-/* Filtreleme ve Sıralama Kontrolleri */
-.filter-controls {
-    display: flex;
-    gap: 15px;
-    margin-bottom: 30px;
-    flex-wrap: wrap;
-}
-
-.filter-controls select {
-    padding: 10px 15px;
-    border: 1px solid #ced4da;
-    border-radius: 6px;
-    background-color: var(--white);
-    color: var(--text-dark);
-    font-size: 1rem;
-    cursor: pointer;
-    flex-grow: 1; /* Alanda eşit yayılmasını sağlar */
-    min-width: 180px;
-}
-
-.grouped-modules-container {
-    /* Filtreleme ve sıralamadan sonraki modül listesinin ana kapsayıcısı */
-    min-height: 200px; /* İçerik yoksa bile boşluk bırakır */
-}
-/* learning-path.css dosyasının sonuna eklenecek stiller */
 
 /* -------------------------------------- */
 /* 4. MODÜL İÇERİĞİ EKRANI STİLLERİ       */
@@ -465,4 +428,3 @@
     background: #ffffff;
     cursor: default;
 }
-

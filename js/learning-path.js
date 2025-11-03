@@ -18,11 +18,17 @@ const LearningPath = {
 
     init: function() {
         console.log('🔗 Eventler bağlanıyor...');
-        document.getElementById('startTestBtn').addEventListener('click', this.startTest.bind(this));
+        // DOM'da var olan elemanlara listener ekle
+        const startBtn = document.getElementById('startTestBtn');
+        const nextBtn = document.getElementById('nextQuestionBtn');
+        const prevBtn = document.getElementById('prevQuestionBtn');
+        const submitBtn = document.getElementById('submitTestBtn');
         
-        document.getElementById('nextQuestionBtn').addEventListener('click', this.navigateTest.bind(this, 1));
-        document.getElementById('prevQuestionBtn').addEventListener('click', this.navigateTest.bind(this, -1));
-        document.getElementById('submitTestBtn').addEventListener('click', this.submitTest.bind(this));
+        if (startBtn) startBtn.addEventListener('click', this.startTest.bind(this));
+        if (nextBtn) nextBtn.addEventListener('click', this.navigateTest.bind(this, 1));
+        if (prevBtn) prevBtn.addEventListener('click', this.navigateTest.bind(this, -1));
+        if (submitBtn) submitBtn.addEventListener('click', this.submitTest.bind(this));
+
 
         this.resetTest(); 
     },
@@ -38,10 +44,17 @@ const LearningPath = {
         this.totalQuestions = 0;
         this.testStarted = false; 
         
-        document.getElementById('currentQuestionNumber').textContent = '0';
-        document.getElementById('totalQuestionCount').textContent = '0';
-        document.getElementById('testProgressBar').style.width = '0%';
-        document.getElementById('questionContainer').innerHTML = 'Lütfen bekleyiniz, test yükleniyor...';
+        // DOM elemanlarını sıfırla
+        const currentNumEl = document.getElementById('currentQuestionNumber');
+        const totalCountEl = document.getElementById('totalQuestionCount');
+        const progressBar = document.getElementById('testProgressBar');
+
+        if(currentNumEl) currentNumEl.textContent = '0';
+        if(totalCountEl) totalCountEl.textContent = '0';
+        if(progressBar) progressBar.style.width = '0%';
+        
+        const questionContainer = document.getElementById('questionContainer');
+        if(questionContainer) questionContainer.innerHTML = 'Lütfen bekleyiniz, test yükleniyor...';
 
         console.log('🔄 Test başarıyla sıfırlandı. Giriş ekranı gösteriliyor.');
         this.showSection('levelTestIntroSection'); 
@@ -58,7 +71,7 @@ const LearningPath = {
         this.showSection('levelTestSection');
         
         const totalCountEl = document.getElementById('totalQuestionCount');
-        totalCountEl.textContent = '20'; 
+        if(totalCountEl) totalCountEl.textContent = '20'; 
 
         try {
             const response = await fetch('data/level_test.json'); 
@@ -78,7 +91,8 @@ const LearningPath = {
 
         } catch (error) {
             console.error('❌ Sorular yüklenirken hata oluştu:', error);
-            document.getElementById('questionContainer').innerHTML = 
+            const questionContainer = document.getElementById('questionContainer');
+            if(questionContainer) questionContainer.innerHTML = 
                 `<p class="text-danger">Sorular yüklenemedi. Lütfen dosya yolunu (data/level_test.json) kontrol edin. (${error.message})</p>`;
         }
     },
@@ -93,6 +107,8 @@ const LearningPath = {
         const question = this.allQuestions[this.currentQuestionIndex];
         const container = document.getElementById('questionContainer');
         const currentAnswer = this.userAnswers[this.currentQuestionIndex];
+
+        if (!container) return; 
 
         container.innerHTML = `
             <p class="question-text">${this.currentQuestionIndex + 1}. ${question.questionText}</p>
@@ -184,6 +200,7 @@ const LearningPath = {
     displayResults: function(level) {
         const resultsEl = document.getElementById('resultsSection');
         this.showSection('resultsSection'); 
+        if (!resultsEl) return;
 
         resultsEl.innerHTML = `
             <div class="result-card">
@@ -205,6 +222,8 @@ const LearningPath = {
         this.showSection('learningPathSection');
         const pathEl = document.getElementById('learningPathSection');
         
+        if (!pathEl) return;
+
         pathEl.innerHTML = `
             <h2>${level} Seviyesi Öğrenme Yolu</h2>
             <p>Seviyeniz **${level}** olarak belirlendi. Size özel dersler yükleniyor...</p>
@@ -409,7 +428,7 @@ const LearningPath = {
         }
     },
 
-    // 🔴 Modül Başlatma Fonksiyonu (HATA BURADA OLABİLİR)
+    // 🔴 Modül Başlatma Fonksiyonu (YENİ İÇERİK YÜKLEYİCİ)
     startModule: async function(moduleId) {
         // Bu fonksiyon, yeni moduleContentSection'ı aktif eder.
         this.showSection('moduleContentSection');
@@ -417,11 +436,14 @@ const LearningPath = {
         const titleEl = document.getElementById('moduleTitle');
         const contentBodyEl = document.getElementById('moduleContentBody');
         
+        if (!titleEl || !contentBodyEl) return; // HTML yapısı eksikse dur
+
         titleEl.textContent = 'Yükleniyor...';
         contentBodyEl.innerHTML = '<div class="text-center mt-5"><i class="fas fa-spinner fa-spin fa-3x"></i></div>';
 
         try {
-            const response = await fetch('data/module_content.json');
+            // content.json dosyasından modül içeriğini çeker
+            const response = await fetch('data/module_content.json'); 
             if (!response.ok) throw new Error(`Modül içeriği yüklenemedi: ${response.status}`);
             
             const contentData = await response.json();
@@ -501,11 +523,11 @@ const LearningPath = {
         const totalCountEl = document.getElementById('totalQuestionCount');
         const progressBar = document.getElementById('testProgressBar');
 
-        currentNumEl.textContent = this.currentQuestionIndex + 1;
-        totalCountEl.textContent = this.totalQuestions;
+        if(currentNumEl) currentNumEl.textContent = this.currentQuestionIndex + 1;
+        if(totalCountEl) totalCountEl.textContent = this.totalQuestions;
 
         const progress = ((this.currentQuestionIndex + 1) / this.totalQuestions) * 100;
-        progressBar.style.width = `${progress}%`;
+        if(progressBar) progressBar.style.width = `${progress}%`;
     },
 
     updateNavigationButtons: function() {
@@ -513,22 +535,30 @@ const LearningPath = {
         const nextBtn = document.getElementById('nextQuestionBtn');
         const submitBtn = document.getElementById('submitTestBtn');
 
-        prevBtn.style.display = this.currentQuestionIndex > 0 ? 'inline-block' : 'none';
+        if(prevBtn) prevBtn.style.display = this.currentQuestionIndex > 0 ? 'inline-block' : 'none';
 
         if (this.currentQuestionIndex === this.totalQuestions - 1) {
-            nextBtn.style.display = 'none';
-            submitBtn.style.display = 'inline-block';
+            if(nextBtn) nextBtn.style.display = 'none';
+            if(submitBtn) submitBtn.style.display = 'inline-block';
         } else {
-            nextBtn.style.display = 'inline-block';
-            submitBtn.style.display = 'none';
+            if(nextBtn) nextBtn.style.display = 'inline-block';
+            if(submitBtn) submitBtn.style.display = 'none';
         }
     },
 
     showSection: function(sectionId) {
+        // Tüm section'ları gizle
         document.querySelectorAll('.module-section').forEach(section => {
             section.classList.remove('active');
+            section.style.display = 'none'; 
         });
-        document.getElementById(sectionId).classList.add('active');
+        
+        // Hedef section'ı göster
+        const targetSection = document.getElementById(sectionId);
+        if (targetSection) {
+            targetSection.classList.add('active');
+            targetSection.style.display = 'block'; 
+        }
     }
 };
 

@@ -497,12 +497,48 @@ const LearningPath = {
         }
     },
     
-    // Yeni: Modülü Tamamlama Fonksiyonu (Simülasyon)
+    // 🟢 Modülü Tamamla Fonksiyonu
     completeModule: function() {
-        alert('Modülü tamamladınız! Skorunuz kaydedildi. Öğrenme yoluna geri dönülüyor.');
-        this.showSection('learningPathSection'); 
-    },
+        const currentModuleId = LearningPath.currentModuleId;
+        if (!currentModuleId) {
+            alert("Hata: Tamamlanacak modül bulunamadı.");
+            return;
+        }
 
+        const currentLevel = localStorage.getItem('userLevel') || 'A1';
+        let modulesData = JSON.parse(localStorage.getItem('learningModules')) || {};
+        
+        // Modülü bul ve güncelle
+        let moduleFound = false;
+        if (modulesData[currentLevel] && modulesData[currentLevel].modules) {
+            const modules = modulesData[currentLevel].modules;
+            for (let i = 0; i < modules.length; i++) {
+                if (modules[i].id === currentModuleId) {
+                    modules[i].status = "Tamamlandı";
+                    modules[i].progress = 100;
+                    modules[i].lastScore = 100; // Quiz olmadığı için varsayılan tam puan verelim
+                    modules[i].lastDuration = Math.ceil(Math.random() * 15) + 5; // Rastgele süre
+                    moduleFound = true;
+                    break;
+                }
+            }
+        }
+
+        if (moduleFound) {
+            // Güncellenmiş veriyi localStorage'a kaydet
+            localStorage.setItem('learningModules', JSON.stringify(modulesData));
+
+            // Kullanıcıya bilgi ver ve öğrenme yolu ekranına dön
+            alert(`${currentModuleId} modülü başarıyla tamamlandı ve puanlandı!`);
+            
+            // Öğrenme yolunu tekrar çiz
+            this.displayLearningPath(currentLevel); 
+            this.showSection('learningPathSection');
+
+        } else {
+            alert("Hata: Modül verisi bulunamadı veya kaydedilemedi.");
+        }
+    },
     // Seviye Atlatma Mantığı
     advanceLevel: function(currentLevel) {
         const levels = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
@@ -572,4 +608,5 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('📄 SAYFA YÜKLENDİ - LearningPath başlatılıyor');
     LearningPath.init();
 });
+
 

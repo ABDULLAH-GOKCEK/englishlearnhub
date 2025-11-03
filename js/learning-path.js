@@ -430,6 +430,7 @@ const LearningPath = {
 
    // 🔴 Modül Başlatma Fonksiyonu (Hata Tespiti İyileştirildi)
     startModule: async function(moduleId) {
+        LearningPath.currentModuleId = moduleId;
         this.showSection('moduleContentSection');
         
         const titleEl = document.getElementById('moduleTitle');
@@ -608,5 +609,6 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('📄 SAYFA YÜKLENDİ - LearningPath başlatılıyor');
     LearningPath.init();
 });
+
 
 

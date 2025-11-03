@@ -428,3 +428,42 @@
     background: #ffffff;
     cursor: default;
 }
+/* İnteraktif Quiz Stilleri */
+
+.quiz-options-simulated {
+    display: flex;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.quiz-option-item {
+    cursor: pointer;
+    padding: 10px 20px;
+    border: 2px solid #ced4da;
+    border-radius: 8px;
+    transition: all 0.2s ease-in-out;
+    background-color: #f8f9fa;
+    user-select: none; /* Metnin seçilmesini engeller */
+}
+
+/* Seçenekler üzerine gelindiğinde */
+.quiz-option-item:hover {
+    border-color: #4361ee;
+    background-color: #e9ecef;
+}
+
+/* Cevap seçildiğinde (Doğru/Yanlış) */
+.quiz-option-item.selected-answer {
+    font-weight: bold;
+    color: white;
+}
+
+.quiz-option-item.correct-answer {
+    background-color: #28a745; /* Yeşil */
+    border-color: #28a745;
+}
+
+.quiz-option-item.wrong-answer {
+    background-color: #dc3545; /* Kırmızı */
+    border-color: #dc3545;
+}

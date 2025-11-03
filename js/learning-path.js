@@ -5,6 +5,8 @@ const LearningPath = {
     userAnswers: {},
     userLevel: 'A1', // Varsayılan seviye
     currentModuleId: null, // Hata düzeltildi: Hangi modülün açık olduğunu tutar
+    moduleQuizScore: { total: 0, correct: 0, answered: false }, // 🆕 Modül içi quiz skorunu tutar
+    // ...
 
     // Sayfa yüklendiğinde çalışacak başlangıç fonksiyonu
     init: function() {
@@ -493,4 +495,5 @@ const LearningPath = {
 
 // Sayfa yüklendiğinde init fonksiyonunu çağır
 document.addEventListener('DOMContentLoaded', () => LearningPath.init());
+
 

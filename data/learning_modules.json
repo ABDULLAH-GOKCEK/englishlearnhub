@@ -1,45 +1,32 @@
 {
-  "a1_m1": {
-    "title": "Temel Fiiller ve 'Be' Fiili",
-    "topic": "Grammar",
-    "content": [
-      {"type": "heading", "text": "Giriş: İngilizcenin Temelleri"},
-      {"type": "paragraph", "text": "İngilizcede cümle kurmanın temeli olan 'to be' (olmak) fiili, en çok kullanılan fiildir. Şimdiki zamanda üç ana formu vardır: am, is, are."},
-      {"type": "code_block", "text": "I → am\nYou / We / They → are\nHe / She / It → is"},
-      {"type": "example", "text": "I am a teacher. (Ben bir öğretmenim.)\nShe is happy. (O mutlu.)\nWe are students. (Biz öğrenciyiz.)"},
-      {"type": "quiz_intro", "text": "Konuyu pekiştirmek için kısa alıştırma."},
-      {"type": "quiz", "question": "The dog ___ fast.", "options": ["am", "is", "are"], "answer": "is"}
+  "A1": {
+    "title": "A1 Başlangıç Seviyesi",
+    "description": "Günlük hayatınızda basit cümlelerle kendinizi ifade etmeyi ve temel dil bilgisi kurallarını öğreneceksiniz.",
+    "modules": [
+      {"id": "a1_m1", "name": "Temel Fiiller ve 'Be' Fiili", "topic": "Grammar", "status": "Tamamlandı", "progress": 100, "lastDuration": 10, "lastScore": 95},
+      {"id": "a1_m2", "name": "Geniş Zaman (Simple Present)", "topic": "Grammar", "status": "Tamamlandı", "progress": 100, "lastDuration": 8, "lastScore": 90},
+      {"id": "a1_m3", "name": "Sayılar ve Günlük Kelimeler", "topic": "Vocabulary", "status": "Tamamlandı", "progress": 100, "lastDuration": 12, "lastScore": 92},
+      {"id": "a1_m4", "name": "Soru Sorma Temelleri", "topic": "Practice", "status": "Tamamlandı", "progress": 100, "lastDuration": 15, "lastScore": 88}  
     ]
   },
-  "a1_m2": {
-    "title": "Geniş Zaman (Simple Present)",
-    "topic": "Grammar",
-    "content": [
-      {"type": "heading", "text": "Geniş Zaman (Simple Present) Kullanımı"},
-      {"type": "paragraph", "text": "Geniş zaman, genel gerçekleri ve düzenli yapılan alışkanlıkları ifade etmek için kullanılır. Üçüncü tekil şahıslarda fiil 's' takısı alır."},
-      {"type": "example", "text": "I drink coffee every morning. (Her sabah kahve içerim.)\nShe works in a bank. (O bir bankada çalışır.)"}
+  "B1": {
+    "title": "B1 Orta Seviye (Intermediate)",
+    "description": "Daha karmaşık metinleri anlamayı, fikirlerinizi gerekçelendirmeyi ve çeşitli konularda akıcı konuşmayı hedefleyeceksiniz.",
+    "modules": [
+      {"id": "b1_m1", "name": "Zamanların Karşılaştırılması", "topic": "Grammar", "status": "Yeni", "progress": 0, "lastDuration": 0, "lastScore": 0},
+      {"id": "b1_m2", "name": "Pasif Yapı (Passive Voice)", "topic": "Grammar", "status": "Yeni", "progress": 0, "lastDuration": 0, "lastScore": 0},
+      {"id": "b1_m3", "name": "Bağlaçlar (Conjunctions)", "topic": "Grammar", "status": "Yeni", "progress": 0, "lastDuration": 0, "lastScore": 0},
+      {"id": "b1_m4", "name": "Resmi ve Gayriresmi Dil", "topic": "Speaking", "status": "Yeni", "progress": 0, "lastDuration": 0, "lastScore": 0}
     ]
   },
-  "a1_m3": {
-    "title": "Sayılar ve Günlük Kelimeler",
-    "topic": "Vocabulary",
-    "content": [
-      {"type": "heading", "text": "1'den 100'e Kadar Sayılar"},
-      {"type": "paragraph", "text": "Temel sayıları öğrenmek, İngilizcede konuşmanın olmazsa olmazıdır. Özellikle telefon numaralarını ve saatleri söylerken kritiktir."},
-      {"type": "code_block", "text": "1 (one), 10 (ten), 20 (twenty), 50 (fifty), 100 (one hundred)"},
-      {"type": "heading", "text": "Günlük Kelimeler: Aile ve Ev"},
-      {"type": "example", "text": "mother (anne), father (baba), brother (erkek kardeş), sister (kız kardeş)\nkitchen (mutfak), bedroom (yatak odası), table (masa), chair (sandalye)"}
-    ]
-  },
-  "a1_m4": {
-    "title": "Soru Sorma Temelleri",
-    "topic": "Practice",
-    "content": [
-      {"type": "heading", "text": "Who, What, Where Kullanımı"},
-      {"type": "paragraph", "text": "Temel soru kelimeleri (Wh-questions) ile basit sorular kurmayı öğrenin."},
-      {"type": "example", "text": "What is your name? (Adın ne?)\nWhere are you from? (Nerelisin?)\nWho is that person? (Şu kişi kim?) "},
-      {"type": "quiz_intro", "text": "Şimdi bu kuralları uygulayın."},
-      {"type": "quiz", "question": "___ is the capital of France?", "options": ["Who", "What", "Where"], "answer": "What"}
+  "C1": {
+    "title": "C1 İleri Seviye (Advanced)",
+    "description": "Zorlu, uzun metinleri anlamayı, anlam kaymalarını fark etmeyi ve akademik konular üzerine detaylı konuşmayı öğreneceksiniz.",
+    "modules": [
+      {"id": "c1_m1", "name": "İndirgenmiş Cümlecikler", "topic": "Grammar", "status": "Yeni", "progress": 0, "lastDuration": 0, "lastScore": 0},
+      {"id": "c1_m2", "name": "Deyimsel Fiiller (Phrasal Verbs)", "topic": "Vocabulary", "status": "Yeni", "progress": 0, "lastDuration": 0, "lastScore": 0},
+      {"id": "c1_m3", "name": "Karmaşık Koşul Cümleleri", "topic": "Grammar", "status": "Yeni", "progress": 0, "lastDuration": 0, "lastScore": 0},
+      {"id": "c1_m4", "name": "Akademik Yazma Teknikleri", "topic": "Writing", "status": "Yeni", "progress": 0, "lastDuration": 0, "lastScore": 0}
     ]
   }
 }

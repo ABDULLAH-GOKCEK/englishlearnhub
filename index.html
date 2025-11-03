@@ -3,110 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>İngilizce Öğrenme Platformu</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Ana Sayfa - İngilizce Öğrenme Platformu</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <style>
+        /* Sadece Ana Sayfa için temel stil */
+        .main-page-card {
+            margin-top: 50px;
+            padding: 40px;
+            text-align: center;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .module-link {
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            margin: 10px;
+            display: inline-block;
+            border-radius: 8px;
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <div class="container">
-            <h1>İngilizce Öğrenme Platformu</h1>
-            <nav>
-                <ul>
-                    <li><a href="index.html" class="active">🏠 Ana Sayfa</a></li>
-                    <li><a href="learning-path.html">🎯 Öğrenme Yolum</a></li>
-                    <li><a href="teaching.html">📚 Kelime Öğrenme</a></li>
-                    <li><a href="flip_cards.html">🃏 İngilizce-Türkçe Kelimeler</a></li>
-                    <li><a href="daily.html">📝 Günlük Cümleler</a></li>
-                    <li><a href="reading.html">📖 Okuma-Anlama</a></li>
-                    <li><a href="word_games.html">🎮 Kelime Oyunları</a></li>
-                    <li><a href="exam.html">🧪 Sınav</a></li>
-                    <li><a href="chat.html">🧪 Chat</a></li>
-                </ul>
-            </nav>
+    <div class="container">
+        <div class="main-page-card bg-light">
+            <h2>Hoş Geldiniz!</h2>
+            <p class="lead">Lütfen hangi modüle geçmek istediğinizi seçin:</p>
+            <hr>
+            
+            <a href="learning-path.html" class="btn btn-primary module-link">
+                <i class="fas fa-graduation-cap"></i> Seviye Testi ve Öğrenme Yolu
+            </a>
+
+            <a href="#" class="btn btn-secondary module-link">
+                <i class="fas fa-comments"></i> Chat Modülü
+            </a>
+            <a href="#" class="btn btn-secondary module-link">
+                <i class="fas fa-gamepad"></i> Oyun Modülü
+            </a>
         </div>
-    </header>
-
-    <main class="container">
-        <section class="hero">
-            <div class="hero-content">
-                <h2>İngilizce Öğrenme Yolculuğuna Hoş Geldin! 🌟</h2>
-                <p>Kişiselleştirilmiş öğrenme deneyimi ile İngilizce'ni etkili bir şekilde geliştir.</p>
-                <div class="hero-buttons">
-                    <a href="learning-path.html" class="btn primary large">
-                        <i class="fas fa-rocket"></i> Öğrenme Yolculuğuna Başla
-                    </a>
-                    <a href="teaching.html" class="btn secondary large">
-                        <i class="fas fa-play"></i> Hemen Öğrenmeye Başla
-                    </a>
-                </div>
-            </div>
-        </section>
-
-        <section class="features">
-            <h2>Neden Bizimle Öğrenmelisin? 🤔</h2>
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">🎯</div>
-                    <h3>Kişiselleştirilmiş Yol</h3>
-                    <p>Seviyene göre özelleştirilmiş öğrenme yolu ve içerikler</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">📊</div>
-                    <h3>Detaylı İlerleme Takibi</h3>
-                    <p>Günlük, haftalık ve aylık ilerleme istatistikleri</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">🏆</div>
-                    <h3>Başarı Rozetleri</h3>
-                    <p>Ödül sistemi ile motive ol ve başarılarını kutla</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">🔄</div>
-                    <h3>Etkili Tekrar Sistemi</h3>
-                    <p>Akıllı tekrar algoritması ile kalıcı öğrenme</p>
-                </div>
-            </div>
-        </section>
-
-        <section class="quick-actions">
-            <h2>Hızlı Başlangıç 🚀</h2>
-            <div class="actions-grid">
-                <a href="teaching.html" class="action-card">
-                    <div class="action-icon">📚</div>
-                    <h3>Kelime Öğren</h3>
-                    <p>Yeni kelimeler öğren ve kelime dağarcığını genişlet</p>
-                    <span class="action-arrow">→</span>
-                </a>
-                <a href="flip_cards.html" class="action-card">
-                    <div class="action-icon">🃏</div>
-                    <h3>Kartlarla Tekrar</h3>
-                    <p>Flashcard sistem ile eğlenceli tekrar yap</p>
-                    <span class="action-arrow">→</span>
-                </a>
-                <a href="word_games.html" class="action-card">
-                    <div class="action-icon">🎮</div>
-                    <h3>Oyun Oyna</h3>
-                    <p>Eğlenceli oyunlar ile İngilizce'ni geliştir</p>
-                    <span class="action-arrow">→</span>
-                </a>
-                <a href="exam.html" class="action-card">
-                    <div class="action-icon">🧪</div>
-                    <h3>Bilgini Test Et</h3>
-                    <p>Seviye testleri ile bilgini ölç ve geliştir</p>
-                    <span class="action-arrow">→</span>
-                </a>
-            </div>
-        </section>
-    </main>
-
-    <footer>
-        <div class="container">
-            <p>© 2024 İngilizce Öğrenme Platformu - Tüm hakları saklıdır</p>
-            <p class="footer-info">🚀 Kişiselleştirilmiş İngilizce Öğrenme Deneyimi</p>
-        </div>
-    </footer>
-
-    <script src="js/common.js"></script>
+    </div>
 </body>
 </html>

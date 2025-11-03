@@ -4,9 +4,8 @@ const LearningPath = {
     currentQuestionIndex: 0,
     userAnswers: {},
     userLevel: 'A1', // Varsayılan seviye
-    currentModuleId: null, // Hata düzeltildi: Hangi modülün açık olduğunu tutar
+    currentModuleId: null, // Hangi modülün açık olduğunu tutar
     moduleQuizScore: { total: 0, correct: 0, answered: false }, // 🆕 Modül içi quiz skorunu tutar
-    // ...
 
     // Sayfa yüklendiğinde çalışacak başlangıç fonksiyonu
     init: function() {
@@ -34,7 +33,6 @@ const LearningPath = {
 
             this.testQuestions = data.questions;
             
-            // KRİTİK: Eğer questions dizisi boşsa, 0 gösterilir.
             const totalCount = this.testQuestions.length;
             document.getElementById('totalQuestionCount').textContent = totalCount;
             console.log(`✅ ${totalCount} soru yüklendi.`);
@@ -326,13 +324,15 @@ const LearningPath = {
         pathSection.innerHTML = pathHtml;
     },
 
-    // 🟢 Modül Başlatma Fonksiyonu (Tüm Hata Düzeltmeleri Uygulandı)
+    // 🟢 Modül Başlatma Fonksiyonu 
     startModule: async function(moduleId) {
-        // Hata Düzeltme 1: Hangi modülün açık olduğunu kaydet
-        LearningPath.currentModuleId = moduleId;
+        LearningPath.currentModuleId = moduleId; 
+        
         // 🆕 Quiz skorunu sıfırla
         this.moduleQuizScore = { total: 0, correct: 0, answered: false }; 
+
         this.showSection('moduleContentSection');
+        
         const titleEl = document.getElementById('moduleTitle');
         const contentBodyEl = document.getElementById('moduleContentBody');
         
@@ -343,12 +343,10 @@ const LearningPath = {
 
         let module = null;
         try {
-            // module_content.json dosyasından modül içeriğini çekiyoruz (404/JSON hatası çözümleri)
             const response = await fetch('data/module_content.json'); 
             
             if (!response.ok) {
-                console.error('MODÜL İÇERİĞİ YÜKLENEMEDİ! HTTP Durumu:', response.status);
-                throw new Error(`Dosya yüklenirken hata oluştu. Lütfen data/module_content.json dosyasının varlığını ve yolunu kontrol edin. HTTP Status: ${response.status}`);
+                throw new Error(`Dosya yüklenirken hata oluştu. HTTP Status: ${response.status}`);
             }
             
             const contentData = await response.json();
@@ -364,7 +362,6 @@ const LearningPath = {
             let contentHtml = '';
 
             module.content.forEach(item => {
-                // ... (İçerik tipleri işleniyor)
                 if (item.type === 'heading') {
                     contentHtml += `<h3>${item.text}</h3>`;
                 } else if (item.type === 'paragraph') {
@@ -376,7 +373,6 @@ const LearningPath = {
                 } else if (item.type === 'quiz_intro') {
                     contentHtml += `<p class="quiz-intro">${item.text}</p>`;
                 } else if (item.type === 'quiz') {
-                    // Quiz içeriği oluşturuluyor
                     contentHtml += `
                         <div class="module-quiz-card" data-module-id="${moduleId}">
                             <p><strong>Soru:</strong> ${item.question}</p>
@@ -390,7 +386,7 @@ const LearningPath = {
 
             contentBodyEl.innerHTML = contentHtml;
             
-            // 🆕 Yeni: Quiz dinleyicilerini bağla!
+            // Quiz dinleyicilerini bağla ve skor toplamayı başlat
             LearningPath.attachQuizListeners(moduleId, module); 
 
         } catch (error) {
@@ -400,12 +396,14 @@ const LearningPath = {
         }
     },
     
-    // 🟢 Quiz Dinleyicilerini Bağlama (İnteraktiflik)
+    // 🟢 Quiz Dinleyicilerini Bağlama (Puanlama Mantığı Dahil)
     attachQuizListeners: function(moduleId, moduleData) {
+        // Modül açıldığında quiz sayısını bulup total'e kaydet.
+        this.moduleQuizScore.total = moduleData.content.filter(item => item.type === 'quiz').length;
+
         const quizItems = document.querySelectorAll('.module-quiz-card');
         
         quizItems.forEach(quizCard => {
-            // Soru metnini alarak ilgili quiz verisini bulmaya çalışırız
             const questionElement = quizCard.querySelector('p strong');
             if (!questionElement) return;
 
@@ -421,17 +419,23 @@ const LearningPath = {
             
             options.forEach(option => {
                 option.addEventListener('click', function() {
+                    // Zaten cevaplanmışsa, tekrar puanlama yapma
                     if (quizCard.dataset.answered) return; 
 
                     const selectedAnswer = this.textContent.trim();
                     const correctAnswer = quizItem.answer.trim();
-
+                    
+                    // Cevaplandı olarak işaretle
+                    quizCard.dataset.answered = 'true'; 
+                    
                     // Seçimi işaretle
                     options.forEach(opt => opt.classList.remove('selected-answer'));
                     this.classList.add('selected-answer');
 
                     if (selectedAnswer === correctAnswer) {
                         this.classList.add('correct-answer');
+                        // 🆕 DOĞRU CEVAP PUANLAMASI
+                        LearningPath.moduleQuizScore.correct++; 
                     } else {
                         this.classList.add('wrong-answer');
                         
@@ -443,13 +447,14 @@ const LearningPath = {
                         });
                     }
                     
-                    quizCard.dataset.answered = 'true'; // Cevaplandı olarak işaretle
+                    // Modülün en az bir quize cevap verildiğini işaretle
+                    LearningPath.moduleQuizScore.answered = true; 
                 });
             });
         });
     },
 
-    // 🟢 Modülü Tamamla Fonksiyonu
+    // 🟢 Modülü Tamamla Fonksiyonu (Gerçek Puan Hesaplama Dahil)
     completeModule: function() {
         const currentModuleId = LearningPath.currentModuleId;
         if (!currentModuleId) {
@@ -458,8 +463,16 @@ const LearningPath = {
         }
 
         const currentLevel = localStorage.getItem('userLevel') || 'A1';
-        // LocalStorage'daki modül verisini al
         let modulesData = JSON.parse(localStorage.getItem('learningModules')) || {};
+        
+        // 🆕 QUIZ SKORUNU HESAPLA
+        let finalScore = 100; // Varsayılan: Eğer quiz yoksa 100 ver.
+        if (this.moduleQuizScore.total > 0) {
+            finalScore = Math.round((this.moduleQuizScore.correct / this.moduleQuizScore.total) * 100);
+        } else if (this.moduleQuizScore.answered === true) {
+             // Quiz olmamasına rağmen answered true ise (teorik olarak olmamalı), varsayılanı koruruz.
+             // Ancak sadece quiz varsa puanlama yapıldığı için bu satır gereksizdir, sadece güvenlik amaçlı bırakılabilir.
+        }
         
         let moduleFound = false;
         if (modulesData[currentLevel] && modulesData[currentLevel].modules) {
@@ -468,8 +481,11 @@ const LearningPath = {
                 if (modules[i].id === currentModuleId) {
                     modules[i].status = "Tamamlandı";
                     modules[i].progress = 100;
-                    modules[i].lastScore = 100; // Varsayılan tam puan
-                    modules[i].lastDuration = Math.ceil(Math.random() * 15) + 5; // Rastgele süre
+                    
+                    // HESAPLANAN GERÇEK SKOR KULLANILIYOR
+                    modules[i].lastScore = finalScore; 
+                    
+                    modules[i].lastDuration = Math.ceil(Math.random() * 15) + 5; 
                     moduleFound = true;
                     break;
                 }
@@ -480,8 +496,7 @@ const LearningPath = {
             // Güncellenmiş veriyi LocalStorage'a kaydet
             localStorage.setItem('learningModules', JSON.stringify(modulesData));
 
-            // Kullanıcıya bilgi ver ve öğrenme yolu ekranına dön
-            alert(`${currentModuleId} modülü başarıyla tamamlandı ve puanlandı!`);
+            alert(`${currentModuleId} modülü başarıyla tamamlandı ve puanınız kaydedildi: %${finalScore}`);
             
             // Öğrenme yolunu tekrar çiz ve geçiş yap
             this.displayLearningPath(currentLevel); 
@@ -495,6 +510,3 @@ const LearningPath = {
 
 // Sayfa yüklendiğinde init fonksiyonunu çağır
 document.addEventListener('DOMContentLoaded', () => LearningPath.init());
-
-
-

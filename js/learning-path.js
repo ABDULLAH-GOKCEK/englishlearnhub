@@ -428,38 +428,44 @@ const LearningPath = {
         }
     },
 
-    // 🔴 Modül Başlatma Fonksiyonu (YENİ İÇERİK YÜKLEYİCİ)
+   // 🔴 Modül Başlatma Fonksiyonu (Hata Tespiti İyileştirildi)
     startModule: async function(moduleId) {
-        // Bu fonksiyon, yeni moduleContentSection'ı aktif eder.
         this.showSection('moduleContentSection');
         
         const titleEl = document.getElementById('moduleTitle');
         const contentBodyEl = document.getElementById('moduleContentBody');
         
-        if (!titleEl || !contentBodyEl) return; // HTML yapısı eksikse dur
+        if (!titleEl || !contentBodyEl) return; 
 
-        titleEl.textContent = 'Yükleniyor...';
+        titleEl.textContent = 'İçerik Yükleniyor...';
         contentBodyEl.innerHTML = '<div class="text-center mt-5"><i class="fas fa-spinner fa-spin fa-3x"></i></div>';
 
         try {
-            // content.json dosyasından modül içeriğini çeker
+            // content.json dosyasından modül içeriğini çekiyoruz
             const response = await fetch('data/module_content.json'); 
-            if (!response.ok) throw new Error(`Modül içeriği yüklenemedi: ${response.status}`);
+            
+            // Eğer dosya yolu yanlışsa veya sunucu hata verdiyse (404/500), HATA mesajı atar.
+            if (!response.ok) {
+                console.error('MODÜL İÇERİĞİ YÜKLENEMEDİ! HTTP Durumu:', response.status);
+                throw new Error(`Dosya yüklenirken hata oluştu. Lütfen data/module_content.json dosyasının varlığını ve yolunu kontrol edin. HTTP Status: ${response.status}`);
+            }
             
             const contentData = await response.json();
             const module = contentData[moduleId];
 
             if (!module) {
-                titleEl.textContent = 'Hata';
-                contentBodyEl.innerHTML = '<p class="text-danger">Bu modüle ait içerik bulunamadı.</p>';
+                titleEl.textContent = 'Hata: İçerik Eksik';
+                contentBodyEl.innerHTML = `<p class="text-danger"><strong>${moduleId}</strong> kimliğine sahip modül, <strong>module_content.json</strong> dosyası içinde bulunamadı.</p>`;
                 return;
             }
+
+            // ... (İçerik render etme kısmı aynen kalır)
 
             titleEl.textContent = module.title;
             let contentHtml = '';
 
-            // İçerik tiplerini işleme
             module.content.forEach(item => {
+                // ... (İçerik tipleri işlenmeye devam eder)
                 if (item.type === 'heading') {
                     contentHtml += `<h3>${item.text}</h3>`;
                 } else if (item.type === 'paragraph') {
@@ -486,8 +492,8 @@ const LearningPath = {
 
         } catch (error) {
             console.error('❌ Modül içeriği yüklenirken hata:', error);
-            titleEl.textContent = 'Hata';
-            contentBodyEl.innerHTML = '<p class="text-danger">Ders içeriği yüklenirken bir hata oluştu. (Konsolu kontrol edin)</p>';
+            titleEl.textContent = 'Yükleme Hatası';
+            contentBodyEl.innerHTML = `<p class="text-danger"><strong>Ders içeriği yüklenirken kritik bir hata oluştu.</strong> Lütfen tarayıcı konsolunu kontrol edin. Hata Mesajı: <code>${error.message}</code></p>`;
         }
     },
     
@@ -566,3 +572,4 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('📄 SAYFA YÜKLENDİ - LearningPath başlatılıyor');
     LearningPath.init();
 });
+

@@ -15,7 +15,7 @@ const LearningPath = {
         console.log("📄 SAYFA YÜKLENDİ - LearningPath başlatılıyor");
     },
 
-    // Test sorularını JSON dosyasından yükler
+    // Test sorularını JSON dosyasından yükler (Geliştirilmiş Hata Yönetimi)
     loadTestData: async function() {
         try {
             // level_test.json dosyasını data klasöründen çek
@@ -24,14 +24,24 @@ const LearningPath = {
                 throw new Error(`Test verisi yüklenemedi. HTTP Durumu: ${response.status}`);
             }
             const data = await response.json();
+            
+            // KRİTİK KONTROL: data.questions var mı?
+            if (!data.questions || !Array.isArray(data.questions)) {
+                 throw new Error("JSON dosyası beklenen 'questions' dizisini içermiyor.");
+            }
+
             this.testQuestions = data.questions;
             
-            document.getElementById('totalQuestionCount').textContent = this.testQuestions.length;
-            console.log(`✅ ${this.testQuestions.length} soru yüklendi.`);
+            // KRİTİK: Eğer questions dizisi boşsa, 0 gösterilir.
+            const totalCount = this.testQuestions.length;
+            document.getElementById('totalQuestionCount').textContent = totalCount;
+            console.log(`✅ ${totalCount} soru yüklendi.`);
             
         } catch (error) {
             console.error("Test verisi yüklenirken kritik hata:", error);
-            // alert("Hata: Seviye testi verileri yüklenemedi. (Konsolu kontrol edin)"); // Geliştirme aşamasında bu uyarıyı kaldırdık
+            // Hata durumunda test sorularını boş bir dizi olarak ayarla
+            this.testQuestions = []; 
+            alert("Hata: Seviye testi verileri yüklenemedi veya hatalı formatta. Konsolu kontrol edin.");
         }
     },
 
@@ -483,3 +493,4 @@ const LearningPath = {
 
 // Sayfa yüklendiğinde init fonksiyonunu çağır
 document.addEventListener('DOMContentLoaded', () => LearningPath.init());
+

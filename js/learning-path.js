@@ -50,11 +50,12 @@ const LearningPath = {
             moduleRes, levelTestRes, wordsRes, sentencesRes, readingsRes
         ].map(res => res.then(r => r.json())));
 
-        this.allModules = moduleData;
-        this.allLevelTestQuestions = testData;
-        this.allWords = wordsData || []; 
-        this.allSentences = sentencesData || []; 
-        this.allReadings = readingsData || []; 
+        this.allModules = moduleData || {};
+        // KRİTİK DÜZELTME: Verinin bir dizi olduğundan emin ol
+        this.allLevelTestQuestions = Array.isArray(testData) ? testData : []; 
+        this.allWords = Array.isArray(wordsData) ? wordsData : []; 
+        this.allSentences = Array.isArray(sentencesData) ? sentencesData : []; 
+        this.allReadings = Array.isArray(readingsData) ? readingsData : []; 
     },
 
     // Hangi bölümün gösterileceğini ayarlar
@@ -75,8 +76,21 @@ const LearningPath = {
         const testEl = document.getElementById('levelTestSection');
         if (!testEl) return;
 
-        // Test sorularını rastgele seçip karıştır
+        // Test sorularını rastgele seçip karıştır (max 10 soru)
         const questions = this.allLevelTestQuestions.sort(() => 0.5 - Math.random()).slice(0, 10);
+        
+        // HATA KONTROLÜ
+        if (questions.length === 0) {
+            testEl.innerHTML = `
+                <div class="alert alert-danger" role="alert">
+                    <h4>Hata: Seviye Testi Soruları Yüklenemedi!</h4>
+                    <p>Lütfen <code>data/level_test.json</code> dosyasının hem var olduğunu hem de içinde geçerli JSON formatında soruların bulunduğunu kontrol edin.</p>
+                </div>
+                <button class="btn btn-primary mt-3" onclick="window.location.reload()">Tekrar Dene</button>
+            `;
+            return;
+        }
+
         let currentQuestionIndex = 0;
         let userAnswers = {}; // {questionId: selectedOption}
 
@@ -90,7 +104,6 @@ const LearningPath = {
             const progress = Math.round((currentQuestionIndex / questions.length) * 100);
 
             let optionsHtml = '';
-            // Seçenekleri karıştır
             const shuffledOptions = q.options.sort(() => 0.5 - Math.random()); 
             shuffledOptions.forEach((option, index) => {
                 const checked = userAnswers[q.id] === option ? 'checked' : '';
@@ -595,3 +608,4 @@ const LearningPath = {
 };
 
 document.addEventListener('DOMContentLoaded', () => LearningPath.init());
+

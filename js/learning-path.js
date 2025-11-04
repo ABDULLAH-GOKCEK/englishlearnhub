@@ -376,43 +376,115 @@ const LearningPath = {
     // Modül içeriğini dinamik olarak zenginleştirir (Çalışmaları oluşturan kısım)
     enrichModuleContent: function(moduleId, baseContent) {
         const moduleLevel = moduleId.split('_')[0].toUpperCase(); 
-        const moduleTopic = baseContent.topic; 
+        const moduleTopic = baseContent.topic.toLowerCase(); 
         let enrichedContent = [...baseContent.content]; 
+        let quizIndexStart = enrichedContent.filter(item => item.type === 'quiz').length;
 
-        // --- 1. Kelime Alıştırmaları ---
+        // --- 1. Kelime Alıştırmaları (words.json) ---
+        // Modül seviyesine ve konusuna uygun 15 kelime çekilir
         const moduleWords = this.allWords.filter(w => 
             w.difficulty.toUpperCase().includes(moduleLevel) && 
-            w.category.toLowerCase().includes(moduleTopic.toLowerCase())
-        ).slice(0, 10); 
+            w.category.toLowerCase().includes(moduleTopic)
+        ).slice(0, 15); // Sayıyı 15'e çıkardık
 
         if (moduleWords.length > 0) {
              const wordsHtml = moduleWords.map(w => 
                 `<div class="word-item"><strong>${w.word}</strong> - ${w.turkish} (${w.category}) <small class="text-muted">| Seviye: ${w.difficulty}</small></div>`
             ).join('');
             
-            enrichedContent.push({type: 'heading', text: 'Kelime Alıştırması'});
-            enrichedContent.push({type: 'paragraph', text: `Bu modül için ${moduleWords.length} adet kelime seçildi. Lütfen seslerini dinleyip tekrar edin (Simülasyon).`});
+            enrichedContent.push({type: 'heading', text: '1. Kelime Alıştırması'});
+            enrichedContent.push({type: 'paragraph', text: `Bu modül için **${moduleWords.length}** adet temel kelime seçildi. Kelime dağarcığınızı bu kelimelerle zenginleştirin.`});
             enrichedContent.push({type: 'words', html: wordsHtml});
+
+            // Kelimelerden 3 adet soru (Quiz) oluşturulur
+            for (let i = 0; i < Math.min(3, moduleWords.length); i++) {
+                const correctWord = moduleWords[i];
+                const options = [correctWord.turkish];
+                
+                // Diğer yanlış seçenekleri çek
+                const wrongOptions = this.allWords
+                    .filter(w => w.turkish !== correctWord.turkish && w.difficulty.toUpperCase().includes(moduleLevel))
+                    .sort(() => 0.5 - Math.random())
+                    .slice(0, 3)
+                    .map(w => w.turkish);
+                    
+                options.push(...wrongOptions);
+                options.sort(() => 0.5 - Math.random());
+                
+                quizIndexStart++;
+                enrichedContent.push({
+                    type: 'quiz', 
+                    question: `(Kelime Sorusu ${quizIndexStart}): '${correctWord.word}' kelimesinin Türkçe karşılığı nedir?`, 
+                    options: options, 
+                    answer: correctWord.turkish 
+                });
+            }
         }
         
-        // --- 2. Okuma Parçası (Varsa) ---
+        // --- 2. Cümle Alıştırmaları (sentences.json) ---
+        const moduleSentences = this.allSentences.filter(s =>
+            s.difficulty.toUpperCase().includes(moduleLevel) &&
+            s.category.toLowerCase().includes(moduleTopic)
+        ).slice(0, 10); // 10 adet cümle çekilir
+
+        if (moduleSentences.length > 0) {
+            const sentencesHtml = moduleSentences.map(s =>
+                `<div class="sentence-item"><strong>${s.english}</strong> (${s.turkish})</div>`
+            ).join('');
+
+            enrichedContent.push({type: 'heading', text: '2. Cümle Yapısı Alıştırması'});
+            enrichedContent.push({type: 'paragraph', text: `Konuyla alakalı **${moduleSentences.length}** adet örnek cümle. Cümleleri tekrar edin ve telaffuzunu öğrenin (Simülasyon).`});
+            enrichedContent.push({type: 'sentences', html: sentencesHtml});
+
+             // Cümlelerden 2 adet soru (Quiz) oluşturulur (boşluk doldurma simülasyonu)
+            for (let i = 0; i < Math.min(2, moduleSentences.length); i++) {
+                const sentence = moduleSentences[i];
+                const words = sentence.english.split(' ');
+                const missingWordIndex = Math.floor(Math.random() * (words.length - 2)) + 1; // Baş ve son kelimeyi atla
+                const missingWord = words[missingWordIndex].replace(/[.,?!]/g, '');
+                
+                const questionText = words.map((w, index) => index === missingWordIndex ? '___' : w).join(' ');
+                
+                const options = [missingWord];
+                const wrongOptions = this.allWords
+                    .filter(w => !w.word.toLowerCase().includes(missingWord.toLowerCase()) && w.difficulty.toUpperCase().includes(moduleLevel))
+                    .sort(() => 0.5 - Math.random())
+                    .slice(0, 3)
+                    .map(w => w.word);
+                    
+                options.push(...wrongOptions);
+                options.sort(() => 0.5 - Math.random());
+
+                quizIndexStart++;
+                enrichedContent.push({
+                    type: 'quiz', 
+                    question: `(Cümle Sorusu ${quizIndexStart}): Cümledeki boşluğu doldurun: "${questionText}"`, 
+                    options: options, 
+                    answer: missingWord 
+                });
+            }
+        }
+
+        // --- 3. Okuma Parçası (reading_stories.json) ---
         const levelCode = (moduleLevel === 'A1' ? 'beginner' : moduleLevel === 'B1' ? 'intermediate' : 'advanced');
         
         const moduleReading = this.allReadings.find(r => 
             r.level.toLowerCase().includes(levelCode) && 
-            r.category.toLowerCase().includes(moduleTopic.toLowerCase())
+            r.category.toLowerCase().includes(moduleTopic)
         );
 
         if (moduleReading) {
-            enrichedContent.push({type: 'heading', text: `Okuma: ${moduleReading.title}`});
-            enrichedContent.push({type: 'paragraph', text: `**Seviye:** ${moduleReading.level} - **Konu:** ${moduleReading.category}`});
+            enrichedContent.push({type: 'heading', text: `3. Okuma: ${moduleReading.title}`});
+            enrichedContent.push({type: 'paragraph', text: `**Seviye:** ${moduleReading.level} - **Konu:** ${moduleReading.category}. Parçayı okuyun ve aşağıdaki soruları cevaplayın.`});
             enrichedContent.push({type: 'reading_text', text: moduleReading.content});
             
-            moduleReading.questions.forEach((q, idx) => {
+            moduleReading.questions.forEach((q) => {
+                quizIndexStart++;
                  enrichedContent.push({
                     type: 'quiz', 
-                    question: `(Okuma Sorusu ${idx + 1}): ${q.question}`, 
+                    question: `(Okuma Sorusu ${quizIndexStart}): ${q.question}`, 
                     options: q.options, 
+                    // CorrectAnswer 0, 1, 2, 3 ise options dizisinden doğru cevabı bul
                     answer: q.options[q.correctAnswer] 
                 });
             });
@@ -625,3 +697,4 @@ const LearningPath = {
 };
 
 document.addEventListener('DOMContentLoaded', () => LearningPath.init());
+

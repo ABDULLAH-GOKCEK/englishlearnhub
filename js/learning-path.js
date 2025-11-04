@@ -17,6 +17,7 @@ const LearningPath = {
     // Sayfa yüklendiğinde çalışacak başlangıç fonksiyonu
     init: function() {
         // 🚨 KRİTİK DÜZELTME 1: Test atlanma sorununu çözmek için ZORUNLU TEMİZLİK!
+        // Uygulamanın her zaman test giriş ekranından başlamasını sağlar.
         localStorage.removeItem('userLevel'); 
         localStorage.removeItem('learningModules');
         // ---------------------------------------------------------------------
@@ -27,12 +28,9 @@ const LearningPath = {
             this.checkInitialState();
             console.log("✅ Tüm veriler yüklendi ve entegrasyon tamamlandı.");
         }).catch(error => {
-            // 🚨 KRİTİK DÜZELTME 3: showSection artık erişilebilir, ancak hata mesajını daha spesifik yapalım
             console.error("Kritik Hata: Veri yüklemede sorun oluştu.", error);
             this.showSection('levelTestIntroSection'); 
-            
-            // Kullanıcıya dosya adını kontrol etmesi için uyarı
-            alert("Uygulama başlatılamadı: Veri dosyaları yüklenemedi veya hatalı. Özellikle 'module_content.json' dosya adını kontrol edin.");
+            alert("Uygulama başlatılamadı: Veri dosyaları yüklenemedi veya hatalı. Dosya adlarını kontrol edin.");
         });
     },
 
@@ -41,7 +39,7 @@ const LearningPath = {
         this.currentQuestionIndex = 0;
         this.userAnswers = {};
         
-        // Temizliği tekrar yap
+        // Bu fonksiyon her çağrıldığında temizliği tekrar yap
         localStorage.removeItem('userLevel'); 
         localStorage.removeItem('learningModules');
         
@@ -58,7 +56,7 @@ const LearningPath = {
             readingData
         ] = await Promise.all([
             fetch('data/level_test.json').then(res => res.json()),
-            // 🚨 KRİTİK DÜZELTME 2: 404/Syntax hatasını çözmek için dosya adını düzeltiyoruz
+            // Modül içeriği dosya adını tek 'json' uzantısı olarak varsayıyoruz
             fetch('data/module_content.json').then(res => res.json()), 
             fetch('data/words.json').then(res => res.json()),
             fetch('data/sentences.json').then(res => res.json()),
@@ -274,7 +272,7 @@ const LearningPath = {
         return titles[level] || 'Bilinmiyor';
     },
 
-    // Modül verisi şablonu oluşturur
+    // Modül verisi şablonu oluşturur (learning_modules.json'dan okur)
     createModuleDataTemplate: async function() {
         try {
             const response = await fetch('data/learning_modules.json'); 
@@ -300,7 +298,7 @@ const LearningPath = {
         }
     },
 
-    // Öğrenme yolunu ekranda gösterir
+    // Öğrenme yolunu ekranda gösterir (DİNAMİK MODÜL KARTLARI)
     displayLearningPath: async function(level) {
         const pathSection = document.getElementById('learningPathSection');
         pathSection.innerHTML = ''; 
@@ -375,7 +373,7 @@ const LearningPath = {
         this.bindEvents(); // Yeni butonların eventlerini tekrar bağla
     },
 
-    // Modül içeriğini dinamik olarak zenginleştirir
+    // Modül içeriğini dinamik olarak zenginleştirir (Çalışmaları oluşturan kısım)
     enrichModuleContent: function(moduleId, baseContent) {
         const moduleLevel = moduleId.split('_')[0].toUpperCase(); 
         const moduleTopic = baseContent.topic; 
@@ -440,9 +438,8 @@ const LearningPath = {
 
         if (!baseModule) {
             titleEl.textContent = 'Hata: İçerik Eksik';
-            // Modül içeriği eksikse detaylı hata mesajı (Doğru dosya adını belirttik)
             contentBodyEl.innerHTML = `<p class="text-danger"><strong>${moduleId}</strong> kimliğine sahip modül, modül içeriği dosyasında (Örn: <strong>module_content.json</strong>) bulunamadı.</p>
-            <p><strong>Lütfen verilerinizin yüklenip yüklenmediğini ve dosya ismini kontrol edin.</strong></p>`;
+            <p><strong>Lütfen verilerinizin yüklendiğinden ve dosya ismini kontrol edin.</strong></p>`;
             return;
         }
 
@@ -510,7 +507,6 @@ const LearningPath = {
             const questionText = quizCard.querySelector('p strong').textContent.replace(/Soru \d+:/, '').trim();
             
             const quizItem = quizzes.find(item => {
-                // Soru metnini eşleştirirken okuma sorusu önekini kaldır
                 return item.question && item.question.includes(questionText.replace(/\(Okuma Sorusu \d+\):/, '').trim());
             });
 

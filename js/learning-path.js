@@ -27,20 +27,28 @@ const LearningPath = {
             console.log("✅ Tüm veriler yüklendi ve entegrasyon tamamlandı.");
         }).catch(error => {
             console.error("Kritik Hata: Veri yüklemede sorun oluştu.", error);
-            // Hata durumunda bile test giriş ekranını göstermeye çalış.
+            // Hata durumunda bile başlangıç ekranını göstermeye çalış
             this.showSection('levelTestIntroSection'); 
             alert("Uygulama başlatılamadı: Veri dosyaları yüklenemedi veya hatalı. Konsolu kontrol edin.");
         });
     },
 
-    // 🆕 YENİ: Ana sayfaya (öğrenme yoluna) dönüş fonksiyonu
-    goToHome: function() {
-        this.displayLearningPath(this.userLevel);
+    // 🆕 GÜNCEL: Uygulamayı sıfırlayıp ilk ekrana döner (index.html'e dönüş mantığı)
+    goToAppStart: function() {
+        this.currentQuestionIndex = 0;
+        this.userAnswers = {};
+        
+        // LocalStorage'daki seviye ve modül verilerini temizleme (opsiyonel)
+        // Eğer her zaman testin en başından başlamak istenirse:
+        // localStorage.removeItem('userLevel'); 
+        // localStorage.removeItem('learningModules');
+        
+        this.checkInitialState();
     },
 
     // Tüm veri dosyalarını eş zamanlı olarak yükler
     loadAllData: async function() {
-        // Dosyaları yükler (Bu kısım aynı kaldı)
+        // Dosyaları yükler
         const [
             testData, 
             contentData, 
@@ -69,8 +77,8 @@ const LearningPath = {
         
         document.getElementById('totalQuestionCount').textContent = this.testQuestions.length;
     },
-    
-    // Buton ve olay dinleyicilerini bağlar (goToHome butonu bağlandı)
+
+    // Buton ve olay dinleyicilerini bağlar (Tüm geri dönüş butonları bağlandı)
     bindEvents: function() {
         console.log("🔗 Eventler bağlanıyor...");
         document.getElementById('startTestBtn').addEventListener('click', () => this.startTest());
@@ -83,17 +91,290 @@ const LearningPath = {
             completeModuleButton.addEventListener('click', () => this.completeModule());
         }
         
-        // 🆕 YENİ: Ana Sayfaya Dönüş butonu dinleyicisi
-        const returnToHomeButton = document.getElementById('returnToHomeBtn');
-        if (returnToHomeButton) {
-             returnToHomeButton.addEventListener('click', () => this.goToHome());
+        // Tüm sayfalardaki 'Uygulama Başlangıcına Dön' butonlarını bağla
+        document.querySelectorAll('.return-to-app-start').forEach(button => {
+            button.addEventListener('click', () => this.goToAppStart());
+        });
+    },
+
+    // Başlangıç durumunu kontrol eder (Test açılmıyorsa bu fonksiyonda hata vardır)
+    checkInitialState: function() {
+        const storedLevel = localStorage.getItem('userLevel');
+        
+        if (storedLevel && localStorage.getItem('learningModules')) {
+            this.userLevel = storedLevel;
+            this.displayLearningPath(storedLevel);
+            this.showSection('learningPathSection');
+        } else {
+            this.resetTest();
+            this.showSection('levelTestIntroSection');
         }
     },
+
+    // Testi sıfırlar
+    resetTest: function() {
+        this.currentQuestionIndex = 0;
+        this.userAnswers = {};
+        this.showSection('levelTestIntroSection');
+    },
+
+    // Belirli bir bölümü görünür yapar
+    showSection: function(sectionId) {
+        document.querySelectorAll('.module-section').forEach(section => {
+            section.classList.remove('active');
+            section.style.display = 'none';
+        });
+        const activeSection = document.getElementById(sectionId);
+        if (activeSection) {
+            activeSection.classList.add('active');
+            activeSection.style.display = 'block';
+        }
+        const titleMap = {
+            'levelTestIntroSection': 'Seviye Tespit Testi',
+            'levelTestSection': 'Seviye Testi Devam Ediyor',
+            'resultsSection': 'Test Sonuçları',
+            'learningPathSection': 'Öğrenme Yolum',
+            'moduleContentSection': 'Modül İçeriği'
+        };
+        document.title = titleMap[sectionId] || 'Öğrenme Yolu Modülü';
+    },
+
+    // Testi başlatır ve ilk soruyu gösterir
+    startTest: function() {
+        if (this.testQuestions.length === 0) {
+            alert("Sorular yüklenmedi. Lütfen sayfayı yenileyin.");
+            return;
+        }
+        this.resetTest();
+        this.showSection('levelTestSection');
+        this.displayQuestion(this.currentQuestionIndex);
+    },
+
+    // Belirli bir soruyu ekranda gösterir
+    displayQuestion: function(index) {
+        const question = this.testQuestions[index];
+        const container = document.getElementById('questionContainer');
+        
+        if (!question) {
+            container.innerHTML = 'Sorular bitti!';
+            return;
+        }
+
+        document.getElementById('currentQuestionNumber').textContent = index + 1;
+        
+        const progress = ((index + 1) / this.testQuestions.length) * 100;
+        document.getElementById('testProgressBar').style.width = `${progress}%`;
+        
+        let optionsHtml = question.options.map(option => `
+            <div class="form-check question-option">
+                <input class="form-check-input" type="radio" name="answer" id="option-${index}-${option.replace(/\s/g, '-')}" value="${option}">
+                <label class="form-check-label" for="option-${index}-${option.replace(/\s/g, '-')}" >
+                    ${option}
+                </label>
+            </div>
+        `).join('');
+
+        container.innerHTML = `
+            <h4>${question.question}</h4>
+            <div class="question-options-group">${optionsHtml}</div>
+        `;
+        
+        if (this.userAnswers[index] !== undefined) {
+            const selectedOption = document.querySelector(`input[value="${this.userAnswers[index]}"]`);
+            if (selectedOption) {
+                selectedOption.checked = true;
+            }
+        }
+        
+        document.querySelectorAll('input[name="answer"]').forEach(radio => {
+            radio.addEventListener('change', (e) => this.saveAnswer(index, e.target.value));
+        });
+
+        document.getElementById('prevQuestionBtn').disabled = index === 0;
+        document.getElementById('nextQuestionBtn').style.display = index < this.testQuestions.length - 1 ? 'inline-block' : 'none';
+        document.getElementById('submitTestBtn').style.display = index === this.testQuestions.length - 1 ? 'inline-block' : 'none';
+    },
+
+    // Kullanıcının cevabını kaydeder
+    saveAnswer: function(index, answer) {
+        this.userAnswers[index] = answer;
+    },
+
+    // Sonraki soruya geçer
+    nextQuestion: function() {
+        if (this.currentQuestionIndex < this.testQuestions.length - 1) {
+            this.currentQuestionIndex++;
+            this.displayQuestion(this.currentQuestionIndex);
+        }
+    },
+
+    // Önceki soruya geçer
+    prevQuestion: function() {
+        if (this.currentQuestionIndex > 0) {
+            this.currentQuestionIndex--;
+            this.displayQuestion(this.currentQuestionIndex);
+        }
+    },
+
+    // Testi bitirir, puanlar ve sonucu gösterir
+    submitTest: function() {
+        const totalQuestions = this.testQuestions.length;
+        let correctAnswers = 0;
+
+        for (let i = 0; i < totalQuestions; i++) {
+            const question = this.testQuestions[i];
+            const userAnswer = this.userAnswers[i];
+            
+            if (userAnswer && userAnswer === question.answer) {
+                correctAnswers++;
+            }
+        }
+
+        const score = (correctAnswers / totalQuestions) * 100;
+        const level = this.determineLevel(score);
+        this.userLevel = level;
+        
+        localStorage.setItem('userLevel', level);
+        
+        this.displayResults(score, level);
+    },
+
+    // Puana göre seviyeyi belirler
+    determineLevel: function(score) {
+        if (score >= 80) return 'C1';
+        if (score >= 50) return 'B1';
+        return 'A1';
+    },
+
+    // Sonuçları ekranda gösterir
+    displayResults: function(score, level) {
+        const resultsSection = document.getElementById('resultsSection');
+        resultsSection.innerHTML = `
+            <div class="result-card">
+                <h2>Tebrikler, Testi Bitirdiniz!</h2>
+                <p class="lead">Puanınız: <strong>${score.toFixed(0)} / 100</strong></p>
+                <h3 class="level-result">Seviyeniz: <span>${level}</span> - ${this.getLevelTitle(level)}</h3>
+                <p>Sizin için kişiselleştirilmiş öğrenme yolunuzu hazırladık.</p>
+                <button class="btn btn-primary btn-lg mt-3" onclick="LearningPath.displayLearningPath('${level}')">Öğrenme Yolunu Gör</button>
+            </div>
+        `;
+        this.showSection('resultsSection');
+    },
     
-    // ... (checkInitialState, resetTest, showSection, startTest, displayQuestion, saveAnswer, nextQuestion, prevQuestion, submitTest, determineLevel, displayResults, getLevelTitle, createModuleDataTemplate, displayLearningPath fonksiyonları önceki versiyonlarla aynı kaldı) ...
-    
-    // Modül içeriğini dinamik olarak zenginleştirir (Önceki versiyonla aynı kaldı)
+    // Seviye başlığını döndürür
+    getLevelTitle: function(level) {
+        const titles = {
+            'A1': 'Başlangıç Seviyesi',
+            'B1': 'Orta Seviye',
+            'C1': 'İleri Seviye'
+        };
+        return titles[level] || 'Bilinmiyor';
+    },
+
+    // Modül verisi şablonu oluşturur
+    createModuleDataTemplate: async function() {
+        try {
+            const response = await fetch('data/learning_modules.json'); 
+            if (!response.ok) throw new Error("Modül tanımları yüklenemedi.");
+            
+            const modulesData = await response.json();
+            
+            Object.keys(modulesData).forEach(lvl => {
+                modulesData[lvl].modules.forEach(module => {
+                    module.progress = 0;
+                    module.status = 'Başlanmadı';
+                    module.lastScore = 0;
+                    module.lastDuration = 0;
+                });
+            });
+
+            localStorage.setItem('learningModules', JSON.stringify(modulesData));
+            return modulesData;
+
+        } catch (error) {
+            console.error("Öğrenme modülleri yüklenemedi:", error);
+            throw new Error("Kritik Hata: Modül verileri yüklenemedi.");
+        }
+    },
+
+    // Öğrenme yolunu ekranda gösterir
+    displayLearningPath: async function(level) {
+        const pathSection = document.getElementById('learningPathSection');
+        pathSection.innerHTML = ''; // Önceki içeriği temizle
+        this.showSection('learningPathSection');
+        
+        let modulesData = JSON.parse(localStorage.getItem('learningModules'));
+        
+        if (!modulesData) {
+            modulesData = await this.createModuleDataTemplate();
+        }
+        
+        const levelData = modulesData[level];
+        if (!levelData) {
+            pathSection.innerHTML = `<button class="btn btn-dark mb-4 return-to-app-start"><i class="fas fa-arrow-left"></i> Uygulama Başlangıcına Dön</button><div class="alert alert-warning">Seviyenize ait modül bulunamadı.</div>`;
+            this.bindEvents();
+            return;
+        }
+
+        // Seviye Atlama Kontrolü (Aynı kaldı)
+        let allModulesCompleted = levelData.modules.every(m => m.progress === 100);
+        let currentLevel = level;
+        
+        if (allModulesCompleted && this.levelMapping[level] && this.levelMapping[level] !== level) {
+            const nextLevel = this.levelMapping[level];
+            alert(`Tebrikler! ${level} seviyesindeki tüm modülleri tamamladınız. Artık ${nextLevel} seviyesine geçiyorsunuz.`);
+            localStorage.setItem('userLevel', nextLevel);
+            currentLevel = nextLevel;
+            return this.displayLearningPath(currentLevel); 
+        }
+
+        // HTML oluşturma (Aynı kaldı)
+        let pathHtml = `
+            <button class="btn btn-dark mb-4 return-to-app-start"><i class="fas fa-arrow-left"></i> Uygulama Başlangıcına Dön</button>
+            <div class="level-header">
+                <h2>${currentLevel} Seviyesi Öğrenme Yolu: ${levelData.title}</h2>
+                <p class="lead">${levelData.description}</p>
+                ${allModulesCompleted ? `<div class="alert alert-success mt-3">Bu seviyedeki tüm modüller tamamlandı!</div>` : ''}
+            </div>
+        `;
+        
+        const modulesByTopic = levelData.modules.reduce((acc, module) => {
+            if (!acc[module.topic]) { acc[module.topic] = []; }
+            acc[module.topic].push(module);
+            return acc;
+        }, {});
+
+        for (const topic in modulesByTopic) {
+            pathHtml += `
+                <h4 class="topic-header">${topic} Modülleri (${modulesByTopic[topic].length})</h4>
+                <div class="module-grid">
+            `;
+            
+            pathHtml += modulesByTopic[topic].map(module => `
+                <div class="module-card ${module.progress === 100 ? 'completed' : ''}" onclick="LearningPath.startModule('${module.id}')">
+                    <span class="module-status badge bg-${module.progress === 100 ? 'success' : 'primary'}">${module.status}</span>
+                    <h5>${module.name}</h5>
+                    <p class="module-topic">Konu: ${module.topic}</p>
+                    <div class="module-stats">
+                        <small><i class="fas fa-clock"></i> ${module.lastDuration} dk.</small>
+                        <small><i class="fas fa-medal"></i> %${module.lastScore} Skor</small>
+                    </div>
+                    <div class="progress mt-2">
+                        <div class="progress-bar" style="width: ${module.progress}%"></div>
+                    </div>
+                </div>
+            `).join('');
+            
+            pathHtml += `</div>`;
+        }
+
+        pathSection.innerHTML = pathHtml;
+        this.bindEvents(); // Yeni butonların eventlerini tekrar bağla
+    },
+
+    // Modül içeriğini dinamik olarak zenginleştirir (Aynı kaldı)
     enrichModuleContent: function(moduleId, baseContent) {
+        // ... (Aynı kaldı)
         const moduleLevel = moduleId.split('_')[0].toUpperCase(); 
         const moduleTopic = baseContent.topic; 
         let enrichedContent = [...baseContent.content]; 
@@ -115,7 +396,7 @@ const LearningPath = {
         }
         
         // --- 2. Okuma Parçası (Varsa) ---
-        const levelCode = (moduleLevel === 'A1' ? 'beginner' : moduleLevel === 'B1' ? 'intermediate' : 'advanced'); // Seviye kodunu belirle
+        const levelCode = (moduleLevel === 'A1' ? 'beginner' : moduleLevel === 'B1' ? 'intermediate' : 'advanced');
         
         const moduleReading = this.allReadings.find(r => 
             r.level.toLowerCase().includes(levelCode) && 
@@ -139,8 +420,8 @@ const LearningPath = {
         
         return enrichedContent;
     },
-    
-    // Modül Başlatma Fonksiyonu (Boş sayfa sorunu için güçlendirildi)
+
+    // Modül Başlatma Fonksiyonu
     startModule: function(moduleId) {
         LearningPath.currentModuleId = moduleId; 
         this.moduleQuizScore = { total: 0, correct: 0, answered: false }; 
@@ -162,7 +443,6 @@ const LearningPath = {
         }
 
         try {
-            // İçeriği zenginleştirme burada yapılıyor
             const moduleContent = this.enrichModuleContent(moduleId, baseModule);
             
             titleEl.textContent = baseModule.title;
@@ -170,7 +450,6 @@ const LearningPath = {
             let quizIndex = 0;
 
             moduleContent.forEach(item => {
-                // ... (HTML oluşturma mantığı aynı, sadece item.type'a göre contentHtml'e ekleme yapılıyor)
                 if (item.type === 'heading') {
                     contentHtml += `<h3>${item.text}</h3>`;
                 } else if (item.type === 'paragraph') {
@@ -198,38 +477,147 @@ const LearningPath = {
                 }
             });
 
-            // Burası boş sayfa sorununu çözer: Hata oluşmazsa içeriği yerleştirir.
             contentBodyEl.innerHTML = contentHtml;
             
-            // Dinleyicileri zenginleştirilmiş içerikle bağla
             LearningPath.attachQuizListeners(moduleId, { content: moduleContent }); 
-            
             this.updateModuleStatus(moduleId, 'Devam Ediyor', 1);
 
         } catch (error) {
-            console.error('❌ Modül içeriği oluşturulurken kritik hata:', error);
+            console.error('❌ Modül içeriği hazırlanırken kritik hata:', error);
             titleEl.textContent = 'Yükleme Hatası';
-            contentBodyEl.innerHTML = `<p class="text-danger"><strong>Ders içeriği hazırlanırken kritik bir hata oluştu.</strong> Lütfen modül verilerinizi (JSON dosyalarınızı) kontrol edin. Hata Mesajı: <code>${error.message}</code></p>`;
+            contentBodyEl.innerHTML = `<p class="text-danger"><strong>Ders içeriği hazırlanırken kritik bir hata oluştu.</strong> Hata Mesajı: <code>${error.message}</code></p>`;
         }
     },
 
-    // ... (attachQuizListeners, completeModule, updateModuleStatus, getCurrentModuleProgress fonksiyonları önceki versiyonlarla aynı kaldı) ...
-    checkInitialState: function() {
-        const storedLevel = localStorage.getItem('userLevel');
+    // Quiz Dinleyicilerini Bağlama
+    attachQuizListeners: function(moduleId, moduleData) {
+        const quizzes = moduleData.content.filter(item => item.type === 'quiz');
+        this.moduleQuizScore.total = quizzes.length;
         
-        // Eğer test yapılmadıysa ve modül verisi yoksa (veya testQuestions yüklenemedi ise), başlangıç ekranına git
-        if (!storedLevel || !localStorage.getItem('learningModules') || this.testQuestions.length === 0) {
-            this.resetTest();
-            this.showSection('levelTestIntroSection');
+        const progressPerQuiz = quizzes.length > 0 ? Math.floor(99 / quizzes.length) : 0; 
+
+        const quizItems = document.querySelectorAll('.module-quiz-card');
+        
+        quizItems.forEach(quizCard => {
+            const quizIndex = parseInt(quizCard.dataset.quizIndex); 
+            const questionText = quizCard.querySelector('p strong').textContent.replace(/Soru \d+:/, '').trim();
+            
+            const quizItem = quizzes.find(item => {
+                return item.question && item.question.includes(questionText.replace(/\(Okuma Sorusu \d+\):/, '').trim());
+            });
+
+            if (!quizItem) return;
+
+            const options = quizCard.querySelectorAll('.quiz-option-item');
+            
+            options.forEach(option => {
+                option.addEventListener('click', function() {
+                    if (quizCard.dataset.answered) return; 
+
+                    const selectedAnswer = this.textContent.trim();
+                    const correctAnswer = quizItem.answer.trim();
+                    
+                    quizCard.dataset.answered = 'true'; 
+                    
+                    options.forEach(opt => opt.classList.remove('selected-answer'));
+                    this.classList.add('selected-answer');
+
+                    if (selectedAnswer === correctAnswer) {
+                        this.classList.add('correct-answer');
+                        LearningPath.moduleQuizScore.correct++; 
+                    } else {
+                        this.classList.add('wrong-answer');
+                        options.forEach(opt => {
+                            if (opt.textContent.trim() === correctAnswer) {
+                                opt.classList.add('correct-answer');
+                            }
+                        });
+                    }
+                    
+                    LearningPath.moduleQuizScore.answered = true; 
+                    
+                    if (progressPerQuiz > 0) {
+                        const currentProgress = LearningPath.getCurrentModuleProgress(moduleId);
+                        const newProgress = currentProgress + progressPerQuiz;
+                        LearningPath.updateModuleStatus(moduleId, 'Devam Ediyor', newProgress);
+                    }
+                });
+            });
+        });
+    },
+
+    // Modülü Tamamla Fonksiyonu
+    completeModule: function() {
+        const currentModuleId = LearningPath.currentModuleId;
+        if (!currentModuleId) {
+            alert("Hata: Tamamlanacak modül bulunamadı.");
+            return;
+        }
+
+        const currentLevel = localStorage.getItem('userLevel') || 'A1';
+        let modulesData = JSON.parse(localStorage.getItem('learningModules')) || {};
+        
+        let finalScore = 100;
+        if (this.moduleQuizScore.total > 0) {
+            finalScore = Math.round((this.moduleQuizScore.correct / this.moduleQuizScore.total) * 100);
+        }
+        
+        let moduleFound = false;
+        if (modulesData[currentLevel] && modulesData[currentLevel].modules) {
+            const modules = modulesData[currentLevel].modules;
+            for (let i = 0; i < modules.length; i++) {
+                if (modules[i].id === currentModuleId) {
+                    modules[i].status = "Tamamlandı";
+                    modules[i].progress = 100; // Tamamlandıysa %100 yap
+                    modules[i].lastScore = finalScore; 
+                    modules[i].lastDuration = Math.ceil(Math.random() * 15) + 5; 
+                    moduleFound = true;
+                    break;
+                }
+            }
+        }
+
+        if (moduleFound) {
+            localStorage.setItem('learningModules', JSON.stringify(modulesData));
+
+            alert(`${currentModuleId} modülü başarıyla tamamlandı ve puanınız kaydedildi: %${finalScore}`);
+            
+            this.displayLearningPath(currentLevel); 
+
         } else {
-            // Eğer veriler varsa, öğrenme yoluna geç
-            this.userLevel = storedLevel;
-            this.displayLearningPath(storedLevel);
-            this.showSection('learningPathSection');
+            alert("Hata: Modül verisi bulunamadı veya kaydedilemedi.");
         }
     },
-    // ... (diğer fonksiyonlar aynı)
-    // ...
+
+    // Modül ilerlemesini güncelleyen yardımcı fonksiyon
+    updateModuleStatus: function(moduleId, status, progress) {
+        const currentLevel = localStorage.getItem('userLevel') || 'A1';
+        let modulesData = JSON.parse(localStorage.getItem('learningModules'));
+        
+        if (!modulesData) return;
+
+        const modules = modulesData[currentLevel]?.modules;
+        if (!modules) return;
+        
+        const module = modules.find(m => m.id === moduleId);
+        if (module) {
+            module.status = status;
+            module.progress = Math.min(100, progress); 
+            
+            localStorage.setItem('learningModules', JSON.stringify(modulesData));
+            
+            console.log(`Progress Güncellendi: ${moduleId}, Durum: ${status}, İlerleme: ${module.progress}%`);
+        }
+    },
+    
+    // Mevcut modül ilerlemesini döndürür
+    getCurrentModuleProgress: function(moduleId) {
+        const currentLevel = localStorage.getItem('userLevel') || 'A1';
+        let modulesData = JSON.parse(localStorage.getItem('learningModules'));
+        if (!modulesData) return 0;
+        const module = modulesData[currentLevel]?.modules.find(m => m.id === moduleId);
+        return module ? module.progress : 0;
+    }
 };
 
 document.addEventListener('DOMContentLoaded', () => LearningPath.init());

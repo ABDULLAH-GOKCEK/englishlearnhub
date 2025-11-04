@@ -292,3 +292,186 @@ body {
     background-color: #dc3545 !important; /* Kırmızı */
     border-color: #dc3545 !important;
 }
+/* =======================================
+   ANA SAYFA VE GENEL STİLLER (index.html için temel stil)
+   ======================================= */
+body {
+    background-color: #f4f7f6; /* Hafif bir gri/mavi tonu */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #343a40;
+}
+
+.main-header { 
+    padding: 40px 0; 
+    background: linear-gradient(90deg, #4361ee 0%, #48bfe3 100%); /* Dinamik başlık rengi */
+    color: white; 
+    margin-bottom: 40px; 
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+/* Tüm Kartların Temeli (index.html ve learning-path.html'deki kartlar için) */
+.module-card {
+    background-color: white;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    transition: transform 0.2s, box-shadow 0.2s;
+    text-decoration: none;
+    color: #2b2d42;
+    border: 1px solid #e9ecef;
+    position: relative;
+    overflow: hidden;
+    min-height: 140px; 
+}
+.module-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 25px rgba(0,0,0,0.15);
+}
+.module-card i {
+    font-size: 2.5rem;
+    color: #4361ee;
+    margin-bottom: 15px;
+    display: block;
+}
+
+/* =======================================
+   ÖĞRENME YOLU VE MODÜL STİLLERİ (learning-path.html için)
+   ======================================= */
+.module-section {
+    display: none;
+    padding-top: 20px;
+    padding-bottom: 50px;
+}
+.module-section.active {
+    display: block;
+}
+
+.level-header {
+    margin-bottom: 30px;
+    border-left: 6px solid #48bfe3;
+    padding-left: 20px;
+    background-color: #e6f6ff;
+    padding: 15px;
+    border-radius: 5px;
+}
+
+.module-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 25px;
+    margin-top: 20px;
+}
+
+/* Modül Kartlarının Özel Stilleri (İlerleme Durumu) */
+.module-card.completed {
+    border-left-color: #28a745; /* Yeşil kenar */
+    opacity: 0.95;
+    background-color: #f1fbf3;
+}
+.module-card.completed .progress-bar {
+    background-color: #28a745;
+}
+.module-topic {
+    font-size: 0.9em;
+    color: #6c757d;
+    font-weight: 500;
+}
+.progress {
+    height: 8px;
+    background-color: #e9ecef;
+    margin-top: 10px;
+    border-radius: 4px;
+}
+.progress-bar {
+    background-color: #4361ee;
+    transition: width 0.6s ease;
+}
+
+/* =======================================
+   TEST VE MODÜL İÇERİĞİ STİLLERİ
+   ======================================= */
+#levelTestSection, #moduleContentSection {
+    background-color: #ffffff;
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+}
+.question-option {
+    padding: 15px;
+    margin-bottom: 10px;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    transition: background-color 0.2s, border-color 0.2s;
+    cursor: pointer;
+    background-color: #fcfcfc;
+}
+.question-option:hover {
+    background-color: #eaf0ff;
+    border-color: #4361ee;
+}
+.question-option input[type="radio"]:checked + label {
+    font-weight: bold;
+    color: #4361ee;
+}
+
+/* Modül İçeriği Detayları */
+.code-block {
+    background-color: #f1f3f5;
+    border-left: 4px solid #007bff;
+    padding: 15px;
+    font-family: monospace;
+    overflow-x: auto;
+    border-radius: 5px;
+    margin: 15px 0;
+}
+.example-box {
+    border: 1px solid #ffe0b2;
+    background-color: #fff8e1;
+    padding: 15px;
+    border-radius: 8px;
+    margin: 20px 0;
+    font-style: italic;
+    color: #8b740e;
+}
+.word-list-section, .sentence-list-section {
+    padding: 20px;
+    background-color: #f7f9fc;
+    border-radius: 10px;
+    border: 2px dashed #ced4da;
+    column-count: 2; 
+}
+.reading-text-box {
+    border-left: 5px solid #48bfe3;
+    padding: 20px;
+    margin: 25px 0;
+    line-height: 1.7;
+    background-color: #f4f8fc;
+    border-radius: 8px;
+    font-size: 1.05em;
+}
+
+/* Quiz Seçenekleri */
+.quiz-option-item {
+    padding: 10px 12px;
+    margin-top: 8px;
+    border-radius: 6px;
+    background-color: #fff;
+    border: 1px solid #e9ecef;
+    cursor: pointer;
+    transition: background-color 0.15s;
+}
+.quiz-option-item:hover {
+    background-color: #f1f3f5;
+}
+.quiz-option-item.correct-answer {
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+    font-weight: bold;
+}
+.quiz-option-item.wrong-answer {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+}
+

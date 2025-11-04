@@ -16,10 +16,6 @@ const LearningPath = {
 
     // Sayfa yüklendiğinde çalışacak başlangıç fonksiyonu
     init: function() {
-        // Testin atlanmasını engellemek için geçici temizlik, test bitince bu satırları silmeyi unutmayın!
-        // localStorage.removeItem('userLevel'); 
-        // localStorage.removeItem('learningModules');
-        
         console.log("🚀 LearningPath başlatılıyor...");
         this.loadAllData().then(() => {
             this.bindEvents();
@@ -33,22 +29,21 @@ const LearningPath = {
         });
     },
 
-    // 🆕 GÜNCEL: Uygulamayı sıfırlayıp ilk ekrana döner (index.html'e dönüş mantığı)
+    // 🌟 KRİTİK: Uygulamayı sıfırlayıp ilk ekrana döner (index.html'e dönüş mantığı)
     goToAppStart: function() {
         this.currentQuestionIndex = 0;
         this.userAnswers = {};
         
-        // LocalStorage'daki seviye ve modül verilerini temizleme (opsiyonel)
-        // Eğer her zaman testin en başından başlamak istenirse:
-        // localStorage.removeItem('userLevel'); 
-        // localStorage.removeItem('learningModules');
+        // 🚨 TEST ATLANMASI SORUNUNU ÇÖZER: Seviye ve Modül verilerini temizle
+        localStorage.removeItem('userLevel'); 
+        localStorage.removeItem('learningModules');
         
-        this.checkInitialState();
+        this.checkInitialState(); // Bu, sistemi test giriş ekranına yönlendirecektir.
     },
 
     // Tüm veri dosyalarını eş zamanlı olarak yükler
     loadAllData: async function() {
-        // Dosyaları yükler
+        // Dosyaları yükler (Hata yakalama için try/catch eklenmeli, şimdilik promise.all)
         const [
             testData, 
             contentData, 
@@ -78,26 +73,27 @@ const LearningPath = {
         document.getElementById('totalQuestionCount').textContent = this.testQuestions.length;
     },
 
-    // Buton ve olay dinleyicilerini bağlar (Tüm geri dönüş butonları bağlandı)
+    // 🔗 Event dinleyicilerini bağlar
     bindEvents: function() {
         console.log("🔗 Eventler bağlanıyor...");
-        document.getElementById('startTestBtn').addEventListener('click', () => this.startTest());
-        document.getElementById('nextQuestionBtn').addEventListener('click', () => this.nextQuestion());
-        document.getElementById('prevQuestionBtn').addEventListener('click', () => this.prevQuestion());
-        document.getElementById('submitTestBtn').addEventListener('click', () => this.submitTest());
         
-        const completeModuleButton = document.querySelector('#moduleContentSection .btn-success');
-        if (completeModuleButton) {
-            completeModuleButton.addEventListener('click', () => this.completeModule());
-        }
+        // Test butonları
+        document.getElementById('startTestBtn')?.addEventListener('click', () => this.startTest());
+        document.getElementById('nextQuestionBtn')?.addEventListener('click', () => this.nextQuestion());
+        document.getElementById('prevQuestionBtn')?.addEventListener('click', () => this.prevQuestion());
+        document.getElementById('submitTestBtn')?.addEventListener('click', () => this.submitTest());
         
-        // Tüm sayfalardaki 'Uygulama Başlangıcına Dön' butonlarını bağla
+        // Modül tamamlama
+        document.querySelector('#moduleContentSection .btn-success')?.addEventListener('click', () => this.completeModule());
+        
+        // 🚨 KRİTİK DÜZELTME: Tüm geri dönüş butonlarını bağla
         document.querySelectorAll('.return-to-app-start').forEach(button => {
+            console.log("🔗 Geri Dönüş Butonu bağlandı:", button);
             button.addEventListener('click', () => this.goToAppStart());
         });
     },
 
-    // Başlangıç durumunu kontrol eder (Test açılmıyorsa bu fonksiyonda hata vardır)
+    // Başlangıç durumunu kontrol eder
     checkInitialState: function() {
         const storedLevel = localStorage.getItem('userLevel');
         
@@ -107,7 +103,7 @@ const LearningPath = {
             this.showSection('learningPathSection');
         } else {
             this.resetTest();
-            this.showSection('levelTestIntroSection');
+            this.showSection('levelTestIntroSection'); // Test giriş ekranını göster
         }
     },
 
@@ -115,7 +111,7 @@ const LearningPath = {
     resetTest: function() {
         this.currentQuestionIndex = 0;
         this.userAnswers = {};
-        this.showSection('levelTestIntroSection');
+        // showSection çağrılmıyor, checkInitialState çağıracak
     },
 
     // Belirli bir bölümü görünür yapar
@@ -257,7 +253,12 @@ const LearningPath = {
                 <p>Sizin için kişiselleştirilmiş öğrenme yolunuzu hazırladık.</p>
                 <button class="btn btn-primary btn-lg mt-3" onclick="LearningPath.displayLearningPath('${level}')">Öğrenme Yolunu Gör</button>
             </div>
+            <button class="btn btn-dark mt-3 return-to-app-start">
+                <i class="fas fa-arrow-left"></i> Testi Sıfırla ve Başlangıca Dön
+            </button>
         `;
+        // Bu noktada bindEvents tekrar çağrılmalı ki yeni eklenen buton (return-to-app-start) çalışsın
+        this.bindEvents(); 
         this.showSection('resultsSection');
     },
     
@@ -300,7 +301,7 @@ const LearningPath = {
     // Öğrenme yolunu ekranda gösterir
     displayLearningPath: async function(level) {
         const pathSection = document.getElementById('learningPathSection');
-        pathSection.innerHTML = ''; // Önceki içeriği temizle
+        pathSection.innerHTML = ''; 
         this.showSection('learningPathSection');
         
         let modulesData = JSON.parse(localStorage.getItem('learningModules'));
@@ -316,7 +317,7 @@ const LearningPath = {
             return;
         }
 
-        // Seviye Atlama Kontrolü (Aynı kaldı)
+        // Seviye Atlama Kontrolü
         let allModulesCompleted = levelData.modules.every(m => m.progress === 100);
         let currentLevel = level;
         
@@ -328,7 +329,7 @@ const LearningPath = {
             return this.displayLearningPath(currentLevel); 
         }
 
-        // HTML oluşturma (Aynı kaldı)
+        // HTML oluşturma
         let pathHtml = `
             <button class="btn btn-dark mb-4 return-to-app-start"><i class="fas fa-arrow-left"></i> Uygulama Başlangıcına Dön</button>
             <div class="level-header">
@@ -372,9 +373,8 @@ const LearningPath = {
         this.bindEvents(); // Yeni butonların eventlerini tekrar bağla
     },
 
-    // Modül içeriğini dinamik olarak zenginleştirir (Aynı kaldı)
+    // Modül içeriğini dinamik olarak zenginleştirir
     enrichModuleContent: function(moduleId, baseContent) {
-        // ... (Aynı kaldı)
         const moduleLevel = moduleId.split('_')[0].toUpperCase(); 
         const moduleTopic = baseContent.topic; 
         let enrichedContent = [...baseContent.content]; 
@@ -449,6 +449,7 @@ const LearningPath = {
             let contentHtml = '';
             let quizIndex = 0;
 
+            // HTML oluşturma kısmı
             moduleContent.forEach(item => {
                 if (item.type === 'heading') {
                     contentHtml += `<h3>${item.text}</h3>`;
@@ -487,10 +488,13 @@ const LearningPath = {
             titleEl.textContent = 'Yükleme Hatası';
             contentBodyEl.innerHTML = `<p class="text-danger"><strong>Ders içeriği hazırlanırken kritik bir hata oluştu.</strong> Hata Mesajı: <code>${error.message}</code></p>`;
         }
+        
+        this.bindEvents(); // Modül içeriği ekranındaki butonları tekrar bağla
     },
 
-    // Quiz Dinleyicilerini Bağlama
+    // Quiz Dinleyicilerini Bağlama (Aynı kaldı)
     attachQuizListeners: function(moduleId, moduleData) {
+        // ... (Quiz dinleyicileri mantığı) ...
         const quizzes = moduleData.content.filter(item => item.type === 'quiz');
         this.moduleQuizScore.total = quizzes.length;
         
@@ -546,7 +550,7 @@ const LearningPath = {
         });
     },
 
-    // Modülü Tamamla Fonksiyonu
+    // Modülü Tamamla Fonksiyonu (Aynı kaldı)
     completeModule: function() {
         const currentModuleId = LearningPath.currentModuleId;
         if (!currentModuleId) {
@@ -568,7 +572,7 @@ const LearningPath = {
             for (let i = 0; i < modules.length; i++) {
                 if (modules[i].id === currentModuleId) {
                     modules[i].status = "Tamamlandı";
-                    modules[i].progress = 100; // Tamamlandıysa %100 yap
+                    modules[i].progress = 100; 
                     modules[i].lastScore = finalScore; 
                     modules[i].lastDuration = Math.ceil(Math.random() * 15) + 5; 
                     moduleFound = true;
@@ -589,7 +593,7 @@ const LearningPath = {
         }
     },
 
-    // Modül ilerlemesini güncelleyen yardımcı fonksiyon
+    // Modül ilerlemesini güncelleyen yardımcı fonksiyon (Aynı kaldı)
     updateModuleStatus: function(moduleId, status, progress) {
         const currentLevel = localStorage.getItem('userLevel') || 'A1';
         let modulesData = JSON.parse(localStorage.getItem('learningModules'));
@@ -610,7 +614,7 @@ const LearningPath = {
         }
     },
     
-    // Mevcut modül ilerlemesini döndürür
+    // Mevcut modül ilerlemesini döndürür (Aynı kaldı)
     getCurrentModuleProgress: function(moduleId) {
         const currentLevel = localStorage.getItem('userLevel') || 'A1';
         let modulesData = JSON.parse(localStorage.getItem('learningModules'));

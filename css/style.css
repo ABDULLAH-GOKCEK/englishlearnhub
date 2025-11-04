@@ -88,3 +88,42 @@ h1, h2, h3, h4 {
     color: var(--white);
     border: 1px solid #28a745;
 }
+/* style.css içine eklenecekler */
+
+/* Kelime Listesi */
+.word-list-section {
+    padding: 15px;
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+.word-item {
+    padding: 5px 0;
+    border-bottom: 1px dotted #dee2e6;
+}
+
+.word-item:last-child {
+    border-bottom: none;
+}
+
+/* Okuma Metni */
+.reading-text-box {
+    background-color: #fff;
+    border-left: 5px solid #007bff;
+    padding: 15px;
+    margin-top: 15px;
+    margin-bottom: 20px;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    box-shadow: 0 1px 3px rgba(0,0,0,.05);
+    white-space: pre-wrap; /* Metni düzgün göstermek için */
+}
+
+/* Cevaplandığında kaybolması gereken kelimeler için bir "çalışıldı" sistemi simülasyonu */
+/* Örneğin: Word listesine click listener ekleyip "completed" class'ı ekleyebilirsiniz */
+.word-item.completed {
+    opacity: 0.5;
+    text-decoration: line-through;
+}

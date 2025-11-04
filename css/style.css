@@ -127,3 +127,206 @@ h1, h2, h3, h4 {
     opacity: 0.5;
     text-decoration: line-through;
 }
+/* =======================================
+   CRITICAL STYLES FOR LEARNING PATH (TEST & MODULES)
+   ======================================= */
+
+/* Sayfa Bölümleri için Temel Stil */
+.module-section {
+    display: none;
+    padding-top: 20px;
+    padding-bottom: 50px;
+}
+.module-section.active {
+    display: block;
+}
+
+/* Test Sayfası Stilleri */
+#levelTestSection {
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+}
+.progress-container {
+    margin-bottom: 20px;
+}
+.question-options-group {
+    margin-top: 20px;
+}
+.question-option {
+    padding: 10px 15px;
+    margin-bottom: 10px;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    transition: background-color 0.2s;
+    cursor: pointer;
+}
+.question-option:hover {
+    background-color: #f8f9fa;
+}
+.question-option input[type="radio"]:checked + label {
+    font-weight: bold;
+    color: #4361ee;
+}
+.result-card {
+    text-align: center;
+    padding: 40px;
+    border-radius: 15px;
+    background-color: #e9ecef;
+}
+.level-result span {
+    color: #4361ee;
+    font-weight: bold;
+    font-size: 1.5em;
+    display: inline-block;
+    margin-left: 10px;
+}
+
+/* Öğrenme Yolu (Learning Path) Modül Kartları Stilleri */
+/* DİKKAT: Bu stiller, index.html'deki ile karıştırılmamalı, bu dinamik JS ile oluşturulan kartlardır. */
+.level-header {
+    margin-bottom: 30px;
+    border-left: 5px solid #4361ee;
+    padding-left: 15px;
+}
+.topic-header {
+    margin-top: 40px;
+    margin-bottom: 15px;
+    color: #495057;
+    font-size: 1.3rem;
+    border-bottom: 1px solid #f1f3f5;
+    padding-bottom: 5px;
+}
+.module-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+.module-card {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    cursor: pointer;
+    border-left: 5px solid #adb5bd;
+    transition: transform 0.2s, box-shadow 0.2s, border-left-color 0.2s;
+    position: relative;
+}
+.module-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+}
+.module-card.completed {
+    border-left-color: #28a745; /* Yeşil kenar */
+    opacity: 0.9;
+}
+.module-card.completed .progress-bar {
+    background-color: #28a745;
+}
+.module-status {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 0.8em;
+}
+.module-topic {
+    font-size: 0.9em;
+    color: #6c757d;
+    margin-bottom: 10px;
+}
+.module-stats small {
+    margin-right: 15px;
+    font-size: 0.85em;
+    color: #495057;
+}
+
+/* İlerleme Çubuğu */
+.progress {
+    height: 8px;
+    background-color: #e9ecef;
+}
+.progress-bar {
+    background-color: #4361ee; /* Ana renk */
+    transition: width 0.6s ease;
+}
+
+/* Modül İçeriği Stilleri */
+#moduleContentSection {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+}
+.code-block {
+    background-color: #f1f3f5;
+    border-left: 3px solid #007bff;
+    padding: 10px;
+    font-family: monospace;
+    overflow-x: auto;
+}
+.example-box {
+    border: 1px solid #ffe0b2;
+    background-color: #fff8e1;
+    padding: 15px;
+    border-radius: 8px;
+    margin: 15px 0;
+}
+.word-list-section {
+    padding: 15px;
+    background-color: #f7f9fc;
+    border-radius: 8px;
+    border: 1px dashed #ced4da;
+    column-count: 2; /* Kelimeleri iki sütuna ayır */
+}
+.word-item {
+    margin-bottom: 5px;
+    break-inside: avoid;
+}
+.reading-text-box {
+    border-left: 4px solid #adb5bd;
+    padding-left: 15px;
+    margin: 20px 0;
+    font-style: italic;
+    line-height: 1.8;
+    background-color: #f4f6f8;
+    padding: 15px;
+    border-radius: 5px;
+}
+
+/* Modül Quiz Stilleri (Simülasyon) */
+.module-quiz-card {
+    border: 1px solid #ced4da;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    background-color: #f8f9fa;
+}
+.quiz-option-item {
+    display: block;
+    padding: 8px 12px;
+    margin-top: 8px;
+    border-radius: 6px;
+    background-color: #fff;
+    border: 1px solid #e9ecef;
+    cursor: pointer;
+    transition: background-color 0.15s;
+}
+.quiz-option-item:hover {
+    background-color: #f1f3f5;
+}
+.quiz-option-item.selected-answer {
+    border-color: #4361ee;
+    font-weight: bold;
+}
+.quiz-option-item.correct-answer {
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+    font-weight: bold;
+}
+.quiz-option-item.wrong-answer {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+}

@@ -1,137 +1,13 @@
-/* style.css - Projenin temel stil dosyası (css klasörünün içinde olmalıdır) */
-
-:root {
-    /* Temel Renk Değişkenleri */
-    --primary-color: #4361ee;
-    --secondary-color: #3a0ca3;
-    --text-dark: #2b2d42; /* Metin rengini KOYU yap */
-    --text-light: #6c757d;
-    --white: #ffffff;
-    --background: #f8f9fa; /* Arka planı AÇIK yap */
-    --card-shadow: 0 10px 30px rgba(0,0,0,0.08);
-}
-
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    font-family: 'Arial', sans-serif;
-    background: var(--background); /* Sayfa arka planı */
-    color: var(--text-dark); /* TÜM METİN rengi koyu */
-    line-height: 1.6;
-    min-height: 100vh;
-}
-
-.container {
-    width: 90%;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 15px;
-}
-
-/* HEADER Stilleri */
-header {
-    background: linear-gradient(to right, #4361ee, #4cc9f0);
-    color: var(--white);
-    padding: 1.5rem 0;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-}
-
-header .container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-header h1 {
-    margin: 0;
-    font-size: 2rem;
-    color: var(--white);
-}
-
-/* Başlık Stilleri (Metin Görünürlüğü İçin Önemli) */
-h1, h2, h3, h4 {
-    color: var(--text-dark); /* Başlık metinlerini koyu yap */
-    margin-bottom: 0.5rem;
-}
-
-/* BUTONLAR - Arayüzün Görünürlüğü İçin KRİTİK */
-.btn {
-    padding: 10px 20px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 1rem;
-    font-weight: 600;
-    transition: background-color 0.2s, box-shadow 0.2s;
-    text-decoration: none;
-    display: inline-block;
-    text-align: center;
-}
-
-.btn-primary {
-    background-color: var(--primary-color);
-    color: var(--white);
-    border: 1px solid var(--primary-color);
-}
-
-.btn-secondary {
-    background-color: transparent;
-    color: var(--primary-color);
-    border: 1px solid var(--primary-color);
-}
-
-.btn-success {
-    background-color: #28a745;
-    color: var(--white);
-    border: 1px solid #28a745;
-}
-/* style.css içine eklenecekler */
-
-/* Kelime Listesi */
-.word-list-section {
-    padding: 15px;
-    background-color: #f8f9fa;
-    border: 1px solid #e9ecef;
-    border-radius: 5px;
-    margin-bottom: 20px;
-}
-
-.word-item {
-    padding: 5px 0;
-    border-bottom: 1px dotted #dee2e6;
-}
-
-.word-item:last-child {
-    border-bottom: none;
-}
-
-/* Okuma Metni */
-.reading-text-box {
-    background-color: #fff;
-    border-left: 5px solid #007bff;
-    padding: 15px;
-    margin-top: 15px;
-    margin-bottom: 20px;
-    font-size: 1.1rem;
-    line-height: 1.6;
-    box-shadow: 0 1px 3px rgba(0,0,0,.05);
-    white-space: pre-wrap; /* Metni düzgün göstermek için */
-}
-
-/* Cevaplandığında kaybolması gereken kelimeler için bir "çalışıldı" sistemi simülasyonu */
-/* Örneğin: Word listesine click listener ekleyip "completed" class'ı ekleyebilirsiniz */
-.word-item.completed {
-    opacity: 0.5;
-    text-decoration: line-through;
-}
 /* =======================================
-   CRITICAL STYLES FOR LEARNING PATH (TEST & MODULES)
+   GENERAL STYLES
    ======================================= */
+body {
+    background-color: #f8f9fa; /* Arka plan rengi */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #343a40;
+}
 
-/* Sayfa Bölümleri için Temel Stil */
+/* Sayfa Bölümleri */
 .module-section {
     display: none;
     padding-top: 20px;
@@ -141,7 +17,19 @@ h1, h2, h3, h4 {
     display: block;
 }
 
-/* Test Sayfası Stilleri */
+/* Başlıklar ve Genel Yapı */
+.level-header {
+    margin-bottom: 30px;
+    border-left: 5px solid #4361ee;
+    padding-left: 15px;
+    background-color: #e9ecef;
+    padding: 15px;
+    border-radius: 5px;
+}
+
+/* =======================================
+   SEVİYE TESTİ STİLLERİ
+   ======================================= */
 #levelTestSection {
     background-color: #ffffff;
     padding: 30px;
@@ -155,47 +43,52 @@ h1, h2, h3, h4 {
     margin-top: 20px;
 }
 .question-option {
-    padding: 10px 15px;
-    margin-bottom: 10px;
+    padding: 12px 18px;
+    margin-bottom: 12px;
     border: 1px solid #dee2e6;
     border-radius: 8px;
-    transition: background-color 0.2s;
+    transition: background-color 0.2s, border-color 0.2s;
     cursor: pointer;
+    background-color: #fcfcfc;
 }
 .question-option:hover {
-    background-color: #f8f9fa;
+    background-color: #f1f3f5;
+    border-color: #adb5bd;
+}
+/* Seçilen radyo butonu stili */
+.question-option input[type="radio"] {
+    margin-right: 10px;
 }
 .question-option input[type="radio"]:checked + label {
     font-weight: bold;
     color: #4361ee;
 }
+
+/* Sonuç Kartı Stilleri */
 .result-card {
     text-align: center;
     padding: 40px;
     border-radius: 15px;
     background-color: #e9ecef;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 .level-result span {
     color: #4361ee;
     font-weight: bold;
-    font-size: 1.5em;
+    font-size: 1.8em;
     display: inline-block;
     margin-left: 10px;
 }
 
-/* Öğrenme Yolu (Learning Path) Modül Kartları Stilleri */
-/* DİKKAT: Bu stiller, index.html'deki ile karıştırılmamalı, bu dinamik JS ile oluşturulan kartlardır. */
-.level-header {
-    margin-bottom: 30px;
-    border-left: 5px solid #4361ee;
-    padding-left: 15px;
-}
+/* =======================================
+   ÖĞRENME YOLU (MODÜL KARTLARI) STİLLERİ
+   ======================================= */
 .topic-header {
     margin-top: 40px;
     margin-bottom: 15px;
     color: #495057;
-    font-size: 1.3rem;
-    border-bottom: 1px solid #f1f3f5;
+    font-size: 1.5rem;
+    border-bottom: 2px solid #ced4da;
     padding-bottom: 5px;
 }
 .module-grid {
@@ -212,13 +105,14 @@ h1, h2, h3, h4 {
     border-left: 5px solid #adb5bd;
     transition: transform 0.2s, box-shadow 0.2s, border-left-color 0.2s;
     position: relative;
+    min-height: 150px; /* Kartın yüksekliğini belirle */
 }
 .module-card:hover {
     transform: translateY(-3px);
     box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
 }
 .module-card.completed {
-    border-left-color: #28a745; /* Yeşil kenar */
+    border-left-color: #28a745; /* Tamamlanan modül yeşil kenar */
     opacity: 0.9;
 }
 .module-card.completed .progress-bar {
@@ -228,7 +122,8 @@ h1, h2, h3, h4 {
     position: absolute;
     top: 10px;
     right: 10px;
-    font-size: 0.8em;
+    font-size: 0.85em;
+    font-weight: 600;
 }
 .module-topic {
     font-size: 0.9em;
@@ -245,13 +140,16 @@ h1, h2, h3, h4 {
 .progress {
     height: 8px;
     background-color: #e9ecef;
+    margin-top: 10px;
 }
 .progress-bar {
     background-color: #4361ee; /* Ana renk */
     transition: width 0.6s ease;
 }
 
-/* Modül İçeriği Stilleri */
+/* =======================================
+   MODÜL İÇERİĞİ STİLLERİ
+   ======================================= */
 #moduleContentSection {
     background-color: #fff;
     padding: 30px;
@@ -261,9 +159,10 @@ h1, h2, h3, h4 {
 .code-block {
     background-color: #f1f3f5;
     border-left: 3px solid #007bff;
-    padding: 10px;
+    padding: 15px;
     font-family: monospace;
     overflow-x: auto;
+    border-radius: 5px;
 }
 .example-box {
     border: 1px solid #ffe0b2;
@@ -271,27 +170,33 @@ h1, h2, h3, h4 {
     padding: 15px;
     border-radius: 8px;
     margin: 15px 0;
+    font-style: italic;
+    color: #6a510a;
 }
-.word-list-section {
+.word-list-section, .sentence-list-section {
     padding: 15px;
     background-color: #f7f9fc;
     border-radius: 8px;
     border: 1px dashed #ced4da;
-    column-count: 2; /* Kelimeleri iki sütuna ayır */
+    column-count: 2; 
 }
-.word-item {
-    margin-bottom: 5px;
+.word-item, .sentence-item {
+    margin-bottom: 8px;
     break-inside: avoid;
+    font-size: 0.95em;
+}
+.word-item strong, .sentence-item strong {
+    color: #4361ee;
 }
 .reading-text-box {
     border-left: 4px solid #adb5bd;
     padding-left: 15px;
     margin: 20px 0;
-    font-style: italic;
     line-height: 1.8;
     background-color: #f4f6f8;
     padding: 15px;
     border-radius: 5px;
+    font-size: 1.05em;
 }
 
 /* Modül Quiz Stilleri (Simülasyon) */
@@ -304,20 +209,21 @@ h1, h2, h3, h4 {
 }
 .quiz-option-item {
     display: block;
-    padding: 8px 12px;
+    padding: 10px 12px;
     margin-top: 8px;
     border-radius: 6px;
     background-color: #fff;
     border: 1px solid #e9ecef;
     cursor: pointer;
-    transition: background-color 0.15s;
+    transition: background-color 0.15s, box-shadow 0.15s;
 }
 .quiz-option-item:hover {
     background-color: #f1f3f5;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 }
 .quiz-option-item.selected-answer {
     border-color: #4361ee;
-    font-weight: bold;
+    font-weight: 600;
 }
 .quiz-option-item.correct-answer {
     background-color: #d4edda;
@@ -330,4 +236,3 @@ h1, h2, h3, h4 {
     border-color: #f5c6cb;
     color: #721c24;
 }
-

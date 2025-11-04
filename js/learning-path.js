@@ -19,10 +19,16 @@ const LearningPath = {
                 this.displayLevelTest();
             }
         }).catch(error => {
-            console.error("Veri yüklenirken hata oluştu:", error);
-            // Hata durumunda bile test sayfasını göster
+            console.error("Veri yüklenirken kritik hata oluştu:", error);
+            // Hata durumunda, kullanıcıya bilgi vererek test sayfasını göster
             this.showSection('levelTestSection');
-            this.displayLevelTest();
+            const testEl = document.getElementById('levelTestSection');
+            testEl.innerHTML = `
+                <div class="alert alert-danger" role="alert">
+                    <h4>Veri Yükleme Hatası!</h4>
+                    <p>Uygulama temel verileri yükleyemedi. Sunucu bağlantınızı ve dosya yollarınızı kontrol edin (Örn: data/words.json).</p>
+                </div>
+            `;
         });
 
         // Test Başlat butonuna event listener ekle
@@ -48,7 +54,7 @@ const LearningPath = {
 
         const [moduleData, testData, wordsData, sentencesData, readingsData] = await Promise.all([
             moduleRes, levelTestRes, wordsRes, sentencesRes, readingsRes
-        ].map(res => res.then(r => r.json())));
+        ].map(res => res.then(r => r.json()).catch(() => ({})))); // Hata yakalama eklendi
 
         this.allModules = moduleData || {};
         // KRİTİK DÜZELTME: Verinin bir dizi olduğundan emin ol
@@ -79,7 +85,7 @@ const LearningPath = {
         // Test sorularını rastgele seçip karıştır (max 10 soru)
         const questions = this.allLevelTestQuestions.sort(() => 0.5 - Math.random()).slice(0, 10);
         
-        // HATA KONTROLÜ
+        // KRİTİK DÜZELTME: Hata Kontrolü
         if (questions.length === 0) {
             testEl.innerHTML = `
                 <div class="alert alert-danger" role="alert">
@@ -185,10 +191,10 @@ const LearningPath = {
         });
 
         let resultLevel = 'A1';
-        if (b1Count >= 2) { // 3 B1 sorusundan 2'sini bildiyse B1'e atanır
+        if (b1Count >= 2) { 
             resultLevel = 'B1';
         }
-        if (c1Count >= 2) { // 3 C1 sorusundan 2'sini bildiyse C1'e atanır
+        if (c1Count >= 2) { 
             resultLevel = 'C1';
         }
 
@@ -227,14 +233,14 @@ const LearningPath = {
         // Modülleri Local Storage'dan yükle veya varsayılan veriyi kullan
         let modules = JSON.parse(localStorage.getItem('learningModules')) || levelData.modules;
         // Eğer modules boşsa veya level uyuşmuyorsa, JSON'dan tekrar yükle
-        if (!modules || modules.length === 0 || modules.some(m => !m.id.startsWith(level.toLowerCase()))) {
+        if (!modules || modules.length === 0 || !modules[0].id.startsWith(level.toLowerCase())) {
              modules = levelData.modules;
              localStorage.setItem('learningModules', JSON.stringify(modules));
         }
 
         // Modül kartlarını oluştur
         const moduleCards = modules.map(module => `
-            <div class="module-card ${module.status.toLowerCase()}" onclick="LearningPath.displayModuleContent('${module.id}')">
+            <div class="module-card ${module.status.toLowerCase().replace(/ /g, '-')}" onclick="LearningPath.displayModuleContent('${module.id}')">
                 <i class="fas ${this.getIconForTopic(module.topic)}"></i>
                 <h5>${module.name}</h5>
                 <p class="module-topic">${module.topic} Konusu</p>
@@ -275,17 +281,17 @@ const LearningPath = {
             'Gramer': 'fa-graduation-cap',
             'Kelime': 'fa-spell-check',
             'Konuşma': 'fa-comments',
-            'Okuma': 'fa-book-open'
+            'Okuma': 'fa-book-open',
+            'Structure': 'fa-sitemap' // Yeni eklenen
         };
         return icons[topic] || 'fa-cubes';
     },
     
-    // Modül içeriğini görüntüler (En kritik ve zenginleştirilmiş kısım)
+    // Modül içeriğini görüntüler
     displayModuleContent: function(moduleId) {
         this.showSection('moduleContentSection');
         const contentEl = document.getElementById('moduleContentSection');
         
-        // 1. Modül Temel Bilgilerini Çek
         const levelData = Object.values(this.allModules).find(l => l.modules.some(m => m.id === moduleId));
         const baseModule = levelData ? levelData.modules.find(m => m.id === moduleId) : null;
 
@@ -294,13 +300,11 @@ const LearningPath = {
              return;
         }
 
-        // 2. Modül İçeriğini Zenginleştir (Burada Kelime, Cümle, Okuma eklenir)
         const enrichedContent = this.enrichModuleContent(moduleId, baseModule);
         
         let contentHtml = `<button class="btn btn-sm btn-outline-primary mb-4" onclick="LearningPath.displayLearningPath(localStorage.getItem('userLevel'))">← Modüllere Geri Dön</button>`;
         contentHtml += `<h3 class="mb-4">${baseModule.name}</h3>`;
         
-        // 3. İçerik Bileşenlerini HTML'e Çevir
         enrichedContent.forEach(item => {
             switch(item.type) {
                 case 'heading':
@@ -324,11 +328,10 @@ const LearningPath = {
                 case 'reading_text':
                     contentHtml += `<div class="reading-text-box">${item.text.replace(/\n/g, '<p>')}</div>`;
                     break;
-                // Quizler sadece quiz mode'da gösterileceği için burada listelenmez.
+                // Quizler burada gösterilmez
             }
         });
         
-        // Quiz başlatma butonu ekle (Tüm quiz sorularını JSON string'e dönüştürerek)
         const quizQuestions = enrichedContent.filter(item => item.type === 'quiz');
         
         contentHtml += `
@@ -355,7 +358,7 @@ const LearningPath = {
         const moduleWords = this.allWords.filter(w => 
             w.difficulty.toUpperCase().includes(moduleLevel) && 
             (w.category.toLowerCase().includes(moduleTopic) || moduleTopic.includes(w.category.toLowerCase()))
-        ).sort(() => 0.5 - Math.random()).slice(0, 15); 
+        ).sort(() => 0.5 - Math.random()).slice(0, 15); // 15 kelime
 
         if (moduleWords.length > 0) {
              const wordsHtml = moduleWords.map(w => 
@@ -363,7 +366,7 @@ const LearningPath = {
             ).join('');
             
             enrichedContent.push({type: 'heading', text: '1. Kelime Alıştırması'});
-            enrichedContent.push({type: 'paragraph', text: `Bu modül için **${moduleWords.length}** adet temel kelime seçildi. Kelime dağarcığınızı bu kelimelerle zenginleştirin.`});
+            enrichedContent.push({type: 'paragraph', text: `Bu modül için **${moduleWords.length}** adet temel kelime seçildi.`});
             enrichedContent.push({type: 'words', html: wordsHtml});
 
             // Kelimelerden 5 adet soru (Quiz) oluşturulur
@@ -392,9 +395,9 @@ const LearningPath = {
         
         // --- 2. Cümle Alıştırmaları (sentences.json) ---
         const moduleSentences = this.allSentences.filter(s =>
-            s.difficulty.toUpperCase().includes(moduleLevel) &&
+            s.difficulty && s.difficulty.toUpperCase().includes(moduleLevel) &&
             (s.category.toLowerCase().includes(moduleTopic) || moduleTopic.includes(s.category.toLowerCase()))
-        ).sort(() => 0.5 - Math.random()).slice(0, 10); 
+        ).sort(() => 0.5 - Math.random()).slice(0, 10); // 10 adet cümle çekilir
 
         if (moduleSentences.length > 0) {
             const sentencesHtml = moduleSentences.map(s =>
@@ -408,6 +411,9 @@ const LearningPath = {
              // Cümlelerden 3 adet soru (Quiz) oluşturulur (boşluk doldurma simülasyonu)
             for (let i = 0; i < Math.min(3, moduleSentences.length); i++) {
                 const sentence = moduleSentences[i];
+                // Boşluk doldurmak için en az 3 kelimeli olması lazım
+                if (sentence.english.split(' ').length < 3) continue; 
+                
                 const words = sentence.english.split(' ');
                 const missingWordIndex = Math.floor(Math.random() * (words.length - 2)) + 1; 
                 const missingWord = words[missingWordIndex].replace(/[.,?!]/g, '');
@@ -565,9 +571,8 @@ const LearningPath = {
         const moduleIndex = modules.findIndex(m => m.id === moduleId);
         if (moduleIndex !== -1) {
             modules[moduleIndex].lastScore = score;
-            modules[moduleIndex].progress = 100; // Tamamlandı say
+            modules[moduleIndex].progress = 100; 
             modules[moduleIndex].status = (score >= 70) ? 'Tamamlandı' : 'Tekrar Gerekli';
-            // Simülasyon süresi ekle
             modules[moduleIndex].lastDuration = Math.floor(Math.random() * 15) + 5; 
 
             localStorage.setItem('learningModules', JSON.stringify(modules));
@@ -608,4 +613,3 @@ const LearningPath = {
 };
 
 document.addEventListener('DOMContentLoaded', () => LearningPath.init());
-

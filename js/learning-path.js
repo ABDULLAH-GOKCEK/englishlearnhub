@@ -823,7 +823,7 @@ const LearningPath = {
             }
         }
 
-        // --- 3. Okuma Parçası (reading_stories.json) - KRİTİK GÜNCELLEME ---
+        // --- 3. Okuma Parçası (reading_stories.json) - KRİTİK GÜNCELLEME V6 ---
         let readingQuizQuestions = [];
         const readingLevelCode = allowedDifficulties.map(d => d.toLowerCase()).find(d => ['beginner', 'intermediate', 'advanced'].includes(d)) || 'beginner';
         
@@ -841,15 +841,13 @@ const LearningPath = {
         
         moduleReading = this.allReadings.find(isTopicRelated);
         
-        // 2. Aşama: Konu bazlı eşleşme bulunamazsa, SADECE SEVİYE bazlı İLK hikayeyi ara (V5 GÜNCELLEMESİ)
+        // 2. Aşama: Konu bazlı eşleşme bulunamazsa, SADECE SEVİYE bazlı İLK hikayeyi ara
         if (!moduleReading) {
             moduleReading = this.allReadings.find(r => 
                  r.level.toLowerCase().includes(readingLevelCode)
             );
         }
         
-        // 3. Aşama: Hala bulunamadıysa (ki bu, o seviyede hiç okuma parçası olmadığı anlamına gelir), null kalır.
-
         if (moduleReading) {
             // Başarılı bir şekilde hikaye bulundu
             baseModule.moduleReading = moduleReading; 
@@ -862,20 +860,36 @@ const LearningPath = {
             });
             baseModule.reading_story_title = moduleReading.title;
             
-            // --- KRİTİK SORU ALMA DÜZELTMESİ ---
+            // --- KRİTİK SORU ALMA VE HATA YÖNETİMİ DÜZELTMESİ V6 ---
             if (Array.isArray(moduleReading.questions)) {
                 moduleReading.questions.forEach((q) => {
-                     // Soru cevabını seçenek dizisinden alıyoruz (q.correctAnswer bir indekstir)
-                     // q.correctAnswer'ın bir sayı (index) olduğundan emin olun
-                     const correctAnswerIndex = parseInt(q.correctAnswer, 10); 
-                     
-                     if (isNaN(correctAnswerIndex) || correctAnswerIndex < 0 || correctAnswerIndex >= q.options.length) {
-                        console.warn(`Okuma hikayesi "${moduleReading.title}" - Geçersiz cevap indeksi: ${q.correctAnswer}`);
+                     if (!Array.isArray(q.options) || q.options.length < 2) {
+                        console.warn(`Okuma hikayesi "${moduleReading.title}" - Soru geçersiz (Options eksik): ${q.question}`);
                         return; // Geçersiz soruyu atla
                      }
 
-                     const correctAnswerText = q.options[correctAnswerIndex]; 
-
+                     let correctAnswerText = null;
+                     let correctAnswerValue = q.correctAnswer;
+                     
+                     if (typeof correctAnswerValue === 'number') {
+                         // Cevap bir index (sayı) ise
+                         const correctAnswerIndex = parseInt(correctAnswerValue, 10); 
+                         if (correctAnswerIndex >= 0 && correctAnswerIndex < q.options.length) {
+                            correctAnswerText = q.options[correctAnswerIndex]; 
+                         }
+                     } else if (typeof correctAnswerValue === 'string') {
+                          // Cevap metin (string) ise, seçeneklerde metin olarak ara
+                         const match = q.options.find(opt => opt === correctAnswerValue);
+                         if (match) {
+                             correctAnswerText = match;
+                         } else {
+                             // Metin cevap seçeneklerde yoksa, ilk seçeneği varsayılan yap (önerilmez, sadece yedek)
+                             // Veya bu soruyu atla:
+                              console.warn(`Okuma hikayesi "${moduleReading.title}" - Metin cevap seçeneklerde bulunamadı: ${correctAnswerValue}`);
+                              return; 
+                         }
+                     }
+                     
                      if (correctAnswerText) { // Soru ve cevaplar geçerliyse ekle
                          readingQuizQuestions.push({
                             type: 'quiz', 
@@ -884,6 +898,8 @@ const LearningPath = {
                             answer: correctAnswerText, 
                             topic: `${moduleReading.title} - Okuma Anlama`
                         });
+                     } else {
+                          console.warn(`Okuma hikayesi "${moduleReading.title}" - Doğru cevap belirlenemedi veya geçersiz format: ${q.correctAnswer}`);
                      }
                 });
             }
@@ -1009,7 +1025,7 @@ const LearningPath = {
                 quizEl.style.alignItems = 'center'; 
                 quizEl.style.textAlign = 'center';
                 
-                this.calculateModuleScore(moduleId, questions, userAnswers, quizType);
+                this.calculateModuleScore(moduleId, quizQuestions, userAnswers, quizType);
                 return;
             }
             

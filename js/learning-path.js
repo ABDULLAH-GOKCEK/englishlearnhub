@@ -722,6 +722,13 @@ const LearningPath = {
             'C2': ['HARD', 'ADVANCED']
         };
         const allowedDifficulties = difficultyMapping[moduleLevel] || ['EASY'];
+        
+        // KRİTİK GÜNCELLEME V7: Gramer Modülü Kontrolü (Modül adını da içerir)
+        const isModuleGrammar = baseModuleTopic && 
+            (['grammar', 'gramer', 'structure'].includes(baseModuleTopic) || 
+             baseModule.name.toLowerCase().includes('fiili') || 
+             baseModule.name.toLowerCase().includes('zamirler'));
+
 
         // --- 1. Kelime Alıştırmaları (words.json) ---
         let wordQuizQuestions = [];
@@ -730,10 +737,12 @@ const LearningPath = {
             
             if (!isLevelMatch) return false;
 
-            if (['grammar', 'gramer', 'structure', 'kelime', 'word', 'vocabulary'].includes(baseModuleTopic) || !baseModuleTopic) {
+            // Eğer modülün konusu genel bir Gramer/Yapı ise, sadece seviye yeterlidir.
+            if (isModuleGrammar || ['kelime', 'word', 'vocabulary'].includes(baseModuleTopic) || !baseModuleTopic) { 
                 return true; 
             }
             
+            // Aksi takdirde, kategori eşleşmesi ara
             const wordCategory = w.category.toLowerCase();
             return wordCategory.includes(baseModuleTopic) || baseModuleTopic.includes(wordCategory);
 
@@ -777,10 +786,12 @@ const LearningPath = {
             
             if (!isLevelMatch) return false;
             
-            if (['grammar', 'gramer', 'structure', 'konuşma', 'speaking'].includes(baseModuleTopic) || !baseModuleTopic) {
+            // Eğer modülün konusu genel bir Gramer/Yapı ise, sadece seviye yeterlidir.
+            if (isModuleGrammar || ['konuşma', 'speaking', 'sentence', 'cümle'].includes(baseModuleTopic) || !baseModuleTopic) {
                 return true; 
             }
             
+            // Aksi takdirde, kategori eşleşmesi ara
             const sentenceCategory = s.category.toLowerCase();
             return sentenceCategory.includes(baseModuleTopic) || baseModuleTopic.includes(sentenceCategory);
         }).sort(() => 0.5 - Math.random()).slice(0, 15); 
@@ -1175,7 +1186,7 @@ const LearningPath = {
             localStorage.setItem('learningModules', JSON.stringify(modules));
         }
 
-        this.showModuleResult(moduleId, score, questions.length, correctCount, isPassed, Array.from(requiredTopics), quizType);
+        this.showModuleResult(moduleId, score, totalQuestions, correctCount, isPassed, Array.from(requiredTopics), quizType);
     },
 
     showModuleResult: function(moduleId, score, totalQuestions, correctCount, isPassed, feedback, quizType) {

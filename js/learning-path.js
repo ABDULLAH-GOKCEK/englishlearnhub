@@ -1,6 +1,7 @@
 const LearningPath = {
     TEST_FILE_PATH: 'data/level_test.json',
-    MODULE_CONTENT_FILE_PATH: 'data/module_content.json.json',
+    // DÜZELTİLDİ: Dosya yolundaki fazla .json uzantısı kaldırıldı
+    MODULE_CONTENT_FILE_PATH: 'data/module_content.json', 
     PASS_SCORE: 90, // Başarı eşiği: %90
 
     allModules: {},
@@ -11,11 +12,11 @@ const LearningPath = {
     allLevelTestQuestions: [],
     shuffledTestQuestions: [],
 
-    // YENİ: Her modül için sabit bölüm yapısı (sıra ve tipi belirli)
+    // Her modül için sabit bölüm yapısı (sıra ve tipi belirli)
     STANDARD_SECTIONS: [
         { id: 'word', name: '1. Kelime Bilgisi Alıştırması', type: 'word' },
         { id: 'sentence', name: '2. Cümle Yapısı Alıştırması', type: 'sentence' },
-        { id: 'reading', name: '3. Okuma Anlama Alıştırması', type: 'reading' }, // Artık zorunlu bir bölüm
+        { id: 'reading', name: '3. Okuma Anlama Alıştırması', type: 'reading' }, 
     ],
 
     init: function() {
@@ -64,14 +65,14 @@ const LearningPath = {
                 return res.json();
             } catch (error) {
                 console.error(`Kritik JSON Yükleme Hatası: ${path}`, error);
-                if (path.includes('json.json')) return {}; 
-                return []; 
+                // Düzgün bir şekilde boş nesne/dizi dönerek uygulamanın çökmesini engeller
+                return path.includes('json') ? {} : []; 
             }
         };
 
         const [moduleData, moduleContentData, testData, wordsData, sentencesData, readingsData] = await Promise.all([
             fetchData('data/learning_modules.json'), 
-            fetchData(this.MODULE_CONTENT_FILE_PATH), 
+            fetchData(this.MODULE_CONTENT_FILE_PATH), // Düzeltilen yol kullanılıyor
             fetchData('data/level_test.json'),
             fetchData('data/words.json'), 
             fetchData('data/sentences.json'), 
@@ -114,7 +115,7 @@ const LearningPath = {
         return 'bg-secondary';
     },
     
-    // --- Test fonksiyonları aynı kaldı... ---
+    // --- Test fonksiyonları ---
     
     prepareAndDisplayLevelTest: function() {
         const MAX_QUESTIONS = 20;
@@ -143,7 +144,6 @@ const LearningPath = {
     },
 
     displayLevelTest: function() {
-        // ... (Test kodu öncekiyle aynı, yer kaplamaması için atlandı) ...
         const testEl = document.getElementById('levelTestSection');
         if (!testEl) return;
 
@@ -301,7 +301,6 @@ const LearningPath = {
     },
     
     showLevelResult: function(level, score, maxScore) {
-        // ... (Sonuç kodu öncekiyle aynı, yer kaplamaması için atlandı) ...
         const testEl = document.getElementById('levelTestSection');
         
         const isPassedInitialTest = (score / maxScore) * 100 >= this.PASS_SCORE;
@@ -353,7 +352,7 @@ const LearningPath = {
         
         let modules = JSON.parse(localStorage.getItem('learningModules'));
         if (!modules || modules.length === 0) {
-             // YENİ: Başlangıçta bölüm ilerlemesini de dahil et
+             // Başlangıçta bölüm ilerlemesini de dahil et
              modules = modulesList.map(m => ({
                  ...m,
                  progress: 0,
@@ -380,6 +379,11 @@ const LearningPath = {
                          });
                      }
                  });
+                 // İlerleme çubuğunu yeniden hesapla
+                 const totalSections = updatedSections.length;
+                 const completedSections = updatedSections.filter(s => s.status === 'Tamamlandı').length;
+                 m.progress = Math.round((completedSections / totalSections) * 100);
+                 
                  m.sectionProgress = updatedSections;
                  return m;
              });
@@ -391,9 +395,11 @@ const LearningPath = {
         const moduleCards = modules.map(module => {
             const badgeClass = this.getBadgeClass(module.status); 
             
-            // YENİ: Bölüm tamamlama durumunu kontrol et
+            // Bölüm tamamlama durumunu kontrol et
             const totalSections = module.sectionProgress.length;
             const completedSections = module.sectionProgress.filter(s => s.status === 'Tamamlandı').length;
+            
+            // Modül testi için kilit durumu: Tümü tamamlanmalı
             const isSectionsCompleted = completedSections === totalSections;
             
             // Modül test butonu sadece bölümler tamamlandıysa aktif
@@ -473,12 +479,13 @@ const LearningPath = {
              return;
         }
         
-        // 2. Modülün statik içeriğini (ders notlarını) 'module_content.json.json' dosyasından al
+        // 2. Modülün statik içeriğini (ders notlarını) 'module_content.json' dosyasından al
         const staticContentData = this.allModuleContents[moduleId];
         baseModule.content = (staticContentData && Array.isArray(staticContentData.content)) ? staticContentData.content : [];
 
         // 3. İçeriği zenginleştir ve quiz sorularını oluştur/filtrele
-        const enrichedContent = this.enrichModuleContent(moduleId, baseModule, userLevel);
+        // Bu adım, baseModule objesine quiz sorularını ekler.
+        this.enrichModuleContent(moduleId, baseModule, userLevel);
         
         contentEl.style.alignItems = 'flex-start'; 
         contentEl.style.textAlign = 'left';
@@ -487,8 +494,12 @@ const LearningPath = {
         contentHtml += `<button class="btn btn-sm btn-outline-primary mb-4" onclick="LearningPath.displayLearningPath('${userLevel}')">← Modüllere Geri Dön</button>`;
         contentHtml += `<h3 class="mb-4">${baseModule.name}</h3>`;
         
-        // Statik İçerik (Ders Notları)
-        enrichedContent.filter(item => item.type !== 'section_quiz_button').forEach(item => {
+        // Statik İçerik (Ders Notları) ve Dinamik Kelime/Cümle Listeleri
+        
+        // Okuma parçası için de enrichedContent kullanılmalı
+        const enrichedContent = this.getModuleContentHTML(moduleId, baseModule, userLevel);
+
+        enrichedContent.forEach(item => {
             switch(item.type) {
                 case 'heading':
                     contentHtml += `<h4 class="mt-4">${item.text}</h4>`;
@@ -514,9 +525,13 @@ const LearningPath = {
             }
         });
         
-        // YENİ: Bölümler ve Sınav Düğümleri
+        // Bölümler ve Sınav Düğümleri
         contentHtml += `<hr class="my-5"><h4>Modül Çalışma Bölümleri (${userLevel} Seviyesi)</h4>`;
         
+        const totalSections = this.STANDARD_SECTIONS.length;
+        const completedSections = currentModule.sectionProgress.filter(s => s.status === 'Tamamlandı').length;
+        const isSectionsCompleted = completedSections === totalSections;
+
         this.STANDARD_SECTIONS.forEach((section) => {
              const sectionData = currentModule.sectionProgress.find(s => s.id === section.id) || {status: 'Başlanmadı', lastScore: 0};
              const badgeClass = this.getBadgeClass(sectionData.status);
@@ -548,12 +563,16 @@ const LearningPath = {
         });
 
 
+        // Modül Final Testi Butonu
+        const testButtonClass = isSectionsCompleted ? 'btn-success' : 'btn-secondary';
+        const testButtonText = isSectionsCompleted ? 'Genel Modül Testini Başlat' : `Tüm bölümler tamamlanmalı (${completedSections}/${totalSections})`;
+
         contentHtml += `
             <div class="mt-5 text-center">
                 <hr>
                 <p class="lead">Tüm bölümleri tamamladıktan sonra modül final testini yapabilirsiniz.</p>
-                <button class="btn btn-secondary btn-lg" disabled>
-                    <i class="fas fa-lock me-2"></i> Genel Modül Testi
+                <button class="btn ${testButtonClass} btn-lg" ${!isSectionsCompleted ? 'disabled' : ''} onclick="LearningPath.startQuiz('${moduleId}', 'all')">
+                    ${!isSectionsCompleted ? '<i class="fas fa-lock me-2"></i>' : ''} ${testButtonText}
                 </button>
             </div>
             </div>
@@ -561,8 +580,17 @@ const LearningPath = {
 
         contentEl.innerHTML = contentHtml;
     },
+    
+    // getModuleContentHTML'i ekleyelim. Bu, enrichModuleContent'tan statik HTML oluşturmayı ayırır.
+    getModuleContentHTML: function(moduleId, baseModule, userLevel) {
+        // enrichModuleContent'i çağırarak baseModule'a gerekli quiz sorularını ve kelime/cümle listelerini ekler
+        const enrichedContent = this.enrichModuleContent(moduleId, baseModule, userLevel);
+        
+        // Artık enrichedContent dizisini döndürüyoruz.
+        return enrichedContent;
+    },
 
-    // Dinamik içerik oluşturucu
+    // Dinamik içerik oluşturucu (Geri kalanı aynı kaldı)
     enrichModuleContent: function(moduleId, baseModule, userLevel) {
         
         const moduleLevel = userLevel.toUpperCase(); 
@@ -584,7 +612,7 @@ const LearningPath = {
         // --- 1. Kelime Alıştırmaları (words.json) ---
         let wordQuizQuestions = [];
         const moduleWords = this.allWords.filter(w => {
-            const isLevelMatch = allowedDifficulties.includes(w.difficulty.toUpperCase());
+            const isLevelMatch = w.difficulty && allowedDifficulties.includes(w.difficulty.toUpperCase());
             
             if (!isLevelMatch) return false;
 
@@ -611,7 +639,7 @@ const LearningPath = {
                 const options = [correctWord.turkish];
                 
                 const wrongOptions = this.allWords
-                    .filter(w => w.turkish !== correctWord.turkish && allowedDifficulties.includes(w.difficulty.toUpperCase()))
+                    .filter(w => w.turkish !== correctWord.turkish && w.difficulty && allowedDifficulties.includes(w.difficulty.toUpperCase()))
                     .sort(() => 0.5 - Math.random())
                     .slice(0, 3)
                     .map(w => w.turkish);
@@ -664,7 +692,7 @@ const LearningPath = {
                 
                 const options = [missingWord];
                 const wrongOptions = this.allWords
-                    .filter(w => !w.word.toLowerCase().includes(missingWord.toLowerCase()) && allowedDifficulties.includes(w.difficulty.toUpperCase()))
+                    .filter(w => !w.word.toLowerCase().includes(missingWord.toLowerCase()) && w.difficulty && allowedDifficulties.includes(w.difficulty.toUpperCase()))
                     .sort(() => 0.5 - Math.random())
                     .slice(0, 3)
                     .map(w => w.word);
@@ -758,7 +786,7 @@ const LearningPath = {
                  quizEl.innerHTML = `
                      <div class="result-card">
                          <h3 class="text-danger mb-4">Modül Testi Kilitli</h3>
-                         <p class="h5">Modül final testini başlatmak için tüm (${totalSections} adet) çalışma bölümünü tamamlamalısınız.</p>
+                         <p class="h5">Modül final testini başlatmak için tüm (${totalSections} adet) çalışma bölümünü **(%${this.PASS_SCORE} ve üzeri puanla)** tamamlamalısınız.</p>
                          <p>Şu anda **${completedSections}** bölüm tamamlandı. Lütfen eksik bölümleri bitirin.</p>
                          <button class="btn btn-lg btn-primary mt-3" onclick="LearningPath.displayModuleContent('${moduleId}', '${userLevel}')">
                              Modül İçeriğine Geri Dön
@@ -769,7 +797,7 @@ const LearningPath = {
              }
         }
         
-        // Gerekli veriyi almak için enrichModuleContent tekrar çalıştırılır (local storage'da tutulmuyor)
+        // Gerekli veriyi almak için enrichModuleContent tekrar çalıştırılır 
         const staticContentData = this.allModuleContents[moduleId];
         baseModule.content = (staticContentData && Array.isArray(staticContentData.content)) ? staticContentData.content : [];
         this.enrichModuleContent(moduleId, baseModule, userLevel);
@@ -793,7 +821,6 @@ const LearningPath = {
         }
         
         if (quizQuestions.length === 0) {
-            // ... (Soru yoksa uyarı ekranı öncekiyle aynı) ...
             quizEl.style.alignItems = 'center'; 
             quizEl.style.textAlign = 'center';
             quizEl.innerHTML = `
@@ -828,7 +855,6 @@ const LearningPath = {
                 return;
             }
             
-            // ... (Quiz render kodu öncekiyle aynı) ...
             const q = quizQuestions[currentQuestionIndex];
             const progress = Math.round(((currentQuestionIndex + 1) / quizQuestions.length) * 100);
 
@@ -925,24 +951,41 @@ const LearningPath = {
         const moduleIndex = modules.findIndex(m => m.id === moduleId);
         
         if (moduleIndex !== -1) {
+            
+            const currentModule = modules[moduleIndex];
+            const totalSections = this.STANDARD_SECTIONS.length;
+            
             if (quizType === 'all') {
                 // Modül Final Testi Güncellemesi
-                modules[moduleIndex].lastScore = score;
-                modules[moduleIndex].progress = isPassed ? 100 : modules[moduleIndex].progress; 
-                modules[moduleIndex].status = isPassed ? 'Tamamlandı' : 'Tekrar Gerekli';
-                modules[moduleIndex].lastDuration = Math.floor(Math.random() * 15) + 5; 
+                currentModule.lastScore = score;
+                
+                // YENİ KURAL: Tamamlandı = (Tüm Bölümler Tamamlandı) AND (Final Testi Geçildi)
+                const completedSections = currentModule.sectionProgress.filter(s => s.status === 'Tamamlandı').length;
+                const allSectionsComplete = completedSections === totalSections;
+                const passedModuleTest = isPassed; 
+                
+                if (allSectionsComplete && passedModuleTest) {
+                    currentModule.status = 'Tamamlandı';
+                    currentModule.progress = 100;
+                } else {
+                    currentModule.status = 'Tekrar Gerekli';
+                    // Final testi başarısız olsa bile, ilerleme çubuğu bölüm tamamlanmalarına göre kalır.
+                    currentModule.progress = Math.round((completedSections / totalSections) * 100); 
+                }
+                
+                currentModule.lastDuration = Math.floor(Math.random() * 15) + 5; 
+
             } else {
                 // BÖLÜM (Section) Testi Güncellemesi
-                const sectionIndex = modules[moduleIndex].sectionProgress.findIndex(s => s.id === quizType);
+                const sectionIndex = currentModule.sectionProgress.findIndex(s => s.id === quizType);
                 if (sectionIndex !== -1) {
-                    modules[moduleIndex].sectionProgress[sectionIndex].lastScore = score;
-                    modules[moduleIndex].sectionProgress[sectionIndex].status = isPassed ? 'Tamamlandı' : 'Tekrar Gerekli';
+                    currentModule.sectionProgress[sectionIndex].lastScore = score;
+                    currentModule.sectionProgress[sectionIndex].status = isPassed ? 'Tamamlandı' : 'Tekrar Gerekli';
                 }
                 
                 // Modül ilerlemesini (progress bar) bölüm tamamlanmasına göre güncelle
-                const totalSections = modules[moduleIndex].sectionProgress.length;
-                const completedSections = modules[moduleIndex].sectionProgress.filter(s => s.status === 'Tamamlandı').length;
-                modules[moduleIndex].progress = Math.round((completedSections / totalSections) * 100);
+                const completedSectionsAfterUpdate = currentModule.sectionProgress.filter(s => s.status === 'Tamamlandı').length;
+                currentModule.progress = Math.round((completedSectionsAfterUpdate / totalSections) * 100);
             }
 
             localStorage.setItem('learningModules', JSON.stringify(modules));

@@ -63,9 +63,13 @@ const LearningPath = {
 
     // Tüm JSON dosyalarını yükleyen asenkron fonksiyon
     loadAllData: async function() {
+        
+        // 💡 KRİTİK DEĞİŞİKLİK: 'level_test.json' yerine 'exam.json' deniyoruz
+        const TEST_FILE_PATH = 'data/exam.json'; 
+
         // Module ve Level Test verisi
         const moduleRes = fetch('data/learning_modules.json');
-        const levelTestRes = fetch('data/level_test.json');
+        const levelTestRes = fetch(TEST_FILE_PATH); 
         
         // Zenginleştirme verileri
         const wordsRes = fetch('data/words.json');
@@ -74,10 +78,15 @@ const LearningPath = {
 
         const [moduleData, testData, wordsData, sentencesData, readingsData] = await Promise.all([
             moduleRes, levelTestRes, wordsRes, sentencesRes, readingsRes
-        ].map(res => res.then(r => r.json()).catch(() => ({})))); // Hata yakalama eklendi
+        ].map(res => res.then(r => r.json()).catch(error => {
+            // Hata durumunda konsola detaylı hata mesajı yazdır
+            console.error(`Kritik JSON Yükleme Hatası: Dosya yolu veya format yanlış. Yüklenemeyen dosya: ${res.url}`, error);
+            // Hata oluşsa bile uygulamanın çökmemesi için boş obje dön
+            return {}; 
+        })));
 
         this.allModules = moduleData || {};
-        // KRİTİK DÜZELTME: Verinin bir dizi olduğundan emin ol
+        // Verinin bir dizi olduğundan emin ol
         this.allLevelTestQuestions = Array.isArray(testData) ? testData : []; 
         this.allWords = Array.isArray(wordsData) ? wordsData : []; 
         this.allSentences = Array.isArray(sentencesData) ? sentencesData : []; 
@@ -677,3 +686,4 @@ const LearningPath = {
 };
 
 document.addEventListener('DOMContentLoaded', () => LearningPath.init());
+

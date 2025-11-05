@@ -150,7 +150,7 @@ const LearningPath = {
         return 'bg-secondary';
     },
     
-    // --- Seviye Tespit Testi Fonksiyonları (Eksik olanlar tamamlandı) ---
+    // --- Seviye Tespit Testi Fonksiyonları (V4 ile aynı) ---
 
     prepareAndDisplayLevelTest: function() {
         const MAX_QUESTIONS = 20;
@@ -362,7 +362,7 @@ const LearningPath = {
         if (navButton) navButton.classList.remove('d-none');
     },
 
-    // --- Öğrenme Yolu ve Modül İçeriği Fonksiyonları ---
+    // --- Öğrenme Yolu ve Modül İçeriği Fonksiyonları (V4 ile aynı) ---
     displayLearningPath: function(level) {
         this.showSection('learningPathSection');
         const pathEl = document.getElementById('learningPathSection');
@@ -583,7 +583,7 @@ const LearningPath = {
                         <div class="mt-4">
                             <h4>3. Okuma Anlama Alıştırması</h4>
                             <div class="alert alert-warning" role="alert">
-                                <strong>Okuma Hikayesi Bulunamadı:</strong> Mevcut seviyeniz (${userLevel}) ve modül konusu (${baseModule.topic}) ile eşleşen bir okuma hikayesi/metni <code>reading_stories.json</code> dosyanızda bulunamadı. Bu bölüm **otomatik olarak tamamlanmış sayılacaktır**.
+                                <strong>Okuma Hikayesi Bulunamadı:</strong> Mevcut seviyeniz (${userLevel}) ve modül konusu (${baseModule.topic}) ile eşleşen bir okuma hikayesi/metni bulunamadı. Bu bölüm **otomatik olarak tamamlanmış sayılacaktır**.
                             </div>
                         </div>
                     `;
@@ -830,27 +830,29 @@ const LearningPath = {
         let moduleReading = null;
         
         // 1. Aşama: KONU + SEVİYE bazlı eşleşme ara
-        moduleReading = this.allReadings.find(r => 
-            r.level.toLowerCase().includes(readingLevelCode) && 
-            (['okuma', 'reading'].includes(baseModuleTopic) || // Eğer modül konusu zaten 'okuma' ise, seviye yeterlidir
-             !baseModuleTopic || // Modül konusu boşsa (genel modül)
-             r.category.toLowerCase().includes(baseModuleTopic) || // Hikaye kategorisi modül konusunu içeriyorsa
-             baseModuleTopic.includes(r.category.toLowerCase())) // Modül konusu hikaye kategorisini içeriyorsa
-        );
+        const isTopicRelated = (r) => {
+             const rCat = r.category.toLowerCase();
+             const isRelated = ['okuma', 'reading'].includes(baseModuleTopic) || 
+                               !baseModuleTopic || 
+                               rCat.includes(baseModuleTopic) || 
+                               baseModuleTopic.includes(rCat);
+             return r.level.toLowerCase().includes(readingLevelCode) && isRelated;
+        };
         
-        // 2. Aşama: Eğer Konu bazlı eşleşme bulunamazsa, SADECE SEVİYE bazlı GENEL bir hikaye ara
+        moduleReading = this.allReadings.find(isTopicRelated);
+        
+        // 2. Aşama: Konu bazlı eşleşme bulunamazsa, SADECE SEVİYE bazlı İLK hikayeyi ara (V5 GÜNCELLEMESİ)
         if (!moduleReading) {
-            const generalCategories = ['general', 'daily life', 'nature', 'food', 'travel', 'people', 'music']; 
-            
             moduleReading = this.allReadings.find(r => 
-                 r.level.toLowerCase().includes(readingLevelCode) &&
-                 generalCategories.some(cat => r.category.toLowerCase().includes(cat))
+                 r.level.toLowerCase().includes(readingLevelCode)
             );
         }
+        
+        // 3. Aşama: Hala bulunamadıysa (ki bu, o seviyede hiç okuma parçası olmadığı anlamına gelir), null kalır.
 
         if (moduleReading) {
             // Başarılı bir şekilde hikaye bulundu
-            baseModule.moduleReading = moduleReading; // Modüle hikayeyi ekliyoruz
+            baseModule.moduleReading = moduleReading; 
 
             enrichedContent.push({
                 type: 'reading_text', 
@@ -860,11 +862,19 @@ const LearningPath = {
             });
             baseModule.reading_story_title = moduleReading.title;
             
-            // --- KRİTİK SORU ALMA DÜZELTMESİ BURADA ---
+            // --- KRİTİK SORU ALMA DÜZELTMESİ ---
             if (Array.isArray(moduleReading.questions)) {
                 moduleReading.questions.forEach((q) => {
                      // Soru cevabını seçenek dizisinden alıyoruz (q.correctAnswer bir indekstir)
-                     const correctAnswerText = q.options[q.correctAnswer]; 
+                     // q.correctAnswer'ın bir sayı (index) olduğundan emin olun
+                     const correctAnswerIndex = parseInt(q.correctAnswer, 10); 
+                     
+                     if (isNaN(correctAnswerIndex) || correctAnswerIndex < 0 || correctAnswerIndex >= q.options.length) {
+                        console.warn(`Okuma hikayesi "${moduleReading.title}" - Geçersiz cevap indeksi: ${q.correctAnswer}`);
+                        return; // Geçersiz soruyu atla
+                     }
+
+                     const correctAnswerText = q.options[correctAnswerIndex]; 
 
                      if (correctAnswerText) { // Soru ve cevaplar geçerliyse ekle
                          readingQuizQuestions.push({
@@ -878,7 +888,7 @@ const LearningPath = {
                 });
             }
         } else {
-             // Hala bulunamadıysa yer tutucu ekle (Genel hikaye bile yoksa)
+             // Hala bulunamadıysa yer tutucu ekle 
              enrichedContent.push({type: 'reading_placeholder', text: 'Okuma hikayesi bulunamadı.'});
              baseModule.moduleReading = null;
         }
@@ -903,7 +913,7 @@ const LearningPath = {
         return enrichedContent;
     },
     
-    // --- Quiz ve Skor Fonksiyonları (Eksik olanlar tamamlandı) ---
+    // --- Quiz ve Skor Fonksiyonları (V4 ile aynı) ---
 
     startQuiz: function(moduleId, quizType = 'all') { 
         this.showSection('moduleQuizSection');
@@ -999,7 +1009,7 @@ const LearningPath = {
                 quizEl.style.alignItems = 'center'; 
                 quizEl.style.textAlign = 'center';
                 
-                this.calculateModuleScore(moduleId, quizQuestions, userAnswers, quizType);
+                this.calculateModuleScore(moduleId, questions, userAnswers, quizType);
                 return;
             }
             

@@ -112,6 +112,7 @@ const LearningPath = {
         if (status === 'Tamamlandı') return 'bg-success';
         if (status === 'Başlanmadı') return 'bg-danger';
         if (status === 'Tekrar Gerekli') return 'bg-warning text-dark';
+        if (status === 'Atlandı (Soru Yok)') return 'bg-info text-dark'; // Yeni durum
         return 'bg-secondary';
     },
     
@@ -364,7 +365,7 @@ const LearningPath = {
                  lastDuration: 0,
                  sectionProgress: this.STANDARD_SECTIONS.map(s => ({
                      id: s.id,
-                     status: 'Başlanmadı', // Başlanmadı, Tekrar Gerekli, Tamamlandı
+                     status: 'Başlanmadı', // Başlanmadı, Tekrar Gerekli, Tamamlandı, Atlandı (Soru Yok)
                      lastScore: 0
                  }))
              }));
@@ -384,7 +385,7 @@ const LearningPath = {
                  });
                  // İlerleme çubuğunu yeniden hesapla
                  const totalSections = updatedSections.length;
-                 const completedSections = updatedSections.filter(s => s.status === 'Tamamlandı').length;
+                 const completedSections = updatedSections.filter(s => s.status === 'Tamamlandı' || s.status === 'Atlandı (Soru Yok)').length; // Atlananlar da tamamlanmış sayılır
                  m.progress = Math.round((completedSections / totalSections) * 100);
                  
                  m.sectionProgress = updatedSections;
@@ -400,7 +401,7 @@ const LearningPath = {
             
             // Bölüm tamamlama durumunu kontrol et
             const totalSections = module.sectionProgress.length;
-            const completedSections = module.sectionProgress.filter(s => s.status === 'Tamamlandı').length;
+            const completedSections = module.sectionProgress.filter(s => s.status === 'Tamamlandı' || s.status === 'Atlandı (Soru Yok)').length;
             
             // Modül testi için kilit durumu: Tümü tamamlanmalı
             const isSectionsCompleted = completedSections === totalSections;
@@ -447,7 +448,8 @@ const LearningPath = {
                 ${moduleCards}
             </div>
 
-             <button class="btn btn-sm btn-outline-danger mt-4" onclick="LearningPath.resetProgress()">Seviyeyi Sıfırla</button>
+             <button class="btn btn-sm btn-outline-warning mt-4" onclick="LearningPath.resetUserLevel()">Seviye Tespit Testini Yeniden Yap</button>
+             <button class="btn btn-sm btn-outline-danger mt-4" onclick="LearningPath.resetProgress()">Tüm İlerlemeyi Sıfırla</button>
         `;
         
         localStorage.setItem('userLevel', level);
@@ -539,11 +541,8 @@ const LearningPath = {
         
         // --- 2. Çalışma Bölümleri (İçeriğin hemen altına taşındı) ---
         
-        // Önceki Çalışma Bölümleri listesi kaldırıldı, artık inline (satır içi) gösteriliyor.
-        // SADECE Final Testi butonu kalacak.
-        
         const totalSections = this.STANDARD_SECTIONS.length;
-        const completedSections = currentModule.sectionProgress.filter(s => s.status === 'Tamamlandı').length;
+        const completedSections = currentModule.sectionProgress.filter(s => s.status === 'Tamamlandı' || s.status === 'Atlandı (Soru Yok)').length;
         const isSectionsCompleted = completedSections === totalSections;
 
         // --- 3. Modül Final Testi Butonu ---
@@ -554,7 +553,7 @@ const LearningPath = {
             <div class="mt-5 text-center">
                 <hr>
                 <h4>Modül Genel Değerlendirme Testi</h4>
-                <p class="lead">Tüm bölümleri tamamladıktan sonra modül final testini yapabilirsiniz. **Başarı: ${currentModule.lastScore}%**</p>
+                <p class="lead">Tüm bölümleri tamamladıktan sonra modül final testini yapabilirsiniz. **Son Puan: ${currentModule.lastScore}%**</p>
                 <button class="btn ${testButtonClass} btn-lg" ${!isSectionsCompleted ? 'disabled' : ''} onclick="LearningPath.startQuiz('${moduleId}', 'all')">
                     ${!isSectionsCompleted ? '<i class="fas fa-lock me-2"></i>' : ''} ${testButtonText}
                 </button>
@@ -582,9 +581,36 @@ const LearningPath = {
         questionCount = quizQuestions ? quizQuestions.length : 0;
 
         const sectionData = currentModule.sectionProgress.find(s => s.id === sectionId) || {status: 'Başlanmadı', lastScore: 0};
+        
+        // Atlandı (Soru Yok) durumunu kontrol et
+        if (sectionData.status === 'Başlanmadı' && questionCount === 0) {
+             // Bölüm statüsünü "Atlandı (Soru Yok)" olarak güncelle
+             const modules = JSON.parse(localStorage.getItem('learningModules'));
+             const moduleIndex = modules.findIndex(m => m.id === currentModule.id);
+             if (moduleIndex !== -1) {
+                 const sectionIndex = modules[moduleIndex].sectionProgress.findIndex(s => s.id === sectionId);
+                 if (sectionIndex !== -1) {
+                     modules[moduleIndex].sectionProgress[sectionIndex].status = 'Atlandı (Soru Yok)';
+                 }
+                 localStorage.setItem('learningModules', JSON.stringify(modules));
+             }
+             sectionData.status = 'Atlandı (Soru Yok)';
+        }
+
         const badgeClass = this.getBadgeClass(sectionData.status);
         const isAvailable = questionCount > 0;
         const buttonDisabled = !isAvailable ? 'disabled' : '';
+
+        // Eğer Atlandı ise, butonu gösterme
+        const buttonHtml = (sectionData.status === 'Atlandı (Soru Yok)') ? 
+            '' :
+            `<button class="btn btn-sm btn-info" ${buttonDisabled} onclick="LearningPath.startQuiz('${currentModule.id}', '${sectionId}')">
+                <i class="fas fa-play me-2"></i> ${sectionId === 'reading' ? 'Okuma Testi' : 'Alıştırmayı'} Başlat (${questionCount} Soru)
+            </button>`;
+
+        const statusMessage = !isAvailable && sectionData.status !== 'Atlandı (Soru Yok)'
+            ? '<span class="badge bg-warning text-dark ms-2">Yeterli Soru Yok</span>' 
+            : '';
 
         return `
             <div class="card p-3 my-4 bg-light">
@@ -594,12 +620,10 @@ const LearningPath = {
                         <p class="mb-0">
                             <span class="badge ${badgeClass} me-2">${sectionData.status}</span>
                             <small class="text-muted">Son Puan: ${sectionData.lastScore}%</small>
-                            ${!isAvailable ? '<span class="badge bg-warning text-dark ms-2">Yeterli Soru Yok</span>' : ''}
+                            ${statusMessage}
                         </p>
                     </div>
-                    <button class="btn btn-sm btn-info" ${buttonDisabled} onclick="LearningPath.startQuiz('${currentModule.id}', '${sectionId}')">
-                        <i class="fas fa-play me-2"></i> ${sectionId === 'reading' ? 'Okuma Testi' : 'Alıştırmayı'} Başlat (${questionCount} Soru)
-                    </button>
+                    ${buttonHtml}
                 </div>
             </div>
         `;
@@ -801,7 +825,8 @@ const LearningPath = {
              const modules = JSON.parse(localStorage.getItem('learningModules'));
              const currentModule = modules.find(m => m.id === moduleId);
              const totalSections = this.STANDARD_SECTIONS.length;
-             const completedSections = currentModule.sectionProgress.filter(s => s.status === 'Tamamlandı').length;
+             // Atlananlar da tamamlanmış sayılır
+             const completedSections = currentModule.sectionProgress.filter(s => s.status === 'Tamamlandı' || s.status === 'Atlandı (Soru Yok)').length;
              
              if (completedSections < totalSections) {
                  quizEl.style.alignItems = 'center'; 
@@ -809,7 +834,7 @@ const LearningPath = {
                  quizEl.innerHTML = `
                      <div class="result-card">
                          <h3 class="text-danger mb-4">Modül Testi Kilitli</h3>
-                         <p class="h5">Modül final testini başlatmak için tüm (${totalSections} adet) çalışma bölümünü **(%${this.PASS_SCORE} ve üzeri puanla)** tamamlamalısınız.</p>
+                         <p class="h5">Modül final testini başlatmak için tüm (${totalSections} adet) çalışma bölümünü **(%${this.PASS_SCORE} ve üzeri puanla veya Atlanarak)** tamamlamalısınız.</p>
                          <p>Şu anda **${completedSections}** bölüm tamamlandı. Lütfen eksik bölümleri bitirin.</p>
                          <button class="btn btn-lg btn-primary mt-3" onclick="LearningPath.displayModuleContent('${moduleId}', '${userLevel}')">
                              Modül İçeriğine Geri Dön
@@ -886,7 +911,8 @@ const LearningPath = {
 
             let optionsHtml = '';
             q.options.forEach((option, index) => {
-                const selectedClass = userAnswers[currentQuestionIndex] === option ? 'selected-answer' : '';
+                const isSelected = userAnswers[currentQuestionIndex] === option;
+                const selectedClass = isSelected ? 'selected-answer' : '';
                 optionsHtml += `
                     <div class="quiz-option-item ${selectedClass}" 
                          data-option="${option}" 
@@ -921,20 +947,15 @@ const LearningPath = {
             `;
             quizEl.innerHTML = quizContent;
             
-            // Seçim yapıldığında otomatik ilerleme veya seçimi kaydetme
+            // Seçim yapıldığında otomatik geçişi KALDIRDIK. Sadece seçimi kaydet ve görseli güncelle.
             document.querySelectorAll('.quiz-option-item').forEach(optionEl => {
                 optionEl.addEventListener('click', function() {
                     const selectedValue = this.getAttribute('data-option');
                     userAnswers[currentQuestionIndex] = selectedValue; 
                     
-                    // Otomatik ilerleme: Seçim yapıldığında sonraki soruya geç
-                    if (currentQuestionIndex < quizQuestions.length - 1) {
-                         currentQuestionIndex++;
-                         renderQuizQuestion();
-                    } else if (currentQuestionIndex === quizQuestions.length - 1) {
-                         // Son sorudaysa, butonu güncellemek için renderQuestion çağrılır
-                         renderQuizQuestion();
-                    }
+                    // Görseli güncelle
+                    document.querySelectorAll('.quiz-option-item').forEach(el => el.classList.remove('selected-answer'));
+                    this.classList.add('selected-answer');
                 });
             });
 
@@ -1002,7 +1023,7 @@ const LearningPath = {
                 currentModule.lastScore = score;
                 
                 // KURAL: Tamamlandı = (Tüm Bölümler Tamamlandı) AND (Final Testi Geçildi)
-                const completedSections = currentModule.sectionProgress.filter(s => s.status === 'Tamamlandı').length;
+                const completedSections = currentModule.sectionProgress.filter(s => s.status === 'Tamamlandı' || s.status === 'Atlandı (Soru Yok)').length;
                 const allSectionsComplete = completedSections === totalSections;
                 const passedModuleTest = isPassed; 
                 
@@ -1026,7 +1047,8 @@ const LearningPath = {
                 }
                 
                 // Modül ilerlemesini (progress bar) bölüm tamamlanmasına göre güncelle
-                const completedSectionsAfterUpdate = currentModule.sectionProgress.filter(s => s.status === 'Tamamlandı').length;
+                // Atlananlar da tamamlanmış sayılır
+                const completedSectionsAfterUpdate = currentModule.sectionProgress.filter(s => s.status === 'Tamamlandı' || s.status === 'Atlandı (Soru Yok)').length;
                 currentModule.progress = Math.round((completedSectionsAfterUpdate / totalSections) * 100);
                 
                 // Bölüm tamamlandıysa, modülün genel durumunu kontrol et
@@ -1112,12 +1134,24 @@ const LearningPath = {
         quizEl.innerHTML = resultHtml;
     },
 
+    // SADECE seviye bilgisini sıfırlar ve testi başlatır, modül ilerlemesini korur
+    resetUserLevel: function() {
+        if (confirm("Seviye belirleme testini yeniden yaparak mevcut seviyenizi güncelleyebilirsiniz. Bu işlem modüllerdeki ilerlemenizi (tamamlama durumunuzu) silmez, sadece yeni seviyenize göre içerik filtrelemeyi sağlar. Emin misiniz?")) {
+            localStorage.removeItem('userLevel');
+            localStorage.removeItem('levelTestAnswers');
+            // LearningModules kalır
+            alert("Seviye sıfırlandı. Seviye tespit testi yeniden başlıyor.");
+            window.location.reload();
+        }
+    },
+
+    // Tüm ilerlemeyi sıfırlar
     resetProgress: function() {
-        if (confirm("Tüm ilerlemeniz ve seviyeniz sıfırlanacaktır. Emin misiniz?")) {
+        if (confirm("Tüm ilerlemeniz, modül tamamlama durumunuz ve seviyeniz sıfırlanacaktır. Emin misiniz?")) {
             localStorage.removeItem('userLevel');
             localStorage.removeItem('learningModules');
             localStorage.removeItem('levelTestAnswers');
-            alert("İlerleme sıfırlandı. Seviye tespit testi yeniden başlayacak.");
+            alert("Tüm ilerleme sıfırlandı. Seviye tespit testi yeniden başlayacak.");
             window.location.reload(); 
         }
     }

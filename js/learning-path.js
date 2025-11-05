@@ -1,6 +1,6 @@
 const LearningPath = {
     TEST_FILE_PATH: 'data/level_test.json', 
-    MODULE_CONTENT_FILE_PATH: 'data/module_content.json', // YENİ EKLENDİ
+    MODULE_CONTENT_FILE_PATH: 'data/module_content.json.json', // YENİ EKLENDİ
     
     allModules: {}, // learning_modules.json içeriği
     allModuleContents: {}, // module_content.json.json içeriği
@@ -765,4 +765,5 @@ const LearningPath = {
 };
 
 document.addEventListener('DOMContentLoaded', () => LearningPath.init());
+
 

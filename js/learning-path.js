@@ -492,7 +492,6 @@ const LearningPath = {
         let quizIndexStart = enrichedContent.filter(item => item.type === 'quiz').length;
         
         // YENİ/DÜZELTİLMİŞ: Seviye-Zorluk Eşleşmesi
-        // Veri setinizdeki 'easy', 'medium', 'hard' seviyelerini A1/B1/C1 seviyeleriyle eşleştiriyoruz.
         const difficultyMapping = {
             'A1': ['EASY', 'BEGINNER'],
             'A2': ['EASY', 'MEDIUM', 'BEGINNER', 'INTERMEDIATE'],
@@ -510,8 +509,8 @@ const LearningPath = {
             
             if (!isLevelMatch) return false;
 
-            // Kategori Eşleşmesi: Gramer gibi genel konularda sadece seviyeye bak, spesifik konularda kategori eşleştirmesi yap
-            if (baseModuleTopic === 'grammar' || baseModuleTopic === 'structure' || !baseModuleTopic) {
+            // KRİTİK DÜZELTME: Hem Türkçe "gramer" hem de İngilizce "grammar" kontrolü eklendi.
+            if (baseModuleTopic === 'grammar' || baseModuleTopic === 'gramer' || baseModuleTopic === 'structure' || !baseModuleTopic) {
                 return true; 
             }
             
@@ -559,8 +558,8 @@ const LearningPath = {
             
             if (!isLevelMatch) return false;
             
-            // Kategori Eşleşmesi
-            if (baseModuleTopic === 'grammar' || baseModuleTopic === 'structure' || !baseModuleTopic) {
+            // KRİTİK DÜZELTME: Hem Türkçe "gramer" hem de İngilizce "grammar" kontrolü eklendi.
+            if (baseModuleTopic === 'grammar' || baseModuleTopic === 'gramer' || baseModuleTopic === 'structure' || !baseModuleTopic) {
                 return true; 
             }
             
@@ -615,7 +614,7 @@ const LearningPath = {
         // Okuma parçasını bulurken hem seviyeyi hem de konuyu eşleştir
         const moduleReading = this.allReadings.find(r => 
             r.level.toLowerCase().includes(readingLevelCode) && 
-            (baseModuleTopic === 'grammar' || baseModuleTopic === 'structure' || !baseModuleTopic || r.category.toLowerCase().includes(baseModuleTopic) || baseModuleTopic.includes(r.category.toLowerCase()))
+            (baseModuleTopic === 'grammar' || baseModuleTopic === 'gramer' || baseModuleTopic === 'structure' || !baseModuleTopic || r.category.toLowerCase().includes(baseModuleTopic) || baseModuleTopic.includes(r.category.toLowerCase()))
         );
 
         if (moduleReading) {

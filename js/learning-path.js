@@ -149,6 +149,18 @@ const LearningPath = {
         if (status === 'Atlandı (Soru Yok)') return 'bg-info text-dark'; 
         return 'bg-secondary';
     },
+
+    // Ana Sayfa butonu HTML'i
+    getHomeButton: function(userLevel) {
+        const pathFunction = userLevel ? `LearningPath.displayLearningPath('${userLevel}')` : `window.location.reload()`;
+        return `
+            <div style="position: sticky; top: 0; z-index: 10;">
+                 <button class="btn btn-sm btn-outline-primary mb-3 mt-1" onclick="${pathFunction}">
+                    <i class="fas fa-home me-2"></i> Ana Sayfa (Öğrenme Yolu)
+                </button>
+            </div>
+        `;
+    },
     
     // --- Seviye Tespit Testi Fonksiyonları (V4 ile aynı) ---
 
@@ -362,7 +374,7 @@ const LearningPath = {
         if (navButton) navButton.classList.remove('d-none');
     },
 
-    // --- Öğrenme Yolu ve Modül İçeriği Fonksiyonları (V4 ile aynı) ---
+    // --- Öğrenme Yolu ve Modül İçeriği Fonksiyonları (V8 Güncellendi) ---
     displayLearningPath: function(level) {
         this.showSection('learningPathSection');
         const pathEl = document.getElementById('learningPathSection');
@@ -378,11 +390,12 @@ const LearningPath = {
             levelTitle = `${baseLevelData.title} (${level} Seviyesi için)`;
         } else {
              pathEl.innerHTML = `
+                ${this.getHomeButton(level)}
                 <div class="alert alert-danger" role="alert" style="max-width: 800px; margin-top: 50px;">
                     <h4>Hata: Öğrenme Modülleri Yüklenemedi!</h4>
                     <p>Lütfen <code>data/learning_modules.json</code> dosyasının hem var olduğunu hem de **"${baseLevelCode}"** anahtarının altında bir **"modules"** dizisi bulunduğunu kontrol edin.</p>
                 </div>
-                <button class="btn btn-primary mt-3" onclick="LearningPath.resetProgress()">Seviyeyi Sıfırla ve Tekrar Dene</button>
+                <button class="btn btn-primary mt-3" onclick="LearningPath.resetUserLevel()">Seviyeyi Sıfırla ve Tekrar Dene</button>
             `;
             return;
         }
@@ -471,6 +484,10 @@ const LearningPath = {
         }).join('');
 
         pathEl.innerHTML = `
+            <div style="max-width: 900px; width: 100%;">
+                ${this.getHomeButton(level)}
+            </div>
+            
             <div class="level-header" style="max-width: 900px; width: 100%;">
                 <h2>${levelTitle}</h2>
                 <p class="lead">Seviyeniz **${level}** olarak belirlendi. Modüller **${level}** seviyesine uygun çalışmalar içerecektir.</p>
@@ -482,7 +499,6 @@ const LearningPath = {
             </div>
 
              <button class="btn btn-sm btn-outline-warning mt-4" onclick="LearningPath.resetUserLevel()">Seviye Tespit Testini Yeniden Yap</button>
-             <button class="btn btn-sm btn-outline-danger mt-4" onclick="LearningPath.resetProgress()">Tüm İlerlemeyi Sıfırla</button>
         `;
         
         localStorage.setItem('userLevel', level);
@@ -530,7 +546,8 @@ const LearningPath = {
         contentEl.style.textAlign = 'left';
 
         let contentHtml = `<div style="max-width: 800px; width: 100%;">`;
-        contentHtml += `<button class="btn btn-sm btn-outline-primary mb-4" onclick="LearningPath.displayLearningPath('${userLevel}')">← Modüllere Geri Dön</button>`;
+        contentHtml += this.getHomeButton(userLevel); // Ana Sayfa butonu
+        contentHtml += `<button class="btn btn-sm btn-outline-primary mb-4 me-2" onclick="LearningPath.displayLearningPath('${userLevel}')">← Modüllere Geri Dön</button>`;
         contentHtml += `<h3 class="mb-4">${baseModule.name}</h3>`;
         
         // --- 1. Statik ve Dinamik Modül İçeriği ---
@@ -704,7 +721,12 @@ const LearningPath = {
         return enrichedContent;
     },
 
-    // Dinamik içerik oluşturucu
+    // Rastgele eleman seçici
+    getRandomElement: function(arr) {
+        return arr[Math.floor(Math.random() * arr.length)];
+    },
+
+    // Dinamik içerik oluşturucu (V8 Güncellendi)
     enrichModuleContent: function(moduleId, baseModule, userLevel) {
         
         const moduleLevel = userLevel.toUpperCase(); 
@@ -714,14 +736,14 @@ const LearningPath = {
         let enrichedContent = [...staticContent]; 
         
         const difficultyMapping = {
-            'A1': ['EASY', 'BEGINNER'],
-            'A2': ['EASY', 'MEDIUM', 'BEGINNER', 'INTERMEDIATE'],
-            'B1': ['MEDIUM', 'INTERMEDIATE'],
-            'B2': ['MEDIUM', 'HARD', 'INTERMEDIATE', 'ADVANCED'],
-            'C1': ['HARD', 'ADVANCED'],
-            'C2': ['HARD', 'ADVANCED']
+            'A1': ['easy', 'beginner'], // Hepsi küçük harfe çevrildi
+            'A2': ['easy', 'medium', 'beginner', 'intermediate'],
+            'B1': ['medium', 'intermediate'],
+            'B2': ['medium', 'hard', 'intermediate', 'advanced'],
+            'C1': ['hard', 'advanced'],
+            'C2': ['hard', 'advanced']
         };
-        const allowedDifficulties = difficultyMapping[moduleLevel] || ['EASY'];
+        const allowedDifficulties = difficultyMapping[moduleLevel] || ['easy'];
         
         // KRİTİK GÜNCELLEME V7: Gramer Modülü Kontrolü (Modül adını da içerir)
         const isModuleGrammar = baseModuleTopic && 
@@ -733,7 +755,8 @@ const LearningPath = {
         // --- 1. Kelime Alıştırmaları (words.json) ---
         let wordQuizQuestions = [];
         const moduleWords = this.allWords.filter(w => {
-            const isLevelMatch = w.difficulty && allowedDifficulties.includes(w.difficulty.toUpperCase());
+            // KRİTİK DÜZELTME V8: difficulty alanını küçük harfe çevirerek karşılaştır
+            const isLevelMatch = w.difficulty && allowedDifficulties.includes(w.difficulty.toLowerCase());
             
             if (!isLevelMatch) return false;
 
@@ -762,7 +785,7 @@ const LearningPath = {
                 const options = [correctWord.turkish];
                 
                 const wrongOptions = this.allWords
-                    .filter(w => w.turkish !== correctWord.turkish && w.difficulty && allowedDifficulties.includes(w.difficulty.toUpperCase()))
+                    .filter(w => w.turkish !== correctWord.turkish && w.difficulty && allowedDifficulties.includes(w.difficulty.toLowerCase()))
                     .sort(() => 0.5 - Math.random())
                     .slice(0, 3)
                     .map(w => w.turkish);
@@ -782,7 +805,8 @@ const LearningPath = {
         // --- 2. Cümle Alıştırmaları (sentences.json) ---
         let sentenceQuizQuestions = [];
         const moduleSentences = this.allSentences.filter(s => {
-            const isLevelMatch = s.difficulty && allowedDifficulties.includes(s.difficulty.toUpperCase());
+            // KRİTİK DÜZELTME V8: difficulty alanını küçük harfe çevirerek karşılaştır
+            const isLevelMatch = s.difficulty && allowedDifficulties.includes(s.difficulty.toLowerCase());
             
             if (!isLevelMatch) return false;
             
@@ -817,7 +841,7 @@ const LearningPath = {
                 
                 const options = [missingWord];
                 const wrongOptions = this.allWords
-                    .filter(w => !w.word.toLowerCase().includes(missingWord.toLowerCase()) && w.difficulty && allowedDifficulties.includes(w.difficulty.toUpperCase()))
+                    .filter(w => !w.word.toLowerCase().includes(missingWord.toLowerCase()) && w.difficulty && allowedDifficulties.includes(w.difficulty.toLowerCase()))
                     .sort(() => 0.5 - Math.random())
                     .slice(0, 3)
                     .map(w => w.word);
@@ -834,29 +858,36 @@ const LearningPath = {
             }
         }
 
-        // --- 3. Okuma Parçası (reading_stories.json) - KRİTİK GÜNCELLEME V6 ---
+        // --- 3. Okuma Parçası (reading_stories.json) - KRİTİK GÜNCELLEME V8 ---
         let readingQuizQuestions = [];
-        const readingLevelCode = allowedDifficulties.map(d => d.toLowerCase()).find(d => ['beginner', 'intermediate', 'advanced'].includes(d)) || 'beginner';
-        
+        const readingLevelCodes = allowedDifficulties.filter(d => ['beginner', 'intermediate', 'advanced'].includes(d)) 
+
         let moduleReading = null;
         
-        // 1. Aşama: KONU + SEVİYE bazlı eşleşme ara
-        const isTopicRelated = (r) => {
+        // 1. Aşama: KONU + SEVİYE bazlı eşleşen TÜM hikayeleri bul
+        const topicAndLevelMatches = this.allReadings.filter(r => {
              const rCat = r.category.toLowerCase();
-             const isRelated = ['okuma', 'reading'].includes(baseModuleTopic) || 
+             const isTopicRelated = ['okuma', 'reading'].includes(baseModuleTopic) || 
                                !baseModuleTopic || 
                                rCat.includes(baseModuleTopic) || 
                                baseModuleTopic.includes(rCat);
-             return r.level.toLowerCase().includes(readingLevelCode) && isRelated;
-        };
+             // r.level.toLowerCase() ile readingLevelCodes'taki seviyeleri karşılaştır
+             return readingLevelCodes.includes(r.level.toLowerCase()) && isTopicRelated;
+        });
         
-        moduleReading = this.allReadings.find(isTopicRelated);
-        
-        // 2. Aşama: Konu bazlı eşleşme bulunamazsa, SADECE SEVİYE bazlı İLK hikayeyi ara
-        if (!moduleReading) {
-            moduleReading = this.allReadings.find(r => 
-                 r.level.toLowerCase().includes(readingLevelCode)
+        // 2. Aşama: Konu bazlı eşleşme bulunamazsa, SADECE SEVİYE bazlı TÜM hikayeleri bul
+        let levelOnlyMatches = [];
+        if (topicAndLevelMatches.length === 0) {
+            levelOnlyMatches = this.allReadings.filter(r => 
+                 readingLevelCodes.includes(r.level.toLowerCase())
             );
+        }
+
+        const finalMatches = topicAndLevelMatches.length > 0 ? topicAndLevelMatches : levelOnlyMatches;
+
+        // KRİTİK DÜZELTME V8: Eşleşen hikayelerden rastgele birini seç
+        if (finalMatches.length > 0) {
+             moduleReading = this.getRandomElement(finalMatches);
         }
         
         if (moduleReading) {
@@ -894,8 +925,6 @@ const LearningPath = {
                          if (match) {
                              correctAnswerText = match;
                          } else {
-                             // Metin cevap seçeneklerde yoksa, ilk seçeneği varsayılan yap (önerilmez, sadece yedek)
-                             // Veya bu soruyu atla:
                               console.warn(`Okuma hikayesi "${moduleReading.title}" - Metin cevap seçeneklerde bulunamadı: ${correctAnswerValue}`);
                               return; 
                          }
@@ -1058,6 +1087,7 @@ const LearningPath = {
 
             const quizContent = `
                 <div style="max-width: 800px; width: 100%;">
+                    ${this.getHomeButton(userLevel)}
                     <h3 class="mb-4">${quizTitle} (${currentQuestionIndex + 1} / ${quizQuestions.length})</h3>
                     <div class="progress-container">
                         <div class="progress" role="progressbar" style="height: 12px;">
@@ -1186,7 +1216,7 @@ const LearningPath = {
             localStorage.setItem('learningModules', JSON.stringify(modules));
         }
 
-        this.showModuleResult(moduleId, score, totalQuestions, correctCount, isPassed, Array.from(requiredTopics), quizType);
+        this.showModuleResult(moduleId, score, questions.length, correctCount, isPassed, Array.from(requiredTopics), quizType);
     },
 
     showModuleResult: function(moduleId, score, totalQuestions, correctCount, isPassed, feedback, quizType) {

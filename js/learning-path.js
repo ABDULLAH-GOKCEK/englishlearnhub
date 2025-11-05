@@ -46,16 +46,13 @@ const LearningPath = {
         // Module ve Level Test verisi
         const moduleRes = fetch('data/learning_modules.json');
         const levelTestRes = fetch('data/level_test.json');
-        
         // Zenginleştirme verileri
         const wordsRes = fetch('data/words.json');
         const sentencesRes = fetch('data/sentences.json');
         const readingsRes = fetch('data/reading_stories.json');
-
         const [moduleData, testData, wordsData, sentencesData, readingsData] = await Promise.all([
             moduleRes, levelTestRes, wordsRes, sentencesRes, readingsRes
         ].map(res => res.then(r => r.json()).catch(() => ({})))); // Hata yakalama eklendi
-
         this.allModules = moduleData || {};
         // KRİTİK DÜZELTME: Verinin bir dizi olduğundan emin ol
         this.allLevelTestQuestions = Array.isArray(testData) ? testData : []; 
@@ -613,3 +610,4 @@ const LearningPath = {
 };
 
 document.addEventListener('DOMContentLoaded', () => LearningPath.init());
+

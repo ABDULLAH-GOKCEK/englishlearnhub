@@ -474,4 +474,24 @@ body {
     border-color: #f5c6cb;
     color: #721c24;
 }
+/* TÜM BÖLÜMLERİ BAŞLANGIÇTA GİZLE (Sadece 'active' olanlar hariç) */
+.module-section {
+    display: none; 
+    padding: 60px 0;
+    min-height: 80vh; 
+}
+
+/* SADECE 'active' sınıfına sahip olan bölümü GÖSTER */
+.module-section.active {
+    display: flex; /* İçeriği ortalamak için flex kullan */
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+/* Intro bölümü için stil */
+.intro-content {
+    max-width: 600px;
+}
 

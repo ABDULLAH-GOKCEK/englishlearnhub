@@ -11,24 +11,30 @@ const LearningPath = {
         this.loadAllData().then(() => {
             console.log("Tüm veriler yüklendi.");
             
-            // 1. Kullanıcının seviyesini kontrol et
+            // Kullanıcının seviyesini kontrol et
             const userLevel = localStorage.getItem('userLevel');
             
-            // 2. Testi Başlat butonu elementini al
-            const startTestButton = document.getElementById('startTestButton');
-            
+            // Eğer seviye kayıtlıysa, öğrenme yolunu göster
             if (userLevel) {
-                // Seviye kayıtlıysa, öğrenme yolunu göster
                 this.displayLearningPath(userLevel);
-            } else if (startTestButton) {
-                // Seviye kayıtlı değilse ve "Test Başlat" butonu varsa:
-                // Sadece tanıtım bölümünü gösterip, butona basılmasını bekle.
+            } 
+            // Eğer seviye kayıtlı değilse:
+            else {
+                // Intro bölümü HTML'de zaten 'active' olarak ayarlı.
+                // Sadece diğer tüm bölümleri gizlediğimizden emin oluyoruz.
                 this.showSection('introSection');
-            } else {
-                 // Eğer seviye yok ve HTML'de buton yoksa (örneğin test sayfası direkt açılıyorsa), testi başlat.
-                 this.showSection('levelTestSection');
-                 this.displayLevelTest();
             }
+            
+            // Navigasyon butonunu seviye varsa görünür yap
+            const navButton = document.getElementById('navToPathButton');
+            if (navButton) {
+                if (userLevel) {
+                    navButton.classList.remove('d-none');
+                } else {
+                    navButton.classList.add('d-none');
+                }
+            }
+
 
         }).catch(error => {
             console.error("Veri yüklenirken kritik hata oluştu:", error);
@@ -39,13 +45,13 @@ const LearningPath = {
                 testEl.innerHTML = `
                     <div class="alert alert-danger" role="alert">
                         <h4>Veri Yükleme Hatası!</h4>
-                        <p>Uygulama temel verileri yükleyemedi. Lütfen konsoldaki detayları kontrol edin.</p>
+                        <p>Uygulama temel verileri yükleyemedi. Lütfen konsoldaki detayları ve dosya yollarını kontrol edin.</p>
                     </div>
                 `;
             }
         });
 
-        // Test Başlat butonuna event listener ekle (Tekrar sağlamlaştırma)
+        // Test Başlat butonuna event listener ekle
         const startTestButton = document.getElementById('startTestButton');
         if (startTestButton) {
              startTestButton.onclick = () => {
@@ -54,18 +60,22 @@ const LearningPath = {
              };
         }
     },
+
     // Tüm JSON dosyalarını yükleyen asenkron fonksiyon
     loadAllData: async function() {
         // Module ve Level Test verisi
         const moduleRes = fetch('data/learning_modules.json');
         const levelTestRes = fetch('data/level_test.json');
+        
         // Zenginleştirme verileri
         const wordsRes = fetch('data/words.json');
         const sentencesRes = fetch('data/sentences.json');
         const readingsRes = fetch('data/reading_stories.json');
+
         const [moduleData, testData, wordsData, sentencesData, readingsData] = await Promise.all([
             moduleRes, levelTestRes, wordsRes, sentencesRes, readingsRes
         ].map(res => res.then(r => r.json()).catch(() => ({})))); // Hata yakalama eklendi
+
         this.allModules = moduleData || {};
         // KRİTİK DÜZELTME: Verinin bir dizi olduğundan emin ol
         this.allLevelTestQuestions = Array.isArray(testData) ? testData : []; 
@@ -78,12 +88,12 @@ const LearningPath = {
     showSection: function(sectionId) {
         document.querySelectorAll('.module-section').forEach(section => {
             section.classList.remove('active');
-            section.style.display = 'none';
+            section.style.display = 'none'; // Güvenlik için JS ile gizle
         });
         const activeSection = document.getElementById(sectionId);
         if (activeSection) {
             activeSection.classList.add('active');
-            activeSection.style.display = 'block';
+            activeSection.style.display = 'flex'; // CSS'teki flex kuralını uygulamasını sağla
         }
     },
 
@@ -100,7 +110,7 @@ const LearningPath = {
             testEl.innerHTML = `
                 <div class="alert alert-danger" role="alert">
                     <h4>Hata: Seviye Testi Soruları Yüklenemedi!</h4>
-                    <p>Lütfen <code>data/level_test.json</code> dosyasının hem var olduğunu hem de içinde geçerli JSON formatında soruların bulunduğunu kontrol edin.</p>
+                    <p>Lütfen <code>data/level_test.json</code> dosyasının hem var olduğunu hem de içinde geçerli JSON formatında (en az 10 soru) bulunduğunu kontrol edin.</p>
                 </div>
                 <button class="btn btn-primary mt-3" onclick="window.location.reload()">Tekrar Dene</button>
             `;
@@ -110,8 +120,16 @@ const LearningPath = {
         let currentQuestionIndex = 0;
         let userAnswers = {}; // {questionId: selectedOption}
 
+        // Test bölümünün hizalamasını soru göstermek için sola çek
+        testEl.style.alignItems = 'flex-start'; 
+        testEl.style.textAlign = 'left';
+
         const renderQuestion = () => {
             if (currentQuestionIndex >= questions.length) {
+                // Test bitince hizalamayı tekrar ortala (sonuç kartı için)
+                testEl.style.alignItems = 'center'; 
+                testEl.style.textAlign = 'center';
+
                 this.calculateLevel(questions, userAnswers);
                 return;
             }
@@ -132,24 +150,26 @@ const LearningPath = {
             });
 
             const testContent = `
-                <h3 class="mb-4">Seviye Tespit Testi (${currentQuestionIndex + 1} / ${questions.length})</h3>
-                <div class="progress-container">
-                    <div class="progress" role="progressbar" style="height: 12px;">
-                        <div class="progress-bar" style="width: ${progress}%; background-color: #4361ee;">${progress}%</div>
+                <div style="max-width: 800px; width: 100%;">
+                    <h3 class="mb-4">Seviye Tespit Testi (${currentQuestionIndex + 1} / ${questions.length})</h3>
+                    <div class="progress-container">
+                        <div class="progress" role="progressbar" style="height: 12px;">
+                            <div class="progress-bar" style="width: ${progress}%; background-color: #4361ee;">${progress}%</div>
+                        </div>
                     </div>
-                </div>
-                
-                <div class="card p-4 my-4">
-                    <h5>${q.questionText}</h5>
-                    <p><small class="text-muted">Konu: ${q.topic} (Seviye: ${q.level})</small></p>
-                    <div class="question-options-group">
-                        ${optionsHtml}
+                    
+                    <div class="card p-4 my-4">
+                        <h5>${q.questionText}</h5>
+                        <p><small class="text-muted">Konu: ${q.topic} (Seviye: ${q.level})</small></p>
+                        <div class="question-options-group">
+                            ${optionsHtml}
+                        </div>
                     </div>
-                </div>
 
-                <div class="d-flex justify-content-between">
-                    <button class="btn btn-secondary ${currentQuestionIndex === 0 ? 'd-none' : ''}" id="prevButton">Geri</button>
-                    <button class="btn btn-primary" id="nextButton">${currentQuestionIndex === questions.length - 1 ? 'Testi Bitir' : 'Sonraki'}</button>
+                    <div class="d-flex justify-content-between">
+                        <button class="btn btn-secondary ${currentQuestionIndex === 0 ? 'd-none' : ''}" id="prevButton">Geri</button>
+                        <button class="btn btn-primary" id="nextButton">${currentQuestionIndex === questions.length - 1 ? 'Testi Bitir' : 'Sonraki'}</button>
+                    </div>
                 </div>
             `;
             testEl.innerHTML = testContent;
@@ -185,6 +205,8 @@ const LearningPath = {
     // Seviyeyi hesaplar ve sonucu gösterir
     calculateLevel: function(questions, userAnswers) {
         let score = 0;
+        // ... (Kalan calculateLevel fonksiyonu aynı kalır)
+        // [Önceki calculateLevel kodunuzu buraya ekleyin]
         let maxScore = questions.length;
         let a1Count = 0;
         let b1Count = 0;
@@ -211,10 +233,13 @@ const LearningPath = {
         localStorage.setItem('userLevel', resultLevel);
         
         this.showLevelResult(resultLevel, score, maxScore);
+
     },
     
     // Seviye hesaplama sonucunu gösterir
     showLevelResult: function(level, score, maxScore) {
+        // ... (Kalan showLevelResult fonksiyonu aynı kalır)
+        // [Önceki showLevelResult kodunuzu buraya ekleyin]
         const testEl = document.getElementById('levelTestSection');
         testEl.innerHTML = `
             <div class="result-card">
@@ -231,6 +256,8 @@ const LearningPath = {
 
     // Modül kartlarını görüntüler
     displayLearningPath: function(level) {
+        // ... (Kalan displayLearningPath fonksiyonu aynı kalır)
+        // [Önceki displayLearningPath kodunuzu buraya ekleyin]
         this.showSection('learningPathSection');
         const pathEl = document.getElementById('learningPathSection');
         const levelData = this.allModules[level];
@@ -268,13 +295,13 @@ const LearningPath = {
         `).join('');
 
         pathEl.innerHTML = `
-            <div class="level-header">
+            <div class="level-header" style="max-width: 900px; width: 100%;">
                 <h2>${levelData.title}</h2>
                 <p class="lead">${levelData.description}</p>
             </div>
             
-            <h4 class="topic-header">Öğrenme Modülleri (${modules.length} Adet)</h4>
-            <div class="module-grid">
+            <h4 class="topic-header" style="max-width: 900px; width: 100%; text-align: left; margin-top: 30px;">Öğrenme Modülleri (${modules.length} Adet)</h4>
+            <div class="module-grid" style="max-width: 900px; width: 100%;">
                 ${moduleCards}
             </div>
 
@@ -284,15 +311,21 @@ const LearningPath = {
         // Local Storage'a en son seviyeyi ve modülleri kaydet
         localStorage.setItem('userLevel', level);
         localStorage.setItem('learningModules', JSON.stringify(modules));
+
+        // Navigasyon butonunu seviye varsa görünür yap
+        const navButton = document.getElementById('navToPathButton');
+        if (navButton) navButton.classList.remove('d-none');
     },
     
+    // Yardımcı fonksiyonlar (getIconForTopic, displayModuleContent, enrichModuleContent, startQuiz, calculateModuleScore, showModuleResult, resetProgress)
+    // [Bu fonksiyonların tamamını buraya ekleyin]
     getIconForTopic: function(topic) {
         const icons = {
             'Gramer': 'fa-graduation-cap',
             'Kelime': 'fa-spell-check',
             'Konuşma': 'fa-comments',
             'Okuma': 'fa-book-open',
-            'Structure': 'fa-sitemap' // Yeni eklenen
+            'Structure': 'fa-sitemap' 
         };
         return icons[topic] || 'fa-cubes';
     },
@@ -312,7 +345,12 @@ const LearningPath = {
 
         const enrichedContent = this.enrichModuleContent(moduleId, baseModule);
         
-        let contentHtml = `<button class="btn btn-sm btn-outline-primary mb-4" onclick="LearningPath.displayLearningPath(localStorage.getItem('userLevel'))">← Modüllere Geri Dön</button>`;
+        // İçeriğin sola hizalanmasını sağla
+        contentEl.style.alignItems = 'flex-start'; 
+        contentEl.style.textAlign = 'left';
+
+        let contentHtml = `<div style="max-width: 800px; width: 100%;">`;
+        contentHtml += `<button class="btn btn-sm btn-outline-primary mb-4" onclick="LearningPath.displayLearningPath(localStorage.getItem('userLevel'))">← Modüllere Geri Dön</button>`;
         contentHtml += `<h3 class="mb-4">${baseModule.name}</h3>`;
         
         enrichedContent.forEach(item => {
@@ -324,21 +362,20 @@ const LearningPath = {
                     contentHtml += `<p>${item.text}</p>`;
                     break;
                 case 'code_block':
-                    contentHtml += `<pre class="code-block">${item.text}</pre>`;
+                    contentHtml += `<pre class="code-block" style="background: #eee; padding: 10px; border-radius: 5px;">${item.text}</pre>`;
                     break;
                 case 'example':
-                    contentHtml += `<div class="example-box">${item.text.replace(/\n/g, '<br>')}</div>`;
+                    contentHtml += `<div class="example-box" style="border-left: 3px solid #007bff; padding-left: 10px; margin: 15px 0; background: #f0f8ff;">${item.text.replace(/\n/g, '<br>')}</div>`;
                     break;
                 case 'words':
-                    contentHtml += `<div class="word-list-section">${item.html}</div>`;
+                    contentHtml += `<div class="word-list-section" style="columns: 2;">${item.html}</div>`;
                     break;
                 case 'sentences':
                     contentHtml += `<div class="sentence-list-section">${item.html}</div>`;
                     break;
                 case 'reading_text':
-                    contentHtml += `<div class="reading-text-box">${item.text.replace(/\n/g, '<p>')}</div>`;
+                    contentHtml += `<div class="reading-text-box" style="border: 1px dashed #ccc; padding: 15px; margin: 15px 0;">${item.text.replace(/\n/g, '<p>')}</div>`;
                     break;
-                // Quizler burada gösterilmez
             }
         });
         
@@ -352,13 +389,15 @@ const LearningPath = {
                     <i class="fas fa-play me-2"></i> ${baseModule.name} Testini Başlat (${quizQuestions.length} Soru)
                 </button>
             </div>
+            </div>
         `;
 
         contentEl.innerHTML = contentHtml;
     },
 
-    // Modül içeriğini dinamik olarak zenginleştirir (Çalışmaları oluşturan kısım)
+    // Modül içeriğini dinamik olarak zenginleştirir (Alıştırmaları oluşturan kısım)
     enrichModuleContent: function(moduleId, baseModule) {
+        // [Önceki enrichModuleContent kodunuzun tamamını buraya ekleyin]
         const moduleLevel = moduleId.split('_')[0].toUpperCase(); 
         const moduleTopic = baseModule.topic.toLowerCase(); 
         let enrichedContent = [...baseModule.content]; 
@@ -479,6 +518,8 @@ const LearningPath = {
 
     // Quiz başlatma fonksiyonu (Çoktan seçmeli soruları gösterir)
     startQuiz: function(moduleId) {
+        // ... (Kalan startQuiz fonksiyonu aynı kalır)
+        // [Önceki startQuiz kodunuzun tamamını buraya ekleyin]
         this.showSection('moduleQuizSection');
         const quizEl = document.getElementById('moduleQuizSection');
         
@@ -491,8 +532,16 @@ const LearningPath = {
         let currentQuestionIndex = 0;
         let userAnswers = {}; // {questionIndex: selectedOption}
 
+        // Quiz bölümünün hizalamasını soru göstermek için sola çek
+        quizEl.style.alignItems = 'flex-start'; 
+        quizEl.style.textAlign = 'left';
+
         const renderQuizQuestion = () => {
             if (currentQuestionIndex >= quizQuestions.length) {
+                // Test bitince hizalamayı tekrar ortala (sonuç kartı için)
+                quizEl.style.alignItems = 'center'; 
+                quizEl.style.textAlign = 'center';
+
                 this.calculateModuleScore(moduleId, quizQuestions, userAnswers);
                 return;
             }
@@ -511,23 +560,25 @@ const LearningPath = {
             });
 
             const quizContent = `
-                <h3 class="mb-4">${baseModule.name} - Test (${currentQuestionIndex + 1} / ${quizQuestions.length})</h3>
-                <div class="progress-container">
-                    <div class="progress" role="progressbar" style="height: 12px;">
-                        <div class="progress-bar" style="width: ${progress}%; background-color: #28a745;">${progress}%</div>
+                <div style="max-width: 800px; width: 100%;">
+                    <h3 class="mb-4">${baseModule.name} - Test (${currentQuestionIndex + 1} / ${quizQuestions.length})</h3>
+                    <div class="progress-container">
+                        <div class="progress" role="progressbar" style="height: 12px;">
+                            <div class="progress-bar" style="width: ${progress}%; background-color: #28a745;">${progress}%</div>
+                        </div>
                     </div>
-                </div>
-                
-                <div class="card p-4 my-4">
-                    <h5>${q.question}</h5>
-                    <div>
-                        ${optionsHtml}
+                    
+                    <div class="card p-4 my-4">
+                        <h5>${q.question}</h5>
+                        <div>
+                            ${optionsHtml}
+                        </div>
                     </div>
-                </div>
 
-                <div class="d-flex justify-content-between">
-                    <button class="btn btn-secondary ${currentQuestionIndex === 0 ? 'd-none' : ''}" id="quizPrevButton">Geri</button>
-                    <button class="btn btn-success" id="quizNextButton">${currentQuestionIndex === quizQuestions.length - 1 ? 'Testi Bitir' : 'Sonraki'}</button>
+                    <div class="d-flex justify-content-between">
+                        <button class="btn btn-secondary ${currentQuestionIndex === 0 ? 'd-none' : ''}" id="quizPrevButton">Geri</button>
+                        <button class="btn btn-success" id="quizNextButton">${currentQuestionIndex === quizQuestions.length - 1 ? 'Testi Bitir' : 'Sonraki'}</button>
+                    </div>
                 </div>
             `;
             quizEl.innerHTML = quizContent;
@@ -556,7 +607,7 @@ const LearningPath = {
             // Tüm seçeneklerin seçili sınıfını kaldır
             document.querySelectorAll('.quiz-option-item').forEach(item => item.classList.remove('selected-answer'));
             // Yeni seçilen seçeneğe sınıfı ekle
-            document.querySelector(`.quiz-option-item[data-option="${selectedOption}"]`).classList.add('selected-answer');
+            document.querySelector(`#moduleQuizSection .quiz-option-item[data-option="${selectedOption}"]`).classList.add('selected-answer');
         };
 
         renderQuizQuestion();
@@ -564,6 +615,7 @@ const LearningPath = {
 
     // Modül puanını hesaplar ve kaydeder
     calculateModuleScore: function(moduleId, questions, userAnswers) {
+        // [Önceki calculateModuleScore kodunuzun tamamını buraya ekleyin]
         let correctCount = 0;
         
         questions.forEach((q, index) => {
@@ -593,6 +645,7 @@ const LearningPath = {
 
     // Modül sonucunu gösterir
     showModuleResult: function(moduleId, score, totalQuestions, correctCount) {
+        // [Önceki showModuleResult kodunuzun tamamını buraya ekleyin]
         const quizEl = document.getElementById('moduleQuizSection');
         const userLevel = localStorage.getItem('userLevel');
         
@@ -613,6 +666,7 @@ const LearningPath = {
 
     // İlerleme verilerini sıfırlar
     resetProgress: function() {
+        // [Önceki resetProgress kodunuzun tamamını buraya ekleyin]
         if (confirm("Tüm ilerlemeniz ve seviyeniz sıfırlanacaktır. Emin misiniz?")) {
             localStorage.removeItem('userLevel');
             localStorage.removeItem('learningModules');
@@ -623,5 +677,3 @@ const LearningPath = {
 };
 
 document.addEventListener('DOMContentLoaded', () => LearningPath.init());
-
-

@@ -1,7 +1,7 @@
 const LearningPath = {
     TEST_FILE_PATH: 'data/level_test.json', 
     MODULE_CONTENT_FILE_PATH: 'data/module_content.json.json', 
-    PASS_SCORE: 90, // Yeni başarı eşiği: %90
+    PASS_SCORE: 90, // Başarı eşiği: %90
 
     allModules: {}, 
     allModuleContents: {}, 
@@ -58,14 +58,17 @@ const LearningPath = {
                 return res.json();
             } catch (error) {
                 console.error(`Kritik JSON Yükleme Hatası: ${path}`, error);
-                return {};
+                // Hata durumunda boş bir nesne/dizi döndür, uygulamanın çökmesini engelle
+                if (path.includes('json.json')) return {}; 
+                return []; 
             }
         };
 
+        // Bu kısımda tüm veri dosyaları Promise.all ile bekleniyor
         const [moduleData, moduleContentData, testData, wordsData, sentencesData, readingsData] = await Promise.all([
             fetchData('data/learning_modules.json'), 
             fetchData(this.MODULE_CONTENT_FILE_PATH), 
-            fetchData(this.TEST_FILE_PATH), 
+            fetchData('data/level_test.json'), // path düzeltildi, TEST_FILE_PATH kullanıldı
             fetchData('data/words.json'), 
             fetchData('data/sentences.json'), 
             fetchData('data/reading_stories.json')
@@ -100,7 +103,7 @@ const LearningPath = {
         }
     },
     
-    // Test fonksiyonları (prepareAndDisplayLevelTest, displayLevelTest, calculateLevel, showLevelResult) aynı kaldı.
+    // Test fonksiyonları aynı kaldı...
 
     prepareAndDisplayLevelTest: function() {
         const MAX_QUESTIONS = 20;
@@ -138,7 +141,7 @@ const LearningPath = {
             testEl.innerHTML = `
                 <div class="alert alert-danger" role="alert">
                     <h4>Hata: Seviye Testi Soruları Yüklenemedi!</h4>
-                    <p>Lütfen <code>${this.TEST_FILE_PATH}</code> dosyasının hem var olduğunu hem de içinde geçerli bir soru dizisi bulunduğunu kontrol edin.</p>
+                    <p>Lütfen <code>level_test.json</code> dosyasının hem var olduğunu hem de içinde geçerli bir soru dizisi bulunduğunu kontrol edin.</p>
                 </div>
                 <button class="btn btn-primary mt-3" onclick="window.location.reload()">Tekrar Dene</button>
             `;
@@ -295,7 +298,6 @@ const LearningPath = {
         if (isPassedInitialTest) {
             resultMessage = `Tebrikler! ${level} seviyesindeki öğrenme yolunuz ${this.PASS_SCORE}% başarı ile belirlendi.`;
         } else {
-             // Not: Henüz seviye testinde geri bildirim mantığını eklemedik. Şimdilik sadece seviyeyi atayalım.
             resultMessage = `Seviyeniz **${level}** olarak belirlendi. Modüllere başlayabilirsiniz. Modülleri tamamlayıp ${this.PASS_SCORE}% başarı ile seviye sonu sınavını geçmeniz gerekecek.`;
         }
         
@@ -479,21 +481,44 @@ const LearningPath = {
         contentEl.innerHTML = contentHtml;
     },
 
-    // Dinamik içerik oluşturucu
+    // DÜZELTİLDİ: Dinamik içerik oluşturucu
     enrichModuleContent: function(moduleId, baseModule, userLevel) {
         
         const moduleLevel = userLevel.toUpperCase(); 
-        const moduleTopic = baseModule.topic.toLowerCase(); 
+        const baseModuleTopic = baseModule.topic ? baseModule.topic.toLowerCase() : ''; 
         
         const staticContent = Array.isArray(baseModule.content) ? baseModule.content : [];
         let enrichedContent = [...staticContent]; 
         let quizIndexStart = enrichedContent.filter(item => item.type === 'quiz').length;
+        
+        // YENİ/DÜZELTİLMİŞ: Seviye-Zorluk Eşleşmesi
+        // Veri setinizdeki 'easy', 'medium', 'hard' seviyelerini A1/B1/C1 seviyeleriyle eşleştiriyoruz.
+        const difficultyMapping = {
+            'A1': ['EASY', 'BEGINNER'],
+            'A2': ['EASY', 'MEDIUM', 'BEGINNER', 'INTERMEDIATE'],
+            'B1': ['MEDIUM', 'INTERMEDIATE'],
+            'B2': ['MEDIUM', 'HARD', 'INTERMEDIATE', 'ADVANCED'],
+            'C1': ['HARD', 'ADVANCED'],
+            'C2': ['HARD', 'ADVANCED']
+        };
+        const allowedDifficulties = difficultyMapping[moduleLevel] || ['EASY'];
+
 
         // --- 1. Kelime Alıştırmaları (words.json) ---
-        const moduleWords = this.allWords.filter(w => 
-            w.difficulty.toUpperCase().includes(moduleLevel) && 
-            (w.category.toLowerCase().includes(moduleTopic) || moduleTopic.includes(w.category.toLowerCase()))
-        ).sort(() => 0.5 - Math.random()).slice(0, 15); 
+        const moduleWords = this.allWords.filter(w => {
+            const isLevelMatch = allowedDifficulties.includes(w.difficulty.toUpperCase());
+            
+            if (!isLevelMatch) return false;
+
+            // Kategori Eşleşmesi: Gramer gibi genel konularda sadece seviyeye bak, spesifik konularda kategori eşleştirmesi yap
+            if (baseModuleTopic === 'grammar' || baseModuleTopic === 'structure' || !baseModuleTopic) {
+                return true; 
+            }
+            
+            const wordCategory = w.category.toLowerCase();
+            return wordCategory.includes(baseModuleTopic) || baseModuleTopic.includes(wordCategory);
+
+        }).sort(() => 0.5 - Math.random()).slice(0, 15); 
 
         if (moduleWords.length > 0) {
              const wordsHtml = moduleWords.map(w => 
@@ -508,8 +533,9 @@ const LearningPath = {
                 const correctWord = moduleWords[i];
                 const options = [correctWord.turkish];
                 
+                // Aynı seviye ve farklı kelime karşılıklarını seçenek olarak kullan
                 const wrongOptions = this.allWords
-                    .filter(w => w.turkish !== correctWord.turkish && w.difficulty.toUpperCase().includes(moduleLevel))
+                    .filter(w => w.turkish !== correctWord.turkish && allowedDifficulties.includes(w.difficulty.toUpperCase()))
                     .sort(() => 0.5 - Math.random())
                     .slice(0, 3)
                     .map(w => w.turkish);
@@ -522,16 +548,25 @@ const LearningPath = {
                     question: `(Kelime Sorusu ${quizIndexStart}): '${correctWord.word}' kelimesinin Türkçe karşılığı nedir?`, 
                     options: options.sort(() => 0.5 - Math.random()), 
                     answer: correctWord.turkish,
-                    topic: `${baseModule.name} - Kelime Bilgisi` // Geri bildirim için eklendi
+                    topic: `${baseModule.name} - Kelime Bilgisi`
                 });
             }
         }
         
         // --- 2. Cümle Alıştırmaları (sentences.json) ---
-        const moduleSentences = this.allSentences.filter(s =>
-            s.difficulty && s.difficulty.toUpperCase().includes(moduleLevel) &&
-            (s.category.toLowerCase().includes(moduleTopic) || moduleTopic.includes(s.category.toLowerCase()))
-        ).sort(() => 0.5 - Math.random()).slice(0, 10); 
+        const moduleSentences = this.allSentences.filter(s => {
+            const isLevelMatch = s.difficulty && allowedDifficulties.includes(s.difficulty.toUpperCase());
+            
+            if (!isLevelMatch) return false;
+            
+            // Kategori Eşleşmesi
+            if (baseModuleTopic === 'grammar' || baseModuleTopic === 'structure' || !baseModuleTopic) {
+                return true; 
+            }
+            
+            const sentenceCategory = s.category.toLowerCase();
+            return sentenceCategory.includes(baseModuleTopic) || baseModuleTopic.includes(sentenceCategory);
+        }).sort(() => 0.5 - Math.random()).slice(0, 10); 
 
         if (moduleSentences.length > 0) {
             const sentencesHtml = moduleSentences.map(s =>
@@ -547,6 +582,7 @@ const LearningPath = {
                 if (sentence.english.split(' ').length < 3) continue; 
                 
                 const words = sentence.english.split(' ');
+                // Cümlenin ortasından bir kelime seç
                 const missingWordIndex = Math.floor(Math.random() * (words.length - 2)) + 1; 
                 const missingWord = words[missingWordIndex].replace(/[.,?!]/g, '');
                 
@@ -554,7 +590,7 @@ const LearningPath = {
                 
                 const options = [missingWord];
                 const wrongOptions = this.allWords
-                    .filter(w => !w.word.toLowerCase().includes(missingWord.toLowerCase()) && w.difficulty.toUpperCase().includes(moduleLevel))
+                    .filter(w => !w.word.toLowerCase().includes(missingWord.toLowerCase()) && allowedDifficulties.includes(w.difficulty.toUpperCase()))
                     .sort(() => 0.5 - Math.random())
                     .slice(0, 3)
                     .map(w => w.word);
@@ -567,17 +603,19 @@ const LearningPath = {
                     question: `(Cümle Sorusu ${quizIndexStart}): Cümledeki boşluğu doldurun: "${questionText}"`, 
                     options: options.sort(() => 0.5 - Math.random()), 
                     answer: missingWord,
-                    topic: `${baseModule.name} - Cümle Yapısı` // Geri bildirim için eklendi
+                    topic: `${baseModule.name} - Cümle Yapısı`
                 });
             }
         }
 
         // --- 3. Okuma Parçası (reading_stories.json) ---
-        const levelCode = (moduleLevel === 'A1' ? 'beginner' : moduleLevel === 'B1' ? 'intermediate' : 'advanced');
+        // Okuma seviyesi için 'beginner', 'intermediate', 'advanced' eşleşmesi
+        const readingLevelCode = allowedDifficulties.map(d => d.toLowerCase()).find(d => ['beginner', 'intermediate', 'advanced'].includes(d)) || 'beginner';
         
+        // Okuma parçasını bulurken hem seviyeyi hem de konuyu eşleştir
         const moduleReading = this.allReadings.find(r => 
-            r.level.toLowerCase().includes(levelCode) && 
-            (r.category.toLowerCase().includes(moduleTopic) || moduleTopic.includes(r.category.toLowerCase()))
+            r.level.toLowerCase().includes(readingLevelCode) && 
+            (baseModuleTopic === 'grammar' || baseModuleTopic === 'structure' || !baseModuleTopic || r.category.toLowerCase().includes(baseModuleTopic) || baseModuleTopic.includes(r.category.toLowerCase()))
         );
 
         if (moduleReading) {
@@ -591,8 +629,9 @@ const LearningPath = {
                     type: 'quiz', 
                     question: `(Okuma Sorusu ${quizIndexStart}): ${q.question}`, 
                     options: q.options, 
+                    // reading_stories.json'da correctanswer index olarak verildiği için stringe çeviriyoruz
                     answer: q.options[q.correctAnswer],
-                    topic: `${moduleReading.title} - Okuma Anlama` // Geri bildirim için eklendi
+                    topic: `${moduleReading.title} - Okuma Anlama`
                 });
             });
         }
@@ -628,6 +667,27 @@ const LearningPath = {
 
         const enrichedContent = this.enrichModuleContent(moduleId, baseModule, userLevel);
         const quizQuestions = enrichedContent.filter(item => item.type === 'quiz');
+        
+        // Eğer dinamik içerik yüklenmesine rağmen soru sayısı hala 0 ise
+        if (quizQuestions.length === 0) {
+            quizEl.style.alignItems = 'center'; 
+            quizEl.style.textAlign = 'center';
+            quizEl.innerHTML = `
+                <div class="result-card">
+                    <h3 class="text-warning mb-4">Uyarı</h3>
+                    <p class="h5">${baseModule.name} modülü için, mevcut seviyeniz (**${userLevel}**) ve konusu (**${baseModule.topic}**) ile eşleşen **Kelime, Cümle veya Okuma** alıştırması bulunamadı.</p>
+                    <p>Lütfen modül içeriğini tekrar gözden geçirin veya veri dosyalarınızdaki seviye/konu etiketlerini kontrol edin.</p>
+                    <button class="btn btn-lg btn-primary mt-3" onclick="LearningPath.displayModuleContent('${moduleId}', '${userLevel}')">
+                        Modül İçeriğine Geri Dön
+                    </button>
+                    <button class="btn btn-lg btn-outline-primary mt-3" onclick="LearningPath.displayLearningPath('${userLevel}')">
+                        Öğrenme Yoluna Dön
+                    </button>
+                </div>
+            `;
+            return;
+        }
+
 
         let currentQuestionIndex = 0;
         let userAnswers = {}; 
@@ -714,7 +774,7 @@ const LearningPath = {
         renderQuizQuestion();
     },
 
-    // YENİ/GÜNCEL: Modül Skorunu Hesaplar ve Geri Bildirim Toplar
+    // Modül Skorunu Hesaplar ve Geri Bildirim Toplar
     calculateModuleScore: function(moduleId, questions, userAnswers) {
         let correctCount = 0;
         let requiredTopics = new Set();
@@ -744,11 +804,10 @@ const LearningPath = {
         const moduleIndex = modules.findIndex(m => m.id === moduleId);
         
         if (moduleIndex !== -1) {
-            // Yeni kural: Skor 90 ve üzeri ise başarılı
+            // Kural: Skor 90 ve üzeri ise başarılı
             isPassed = (score >= this.PASS_SCORE);
 
             modules[moduleIndex].lastScore = score;
-            // Başarısız olsa bile ilerlemeyi 100 yapmayalım, sadece tamamlandı ise 100 yapalım
             modules[moduleIndex].progress = isPassed ? 100 : modules[moduleIndex].progress; 
             modules[moduleIndex].status = isPassed ? 'Tamamlandı' : 'Tekrar Gerekli';
             modules[moduleIndex].lastDuration = Math.floor(Math.random() * 15) + 5; 
@@ -760,7 +819,7 @@ const LearningPath = {
         this.showModuleResult(moduleId, score, questions.length, correctCount, isPassed, feedback);
     },
 
-    // YENİ/GÜNCEL: Modül Sonucunu ve Geri Bildirimi Gösterir
+    // Modül Sonucunu ve Geri Bildirimi Gösterir
     showModuleResult: function(moduleId, score, totalQuestions, correctCount, isPassed, feedback) {
         const quizEl = document.getElementById('moduleQuizSection');
         const userLevel = localStorage.getItem('userLevel');

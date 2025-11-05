@@ -268,5 +268,138 @@
     "difficulty": "medium",
     "word_count": 7,
     "tags": ["directions", "city"]
+  },
+  {
+    "english": "There is a lot of water in the glass.",
+    "turkish": "Bardakta çok su var.",
+    "category": "Nouns",
+    "difficulty": "easy"
+  },
+  {
+    "english": "I need some good advice.",
+    "turkish": "Biraz iyi bir öğüde ihtiyacım var.",
+    "category": "Nouns",
+    "difficulty": "medium"
+  },
+  {
+    "english": "The book is on the table.",
+    "turkish": "Kitap masanın üstünde.",
+    "category": "Prepositions",
+    "difficulty": "easy"
+  },
+  {
+    "english": "She lives in London.",
+    "turkish": "O Londra'da yaşıyor.",
+    "category": "Prepositions",
+    "difficulty": "easy"
+  },
+  {
+    "english": "The ball is under the chair.",
+    "turkish": "Top sandalyenin altında.",
+    "category": "Prepositions",
+    "difficulty": "easy"
+  },
+  {
+    "english": "Go straight, then turn left.",
+    "turkish": "Düz git, sonra sola dön.",
+    "category": "Prepositions",
+    "difficulty": "easy"
+  },
+  {
+    "english": "The quantity of information available is overwhelming.",
+    "turkish": "Mevcut bilgi miktarı bunaltıcı.",
+    "category": "Nouns",
+    "difficulty": "medium"
+  },
+  {
+    "english": "We must consider the ethics of artificial intelligence.",
+    "turkish": "Yapay zekanın etik kurallarını değerlendirmeliyiz.",
+    "category": "Nouns",
+    "difficulty": "hard"
+  },
+  {
+    "english": "He was standing amidst the ruins of the ancient city.",
+    "turkish": "Antik kentin kalıntılarının ortasında duruyordu.",
+    "category": "Prepositions",
+    "difficulty": "medium"
+  },
+  {
+    "english": "Notwithstanding his inexperience, he was a good leader.",
+    "turkish": "Tecrübesizliğine rağmen, o iyi bir liderdi.",
+    "category": "Prepositions",
+    "difficulty": "hard"
+  },
+  {
+    "english": "We bought a new chair for the living room.",
+    "turkish": "Oturma odası için yeni bir sandalye aldık.",
+    "category": "Nouns",
+    "difficulty": "easy"
+  },
+  {
+    "english": "Could you pass the sugar, please?",
+    "turkish": "Şekeri uzatır mısın lütfen?",
+    "category": "Nouns",
+    "difficulty": "easy"
+  },
+  {
+    "english": "The quantity of knowledge is increasing rapidly.",
+    "turkish": "Bilgi miktarı hızla artıyor.",
+    "category": "Nouns",
+    "difficulty": "medium"
+  },
+  {
+    "english": "The breaking news was broadcast throughout the day.",
+    "turkish": "Son dakika haberleri gün boyunca yayınlandı.",
+    "category": "Nouns",
+    "difficulty": "medium"
+  },
+  {
+    "english": "The council gave him unsolicited advice.",
+    "turkish": "Konsey ona istenmeyen tavsiyeler verdi.",
+    "category": "Nouns",
+    "difficulty": "hard"
+  },
+  {
+    "english": "The police confirmed they recovered the stolen goods.",
+    "turkish": "Polis, çalınan malları geri aldıklarını doğruladı.",
+    "category": "Nouns",
+    "difficulty": "hard"
+  },
+  {
+    "english": "The cat is hiding behind the curtains.",
+    "turkish": "Kedi perdelerin arkasına saklanıyor.",
+    "category": "Prepositions",
+    "difficulty": "easy"
+  },
+  {
+    "english": "The supermarket is in front of the bank.",
+    "turkish": "Süpermarket bankanın önünde.",
+    "category": "Prepositions",
+    "difficulty": "easy"
+  },
+  {
+    "english": "The mood in the office was tense throughout the meeting.",
+    "turkish": "Toplantı boyunca ofisteki hava gergindi.",
+    "category": "Prepositions",
+    "difficulty": "medium"
+  },
+  {
+    "english": "We received the package via express delivery.",
+    "turkish": "Paketi ekspres teslimat yoluyla aldık.",
+    "category": "Prepositions",
+    "difficulty": "medium"
+  },
+  {
+    "english": "I have reservations concerning the proposed merger.",
+    "turkish": "Önerilen birleşmeyle ilgili çekincelerim var.",
+    "category": "Prepositions",
+    "difficulty": "hard"
+  },
+  {
+    "english": "Subsequent to the initial findings, a new investigation was launched.",
+    "turkish": "İlk bulguların sonrasında, yeni bir soruşturma başlatıldı.",
+    "category": "Prepositions",
+    "difficulty": "hard"
   }
+
 ]

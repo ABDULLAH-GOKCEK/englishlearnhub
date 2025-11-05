@@ -152,11 +152,15 @@ const LearningPath = {
 
     // Ana Sayfa butonu HTML'i
     getHomeButton: function(userLevel) {
-        const pathFunction = userLevel ? `LearningPath.displayLearningPath('${userLevel}')` : `window.location.reload()`;
+        // ESKİ KOD (V8): const pathFunction = userLevel ? `LearningPath.displayLearningPath('${userLevel}')` : `window.location.reload()`;
+        
+        // YENİ KOD (V8.1): Yönlendirmeyi 'index.html' olarak sabitle
+        const homeHref = 'index.html'; 
+
         return `
             <div style="position: sticky; top: 0; z-index: 10;">
-                 <button class="btn btn-sm btn-outline-primary mb-3 mt-1" onclick="${pathFunction}">
-                    <i class="fas fa-home me-2"></i> Ana Sayfa (Öğrenme Yolu)
+                 <button class="btn btn-sm btn-outline-primary mb-3 mt-1" onclick="window.location.href = '${homeHref}'">
+                    <i class="fas fa-home me-2"></i> Ana Sayfa
                 </button>
             </div>
         `;
@@ -1307,3 +1311,4 @@ const LearningPath = {
 };
 
 document.addEventListener('DOMContentLoaded', () => LearningPath.init());
+

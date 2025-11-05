@@ -79,10 +79,8 @@ const LearningPath = {
         // KRİTİK DÜZELTME: JSON yapısının hem dizi hem de {questions: []} formatını desteklemesi
         let questionsArray = [];
         if (Array.isArray(testData)) {
-            // Dizi şeklinde geldiyse (tercih edilen format)
             questionsArray = testData;
         } else if (typeof testData === 'object' && testData !== null && Array.isArray(testData.questions)) {
-            // {questions: [...]} yapısında geldiyse (Sizin dosya formatınız)
             questionsArray = testData.questions;
         }
         
@@ -113,20 +111,17 @@ const LearningPath = {
 
         const MAX_QUESTIONS = 20;
         
-        // KRİTİK DÜZELTME: Soru objelerini standardize etme ve eksik alanları tamamlama
+        // Soru objelerini standardize etme ve eksik alanları tamamlama
         const questions = this.allLevelTestQuestions
             .map((q, index) => ({
-                // ID yoksa index'ten bir ID oluştur
                 id: q.id || `q${index}`, 
-                // questionText yoksa question alanını kullan
                 questionText: q.questionText || q.question, 
                 options: q.options,
-                // correctAnswer yoksa answer alanını kullan
                 correctAnswer: q.correctAnswer || q.answer, 
                 topic: q.topic || 'Genel', 
                 level: q.level || 'Test Sorusu' 
             }))
-            .filter(q => q.correctAnswer && q.questionText) // Cevabı ve sorusu olmayanları filtrele
+            .filter(q => q.correctAnswer && q.questionText) 
             .sort(() => 0.5 - Math.random())
             .slice(0, MAX_QUESTIONS);
         
@@ -143,7 +138,7 @@ const LearningPath = {
         }
 
         let currentQuestionIndex = 0;
-        let userAnswers = {}; // {questionId: selectedOption}
+        let userAnswers = {}; // {questionId: selectedOption} BU DEĞİŞKENİN KAPSAMI BURADA
 
         testEl.style.alignItems = 'flex-start'; 
         testEl.style.textAlign = 'left';
@@ -166,15 +161,12 @@ const LearningPath = {
                 const isSelected = userAnswers[q.id] === option;
                 const selectedClass = isSelected ? 'selected-answer' : '';
 
-                // Direkt tıklanabilir div ile radio butonu gizleme mantığı
+                // KRİTİK DÜZELTME 1: Inline onclick kaldırıldı
                 optionsHtml += `
                     <div 
                         class="form-check question-option ${selectedClass}" 
-                        onclick="
-                            userAnswers['${q.id}'] = '${option.replace(/'/g, "\\'")}'; 
-                            renderQuestion();
-                        "
-                        data-value="${option.replace(/"/g, '')}"
+                        data-question-id="${q.id}"
+                        data-option-value="${option.replace(/"/g, '')}"
                     >
                         <input class="form-check-input d-none" type="radio" name="question_${q.id}" id="radio_${q.id}_${index}" value="${option.replace(/"/g, '')}" ${isSelected ? 'checked' : ''}>
                         <label class="form-check-label w-100">${option}</label>
@@ -207,7 +199,20 @@ const LearningPath = {
             `;
             testEl.innerHTML = testContent;
 
-            // Event Listener'lar
+            // KRİTİK DÜZELTME 2: Event Listener'lar DOM yüklendikten sonra eklendi.
+            document.querySelectorAll('.question-option').forEach(optionEl => {
+                optionEl.addEventListener('click', function() {
+                    const qId = this.getAttribute('data-question-id');
+                    const selectedValue = this.getAttribute('data-option-value');
+                    
+                    // userAnswers değişkenine closure sayesinde erişilir.
+                    userAnswers[qId] = selectedValue;
+                    renderQuestion(); // Seçimin görünmesi için soruyu yeniden çiz
+                });
+            });
+
+
+            // Next/Prev Event Listener'lar
             document.getElementById('nextButton').onclick = () => {
                 if (!userAnswers[q.id]) {
                     alert('Lütfen bir seçenek işaretleyin.');
@@ -229,7 +234,7 @@ const LearningPath = {
         renderQuestion();
     },
 
-    // Seviyeyi hesaplar ve sonucu gösterir
+    // Seviyeyi hesaplar ve sonucu gösterir (Aynı kaldı)
     calculateLevel: function(questions, userAnswers) {
         let score = 0;
         
@@ -240,7 +245,6 @@ const LearningPath = {
             }
         });
 
-        // Skorlama mantığı (20 soruya göre ayarlandı)
         const levelMapping = [
             { threshold: 15, level: 'C1' }, 
             { threshold: 10, level: 'B1' }, 
@@ -261,7 +265,7 @@ const LearningPath = {
 
     },
     
-    // Seviye hesaplama sonucunu gösterir
+    // Seviye hesaplama sonucunu gösterir (Aynı kaldı)
     showLevelResult: function(level, score, maxScore) {
         const testEl = document.getElementById('levelTestSection');
         testEl.innerHTML = `
@@ -279,7 +283,7 @@ const LearningPath = {
         if (navButton) navButton.classList.remove('d-none');
     },
 
-    // Modül kartlarını görüntüler
+    // Modül kartlarını görüntüler (Aynı kaldı)
     displayLearningPath: function(level) {
         this.showSection('learningPathSection');
         const pathEl = document.getElementById('learningPathSection');
@@ -335,7 +339,7 @@ const LearningPath = {
         if (navButton) navButton.classList.remove('d-none');
     },
     
-    // Yardımcı fonksiyonlar
+    // Yardımcı fonksiyonlar (Aynı kaldı)
     getIconForTopic: function(topic) {
         const icons = {
             'Gramer': 'fa-graduation-cap',
@@ -347,7 +351,7 @@ const LearningPath = {
         return icons[topic] || 'fa-cubes';
     },
     
-    // Modül içeriğini görüntüler
+    // Modül içeriğini görüntüler (Aynı kaldı)
     displayModuleContent: function(moduleId) {
         this.showSection('moduleContentSection');
         const contentEl = document.getElementById('moduleContentSection');
@@ -411,7 +415,7 @@ const LearningPath = {
         contentEl.innerHTML = contentHtml;
     },
 
-    // Modül içeriğini dinamik olarak zenginleştirir (Alıştırmaları oluşturan kısım)
+    // Modül içeriğini dinamik olarak zenginleştirir (Aynı kaldı)
     enrichModuleContent: function(moduleId, baseModule) {
         const moduleLevel = moduleId.split('_')[0].toUpperCase(); 
         const moduleTopic = baseModule.topic.toLowerCase(); 
@@ -526,7 +530,7 @@ const LearningPath = {
         return enrichedContent;
     },
 
-    // Quiz başlatma fonksiyonu
+    // Quiz başlatma fonksiyonu (Aynı kaldı)
     startQuiz: function(moduleId) {
         this.showSection('moduleQuizSection');
         const quizEl = document.getElementById('moduleQuizSection');
@@ -561,9 +565,11 @@ const LearningPath = {
                 optionsHtml += `
                     <div class="quiz-option-item ${selectedClass}" 
                          data-option="${option}" 
+                         data-q-index="${currentQuestionIndex}"
                          onclick="
-                             userAnswers[${currentQuestionIndex}] = '${option.replace(/'/g, "\\'")}';
-                             renderQuizQuestion();
+                             // Burada inline onclick tutulduğu için bu da kapsama hatası verebilir.
+                             // Ancak Quiz sayfasını henüz test etmedik. Test sayfasındaki yöntemi buraya da uygulayalım.
+                             // Amaç: HTML'i temizlemek ve JS ile Event Listener eklemek.
                          ">
                         ${option}
                     </div>
@@ -593,8 +599,19 @@ const LearningPath = {
                 </div>
             `;
             quizEl.innerHTML = quizContent;
+            
+            // KRİTİK DÜZELTME 3: Quiz seçenekleri için de Event Listener eklendi
+            document.querySelectorAll('.quiz-option-item').forEach(optionEl => {
+                optionEl.addEventListener('click', function() {
+                    const selectedValue = this.getAttribute('data-option');
+                    // Q index'i doğrudan currentQuestionIndex değişkeni olduğu için data attribute'dan çekmeye gerek yok
+                    userAnswers[currentQuestionIndex] = selectedValue; 
+                    renderQuizQuestion(); // Seçimin görünmesi için soruyu yeniden çiz
+                });
+            });
 
-            // Event Listeners
+
+            // Next/Prev Event Listeners
             document.getElementById('quizNextButton').onclick = () => {
                 if (!userAnswers.hasOwnProperty(currentQuestionIndex)) {
                     alert('Lütfen bir seçenek işaretleyin.');
@@ -616,7 +633,7 @@ const LearningPath = {
         renderQuizQuestion();
     },
 
-    // Modül puanını hesaplar ve kaydeder
+    // Modül puanını hesaplar ve kaydeder (Aynı kaldı)
     calculateModuleScore: function(moduleId, questions, userAnswers) {
         let correctCount = 0;
         
@@ -644,7 +661,7 @@ const LearningPath = {
         this.showModuleResult(moduleId, score, questions.length, correctCount);
     },
 
-    // Modül sonucunu gösterir
+    // Modül sonucunu gösterir (Aynı kaldı)
     showModuleResult: function(moduleId, score, totalQuestions, correctCount) {
         const quizEl = document.getElementById('moduleQuizSection');
         const userLevel = localStorage.getItem('userLevel');
@@ -664,7 +681,7 @@ const LearningPath = {
         quizEl.innerHTML = resultHtml;
     },
 
-    // İlerleme verilerini sıfırlar
+    // İlerleme verilerini sıfırlar (Aynı kaldı)
     resetProgress: function() {
         if (confirm("Tüm ilerlemeniz ve seviyeniz sıfırlanacaktır. Emin misiniz?")) {
             localStorage.removeItem('userLevel');

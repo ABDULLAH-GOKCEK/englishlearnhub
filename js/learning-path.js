@@ -1,7 +1,9 @@
 const LearningPath = {
     TEST_FILE_PATH: 'data/level_test.json', 
+    MODULE_CONTENT_FILE_PATH: 'data/module_content.json.json', // YENİ EKLENDİ
     
-    allModules: {},
+    allModules: {}, // learning_modules.json içeriği
+    allModuleContents: {}, // module_content.json.json içeriği
     allWords: [],
     allSentences: [],
     allReadings: [],
@@ -14,6 +16,7 @@ const LearningPath = {
             
             const userLevel = localStorage.getItem('userLevel');
             
+            // Eğer kaydedilmiş bir seviye varsa, doğrudan öğrenme yolunu göster
             if (userLevel) {
                 this.displayLearningPath(userLevel);
             } 
@@ -32,12 +35,15 @@ const LearningPath = {
 
         }).catch(error => {
             console.error("Veri yüklenirken kritik hata oluştu:", error);
+            // Kritik hata durumunda bile başlangıç ekranını göster
             this.showSection('introSection');
         });
 
         const startTestButton = document.getElementById('startTestButton');
         if (startTestButton) {
              startTestButton.onclick = () => {
+                // Test başladığında, devam eden cevapları temizle
+                localStorage.removeItem('levelTestAnswers'); 
                 this.showSection('levelTestSection');
                 this.prepareAndDisplayLevelTest();
              };
@@ -49,16 +55,17 @@ const LearningPath = {
         const fetchData = async (path) => {
             try {
                 const res = await fetch(path);
-                if (!res.ok) throw new Error(`HTTP hatası! Durum: ${res.status}`);
+                if (!res.ok) throw new Error(`HTTP hatası! Durum: ${res.status} (${path})`);
                 return res.json();
             } catch (error) {
                 console.error(`Kritik JSON Yükleme Hatası: ${path}`, error);
-                return path.includes('modules') || path.includes('test') ? {} : [];
+                return {};
             }
         };
 
-        const [moduleData, testData, wordsData, sentencesData, readingsData] = await Promise.all([
+        const [moduleData, moduleContentData, testData, wordsData, sentencesData, readingsData] = await Promise.all([
             fetchData('data/learning_modules.json'), 
+            fetchData(this.MODULE_CONTENT_FILE_PATH), // YENİ YÜKLEME
             fetchData(this.TEST_FILE_PATH), 
             fetchData('data/words.json'), 
             fetchData('data/sentences.json'), 
@@ -66,7 +73,9 @@ const LearningPath = {
         ]);
 
         this.allModules = moduleData || {};
+        this.allModuleContents = moduleContentData || {}; // YENİ VERİ
         
+        // ... (Kalan yükleme mantığı aynı)
         let questionsArray = [];
         if (Array.isArray(testData)) {
             questionsArray = testData;
@@ -92,6 +101,8 @@ const LearningPath = {
             activeSection.style.display = 'flex'; 
         }
     },
+    
+    // Test fonksiyonları (prepareAndDisplayLevelTest, displayLevelTest, calculateLevel, showLevelResult) aynı kaldı.
 
     prepareAndDisplayLevelTest: function() {
         const MAX_QUESTIONS = 20;
@@ -109,7 +120,6 @@ const LearningPath = {
             .sort(() => 0.5 - Math.random())
             .slice(0, MAX_QUESTIONS);
 
-        // Seçeneklerin yer değiştirmesi (shuffle) düzeltmesi burada.
         this.shuffledTestQuestions = rawQuestions.map(q => {
             return {
                 ...q,
@@ -174,7 +184,6 @@ const LearningPath = {
             const progress = Math.round(((currentQuestionIndex + 1) / questions.length) * 100);
 
             let optionsHtml = '';
-            // KRİTİK DÜZELTME 1: Seçenekleri karıştırılmış diziden al (Yer değiştirme sorunu çözüldü)
             const optionsToRender = q.shuffledOptions; 
             
             optionsToRender.forEach((option, index) => {
@@ -303,8 +312,8 @@ const LearningPath = {
         let modulesList = [];
         let levelTitle = `${level} Seviyesi Öğrenme Yolu`;
 
-        // KRİTİK DÜZELTME 2: Hangi seviye çıkarsa çıksın (level), modül listesini HER ZAMAN "A1" seviyesinden al.
-        const baseLevelCode = 'A1'; // Modüllerin alınacağı temel seviye (Verdiğiniz JSON'daki büyük harf A1)
+        // Modül listesini HER ZAMAN "A1" seviyesinden al.
+        const baseLevelCode = 'A1'; 
         const baseLevelData = this.allModules[baseLevelCode];
 
         if (baseLevelData && Array.isArray(baseLevelData.modules)) {
@@ -384,20 +393,31 @@ const LearningPath = {
         this.showSection('moduleContentSection');
         const contentEl = document.getElementById('moduleContentSection');
         
-        // KRİTİK DÜZELTME 3: Modül içeriğini bulmak için A1 modül listesini kullan
+        // 1. Modülün temel bilgilerini A1 listesinden bul
         const baseLevelCode = 'A1';
         const moduleListSource = (this.allModules[baseLevelCode] && Array.isArray(this.allModules[baseLevelCode].modules)) 
             ? this.allModules[baseLevelCode].modules 
             : [];
 
         const baseModule = moduleListSource.find(m => m.id === moduleId);
-
-
+        
         if (!baseModule) {
-             contentEl.innerHTML = `<h2>Hata: Modül ${moduleId} içeriği bulunamadı. Lütfen <code>learning_modules.json</code> dosyasındaki A1 modülleri içinde bu ID'nin olduğundan emin olun.</h2>`;
+             contentEl.innerHTML = `<h2>Hata: Modül ${moduleId} temel bilgileri (A1 listesinde) bulunamadı.</h2>`;
              return;
         }
         
+        // 2. Modülün statik içeriğini (ders notlarını) 'module_content.json.json' dosyasından al
+        const staticContentData = this.allModuleContents[moduleId];
+        
+        if (!staticContentData || !Array.isArray(staticContentData.content)) {
+            contentEl.innerHTML = `<h2>Hata: Modül ${moduleId} statik içeriği (ders notları) <code>${this.MODULE_CONTENT_FILE_PATH}</code> dosyasında bulunamadı veya formatı bozuk.</h2>`;
+            // Devam edebilmesi için en azından boş bir content array'i ekleyelim.
+            baseModule.content = []; 
+        } else {
+             // Statik içeriği baseModule'a ekleyelim
+             baseModule.content = staticContentData.content;
+        }
+
         // Kullanıcının gerçek seviyesini (B1, C1 vb.) kullanarak içeriği zenginleştir
         const enrichedContent = this.enrichModuleContent(moduleId, baseModule, userLevel);
         
@@ -408,7 +428,6 @@ const LearningPath = {
         contentHtml += `<button class="btn btn-sm btn-outline-primary mb-4" onclick="LearningPath.displayLearningPath('${userLevel}')">← Modüllere Geri Dön</button>`;
         contentHtml += `<h3 class="mb-4">${baseModule.name}</h3>`;
         
-        // ... (İçerik render etme kısmı aynı kaldı)
         enrichedContent.forEach(item => {
             switch(item.type) {
                 case 'heading':
@@ -451,30 +470,26 @@ const LearningPath = {
         contentEl.innerHTML = contentHtml;
     },
 
-    // Modül içeriğini dinamik olarak zenginleştirir
+    // Modül içeriğini dinamik olarak zenginleştirir (Aynı kaldı)
     enrichModuleContent: function(moduleId, baseModule, userLevel) {
         
-        // userLevel: B1, C1 gibi testten çıkan seviye. Bu, getirilecek kelimelerin zorluğunu belirler.
         const moduleLevel = userLevel.toUpperCase(); 
         const moduleTopic = baseModule.topic.toLowerCase(); 
         
-        // baseModule.content'in bir dizi olduğundan emin ol (Önceki hatayı çözmüştü)
-        // DİKKAT: learning_modules.json'da content alanı boş. Bu alanın dolumu için 
-        // muhtemelen başka bir JSON (module_content.json.json) dosyasını kullanmamız gerekebilir.
-        // Ancak şimdilik content'i, modül objesinin kendisinde var olan bir alan olarak varsayacağız.
+        // baseModule.content artık ya orijinal modül listesinden gelir (varsa) ya da yukarıda module_content.json.json'dan yüklenir.
         const staticContent = Array.isArray(baseModule.content) ? baseModule.content : [];
         let enrichedContent = [...staticContent]; 
         let quizIndexStart = enrichedContent.filter(item => item.type === 'quiz').length;
 
+        // ... (Kelime, Cümle ve Okuma Alıştırmaları oluşturma mantığı aynı kaldı)
+        // Bu kısımlar, kullanıcının seviyesine (userLevel) göre doğru zorlukta filtrelemeyi garanti eder.
 
         // --- 1. Kelime Alıştırmaları (words.json) ---
-        // userLevel (B1, C1 vb.) ve topic'e göre filtreleme yapar.
         const moduleWords = this.allWords.filter(w => 
             w.difficulty.toUpperCase().includes(moduleLevel) && 
             (w.category.toLowerCase().includes(moduleTopic) || moduleTopic.includes(w.category.toLowerCase()))
         ).sort(() => 0.5 - Math.random()).slice(0, 15); 
 
-        // ... (Kalan enrichModuleContent kısmı aynı kaldı)
         if (moduleWords.length > 0) {
              const wordsHtml = moduleWords.map(w => 
                 `<div class="word-item"><strong>${w.word}</strong> - ${w.turkish} (${w.category}) <small class="text-muted">| Seviye: ${w.difficulty}</small></div>`
@@ -576,24 +591,33 @@ const LearningPath = {
         
         return enrichedContent;
     },
-
+    
+    // startQuiz, calculateModuleScore, showModuleResult ve resetProgress fonksiyonları aynı kaldı.
     startQuiz: function(moduleId) {
         this.showSection('moduleQuizSection');
         const quizEl = document.getElementById('moduleQuizSection');
         
         const userLevel = localStorage.getItem('userLevel'); 
 
-        // Modülü A1 listesi içinde bul
+        // Modülün temel bilgilerini A1 listesinden bul
         const baseLevelCode = 'A1';
         const moduleListSource = (this.allModules[baseLevelCode] && Array.isArray(this.allModules[baseLevelCode].modules)) 
             ? this.allModules[baseLevelCode].modules 
             : [];
 
-        const baseModule = moduleListSource.find(m => m.id === moduleId);
+        let baseModule = moduleListSource.find(m => m.id === moduleId);
         
         if (!baseModule) {
-             quizEl.innerHTML = `<h2>Hata: Modül ${moduleId} içeriği bulunamadı.</h2>`;
+             quizEl.innerHTML = `<h2>Hata: Modül ${moduleId} temel bilgileri (A1 listesinde) bulunamadı.</h2>`;
              return;
+        }
+
+        // Statik içeriği al ve baseModule'a ekle (enrichModuleContent içinde kullanılacak)
+        const staticContentData = this.allModuleContents[moduleId];
+        if (staticContentData && Array.isArray(staticContentData.content)) {
+             baseModule.content = staticContentData.content;
+        } else {
+             baseModule.content = [];
         }
 
         const enrichedContent = this.enrichModuleContent(moduleId, baseModule, userLevel);

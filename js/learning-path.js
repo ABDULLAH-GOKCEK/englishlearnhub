@@ -1,6 +1,5 @@
 const LearningPath = {
     TEST_FILE_PATH: 'data/level_test.json',
-    // DÜZELTİLDİ: Dosya yolundaki fazla .json uzantısı kaldırıldı
     MODULE_CONTENT_FILE_PATH: 'data/module_content.json', 
     PASS_SCORE: 90, // Başarı eşiği: %90
 
@@ -72,7 +71,7 @@ const LearningPath = {
 
         const [moduleData, moduleContentData, testData, wordsData, sentencesData, readingsData] = await Promise.all([
             fetchData('data/learning_modules.json'), 
-            fetchData(this.MODULE_CONTENT_FILE_PATH), // Düzeltilen yol kullanılıyor
+            fetchData(this.MODULE_CONTENT_FILE_PATH), 
             fetchData('data/level_test.json'),
             fetchData('data/words.json'), 
             fetchData('data/sentences.json'), 
@@ -80,7 +79,8 @@ const LearningPath = {
         ]);
 
         this.allModules = moduleData || {};
-        this.allModuleContents = moduleContentData || {}; 
+        // allModuleContents'in bir nesne olduğundan emin olun
+        this.allModuleContents = (typeof moduleContentData === 'object' && moduleContentData !== null) ? moduleContentData : {}; 
         
         let questionsArray = [];
         if (Array.isArray(testData)) {
@@ -115,7 +115,7 @@ const LearningPath = {
         return 'bg-secondary';
     },
     
-    // --- Test fonksiyonları ---
+    // --- Test fonksiyonları (Değişmedi) ---
     
     prepareAndDisplayLevelTest: function() {
         const MAX_QUESTIONS = 20;
@@ -338,21 +338,25 @@ const LearningPath = {
         const baseLevelCode = 'A1'; 
         const baseLevelData = this.allModules[baseLevelCode];
 
+        // GÜVENLİK KONTROLÜ: allModules[baseLevelCode] objesinin varlığını kontrol et
         if (baseLevelData && Array.isArray(baseLevelData.modules)) {
             modulesList = baseLevelData.modules;
             levelTitle = `${baseLevelData.title} (${level} Seviyesi için)`;
         } else {
+             // Modül verisi yüklenemediğinde hata mesajı göster
              pathEl.innerHTML = `
-                <h2>Hata: Öğrenme modülleri yüklenemedi.</h2>
-                <p>Lütfen <code>learning_modules.json</code> dosyasında **"${baseLevelCode}"** anahtarının altında bir **"modules"** dizisi olduğundan emin olun.</p>
-                <button class="btn btn-primary mt-3" onclick="LearningPath.resetProgress()">Sıfırla ve Tekrar Dene</button>
+                <div class="alert alert-danger" role="alert" style="max-width: 800px; margin-top: 50px;">
+                    <h4>Hata: Öğrenme Modülleri Yüklenemedi!</h4>
+                    <p>Lütfen <code>data/learning_modules.json</code> dosyasının hem var olduğunu hem de **"${baseLevelCode}"** anahtarının altında bir **"modules"** dizisi bulunduğunu kontrol edin.</p>
+                </div>
+                <button class="btn btn-primary mt-3" onclick="LearningPath.resetProgress()">Seviyeyi Sıfırla ve Tekrar Dene</button>
             `;
             return;
         }
         
         let modules = JSON.parse(localStorage.getItem('learningModules'));
         if (!modules || modules.length === 0) {
-             // Başlangıçta bölüm ilerlemesini de dahil et
+             // İlk kez yükleme veya sıfırlama
              modules = modulesList.map(m => ({
                  ...m,
                  progress: 0,
@@ -367,7 +371,7 @@ const LearningPath = {
              }));
              localStorage.setItem('learningModules', JSON.stringify(modules));
         } else {
-             // GÜNCELLEME: Yeni eklenen bölümleri (okuma gibi) mevcut modüllere ekle
+             // Mevcut modülleri güncelle (yeni bölüm eklenmesi vb. durumlar için)
              const updatedModules = modules.map(m => {
                  let updatedSections = [...(m.sectionProgress || [])];
                  this.STANDARD_SECTIONS.forEach(stdSec => {
@@ -464,6 +468,7 @@ const LearningPath = {
         
         const modules = JSON.parse(localStorage.getItem('learningModules'));
         const moduleIndex = modules.findIndex(m => m.id === moduleId);
+        // currentModule'ün null olmaması gerekiyor, bu yüzden güvenle alıyoruz.
         const currentModule = modules[moduleIndex];
 
         // 1. Modülün temel bilgilerini A1 listesinden bul
@@ -480,11 +485,11 @@ const LearningPath = {
         }
         
         // 2. Modülün statik içeriğini (ders notlarını) 'module_content.json' dosyasından al
+        // allModuleContents'in bir nesne olduğundan emin olduk (loadAllData içinde)
         const staticContentData = this.allModuleContents[moduleId];
         baseModule.content = (staticContentData && Array.isArray(staticContentData.content)) ? staticContentData.content : [];
 
         // 3. İçeriği zenginleştir ve quiz sorularını oluştur/filtrele
-        // Bu adım, baseModule objesine quiz sorularını ekler.
         this.enrichModuleContent(moduleId, baseModule, userLevel);
         
         contentEl.style.alignItems = 'flex-start'; 
@@ -494,9 +499,6 @@ const LearningPath = {
         contentHtml += `<button class="btn btn-sm btn-outline-primary mb-4" onclick="LearningPath.displayLearningPath('${userLevel}')">← Modüllere Geri Dön</button>`;
         contentHtml += `<h3 class="mb-4">${baseModule.name}</h3>`;
         
-        // Statik İçerik (Ders Notları) ve Dinamik Kelime/Cümle Listeleri
-        
-        // Okuma parçası için de enrichedContent kullanılmalı
         const enrichedContent = this.getModuleContentHTML(moduleId, baseModule, userLevel);
 
         enrichedContent.forEach(item => {
@@ -581,7 +583,6 @@ const LearningPath = {
         contentEl.innerHTML = contentHtml;
     },
     
-    // getModuleContentHTML'i ekleyelim. Bu, enrichModuleContent'tan statik HTML oluşturmayı ayırır.
     getModuleContentHTML: function(moduleId, baseModule, userLevel) {
         // enrichModuleContent'i çağırarak baseModule'a gerekli quiz sorularını ve kelime/cümle listelerini ekler
         const enrichedContent = this.enrichModuleContent(moduleId, baseModule, userLevel);
@@ -590,7 +591,7 @@ const LearningPath = {
         return enrichedContent;
     },
 
-    // Dinamik içerik oluşturucu (Geri kalanı aynı kaldı)
+    // Dinamik içerik oluşturucu
     enrichModuleContent: function(moduleId, baseModule, userLevel) {
         
         const moduleLevel = userLevel.toUpperCase(); 
@@ -959,7 +960,7 @@ const LearningPath = {
                 // Modül Final Testi Güncellemesi
                 currentModule.lastScore = score;
                 
-                // YENİ KURAL: Tamamlandı = (Tüm Bölümler Tamamlandı) AND (Final Testi Geçildi)
+                // KURAL: Tamamlandı = (Tüm Bölümler Tamamlandı) AND (Final Testi Geçildi)
                 const completedSections = currentModule.sectionProgress.filter(s => s.status === 'Tamamlandı').length;
                 const allSectionsComplete = completedSections === totalSections;
                 const passedModuleTest = isPassed; 
@@ -969,7 +970,7 @@ const LearningPath = {
                     currentModule.progress = 100;
                 } else {
                     currentModule.status = 'Tekrar Gerekli';
-                    // Final testi başarısız olsa bile, ilerleme çubuğu bölüm tamamlanmalarına göre kalır.
+                    // Progress bar'ı bölüm tamamlanmalarına göre kalır.
                     currentModule.progress = Math.round((completedSections / totalSections) * 100); 
                 }
                 

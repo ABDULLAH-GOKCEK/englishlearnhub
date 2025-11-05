@@ -1,4 +1,7 @@
 const LearningPath = {
+    // Kritik Düzeltme: Dosya yolunu Global alana taşıyarak erişilebilir kıldık
+    TEST_FILE_PATH: 'data/level_test.json', 
+    
     // Tüm JSON verilerini tutacak değişkenler
     allModules: {},
     allWords: [],
@@ -11,19 +14,15 @@ const LearningPath = {
         this.loadAllData().then(() => {
             console.log("Tüm veriler yüklendi.");
             
-            // Kullanıcının seviyesini kontrol et
             const userLevel = localStorage.getItem('userLevel');
             
-            // Eğer seviye kayıtlıysa, öğrenme yolunu göster
             if (userLevel) {
                 this.displayLearningPath(userLevel);
             } 
-            // Eğer seviye kayıtlı değilse:
             else {
                 this.showSection('introSection');
             }
             
-            // Navigasyon butonunu seviye varsa görünür yap
             const navButton = document.getElementById('navToPathButton');
             if (navButton) {
                 if (userLevel) {
@@ -33,10 +32,8 @@ const LearningPath = {
                 }
             }
 
-
         }).catch(error => {
             console.error("Veri yüklenirken kritik hata oluştu:", error);
-            // Hata durumunda, kullanıcıya bilgi vererek test sayfasını göster
             this.showSection('levelTestSection');
             const testEl = document.getElementById('levelTestSection');
             if (testEl) {
@@ -63,13 +60,10 @@ const LearningPath = {
     // Tüm JSON dosyalarını yükleyen asenkron fonksiyon
     loadAllData: async function() {
         
-        // 🚨 SORUN ÇÖZÜMÜ: Eğer level_test.json yüklenmiyorsa, 'exam.json' dosyasını deniyoruz.
-        // Hangi dosya geçerliyse onu kullanın.
-        const TEST_FILE_PATH = 'data/level_test.json'; 
-
         // Module ve Level Test verisi
         const moduleRes = fetch('data/learning_modules.json');
-        const levelTestRes = fetch(TEST_FILE_PATH); 
+        // Bu kısımda this.TEST_FILE_PATH kullanıldı
+        const levelTestRes = fetch(this.TEST_FILE_PATH); 
         
         // Zenginleştirme verileri
         const wordsRes = fetch('data/words.json');
@@ -84,7 +78,6 @@ const LearningPath = {
         })));
 
         this.allModules = moduleData || {};
-        // KRİTİK DÜZELTME: Verinin bir dizi olduğundan emin ol
         this.allLevelTestQuestions = Array.isArray(testData) ? testData : []; 
         this.allWords = Array.isArray(wordsData) ? wordsData : []; 
         this.allSentences = Array.isArray(sentencesData) ? sentencesData : []; 
@@ -95,56 +88,30 @@ const LearningPath = {
     showSection: function(sectionId) {
         document.querySelectorAll('.module-section').forEach(section => {
             section.classList.remove('active');
-            section.style.display = 'none'; // Güvenlik için JS ile gizle
+            section.style.display = 'none'; 
         });
         const activeSection = document.getElementById(sectionId);
         if (activeSection) {
             activeSection.classList.add('active');
-            activeSection.style.display = 'flex'; // CSS'teki flex kuralını uygulamasını sağla
+            activeSection.style.display = 'flex'; 
         }
     },
-
-    // Seçeneği işaretler (Global olarak erişilebilir olmalı)
-    selectLevelTestOption: function(questionId, selectedOption) {
-        const inputElement = document.getElementById(`radio_${questionId}_${selectedOption}`);
-        if (inputElement) {
-            // Radyo düğmesini işaretle
-            inputElement.checked = true;
-            
-            // Manuel olarak değişim eventini tetikle (gerekliyse)
-            // inputElement.dispatchEvent(new Event('change')); 
-
-            // Görsel geri bildirim için tüm seçenek sınıflarını yönet
-            const currentQ = this.allLevelTestQuestions.find(q => q.id === questionId);
-            if (currentQ) {
-                document.querySelectorAll('.question-option').forEach(optionEl => {
-                     optionEl.classList.remove('selected-answer');
-                });
-                
-                // Seçilen seçeneğe sınıfı ekle
-                const selectedOptionEl = document.querySelector(`.question-option[data-value="${selectedOption}"]`);
-                if (selectedOptionEl) {
-                    selectedOptionEl.classList.add('selected-answer');
-                }
-            }
-        }
-    },
-
+    
     // Seviye Testini görüntüler
     displayLevelTest: function() {
         const testEl = document.getElementById('levelTestSection');
         if (!testEl) return;
 
-        // KRİTİK DÜZELTME: 20 soru göstermek için slice(0, 20) yapıldı
+        // 20 soru göstermek için slice(0, 20) yapıldı
         const MAX_QUESTIONS = 20;
         const questions = this.allLevelTestQuestions.sort(() => 0.5 - Math.random()).slice(0, MAX_QUESTIONS);
         
-        // KRİTİK DÜZELTME: Hata Kontrolü
+        // Hata Kontrolü: Artık this.TEST_FILE_PATH ile doğru değişkeni kullanıyor.
         if (questions.length === 0) {
             testEl.innerHTML = `
                 <div class="alert alert-danger" role="alert">
                     <h4>Hata: Seviye Testi Soruları Yüklenemedi!</h4>
-                    <p>Lütfen <code>${TEST_FILE_PATH}</code> dosyasının hem var olduğunu hem de içinde geçerli JSON formatında (en az ${MAX_QUESTIONS} soru idealdir) bulunduğunu kontrol edin.</p>
+                    <p>Lütfen <code>${this.TEST_FILE_PATH}</code> dosyasının hem var olduğunu hem de içinde geçerli JSON formatında (en az ${MAX_QUESTIONS} soru idealdir) bulunduğunu kontrol edin.</p>
                 </div>
                 <button class="btn btn-primary mt-3" onclick="window.location.reload()">Tekrar Dene</button>
             `;
@@ -154,13 +121,11 @@ const LearningPath = {
         let currentQuestionIndex = 0;
         let userAnswers = {}; // {questionId: selectedOption}
 
-        // Test bölümünün hizalamasını soru göstermek için sola çek
         testEl.style.alignItems = 'flex-start'; 
         testEl.style.textAlign = 'left';
 
         const renderQuestion = () => {
             if (currentQuestionIndex >= questions.length) {
-                // Test bitince hizalamayı tekrar ortala (sonuç kartı için)
                 testEl.style.alignItems = 'center'; 
                 testEl.style.textAlign = 'center';
 
@@ -169,7 +134,7 @@ const LearningPath = {
             }
 
             const q = questions[currentQuestionIndex];
-            const progress = Math.round((currentQuestionIndex / questions.length) * 100);
+            const progress = Math.round(((currentQuestionIndex + 1) / questions.length) * 100);
 
             let optionsHtml = '';
             const shuffledOptions = q.options.sort(() => 0.5 - Math.random()); 
@@ -177,14 +142,12 @@ const LearningPath = {
                 const isSelected = userAnswers[q.id] === option;
                 const selectedClass = isSelected ? 'selected-answer' : '';
 
-                // KRİTİK DÜZELTME: Radio butonu gizlenir, tıklama event'i div'e atanır.
+                // Direkt tıklanabilir div ile radio butonu gizleme mantığı
                 optionsHtml += `
                     <div 
                         class="form-check question-option ${selectedClass}" 
                         onclick="
-                            // Cevabı kaydet
                             userAnswers['${q.id}'] = '${option.replace(/'/g, "\\'")}'; 
-                            // Görsel sınıfı güncellemek için tekrar render et
                             renderQuestion();
                         "
                         data-value="${option.replace(/"/g, '')}"
@@ -200,7 +163,7 @@ const LearningPath = {
                     <h3 class="mb-4">Seviye Tespit Testi (${currentQuestionIndex + 1} / ${questions.length})</h3>
                     <div class="progress-container">
                         <div class="progress" role="progressbar" style="height: 12px;">
-                            <div class="progress-bar" style="width: ${progress}%; background-color: #4361ee;">${progress}%</div>
+                            <div class="progress-bar" style="width: ${progress}%; background-color: #4361ee;"></div>
                         </div>
                     </div>
                     
@@ -245,32 +208,31 @@ const LearningPath = {
     // Seviyeyi hesaplar ve sonucu gösterir
     calculateLevel: function(questions, userAnswers) {
         let score = 0;
-        let maxScore = questions.length;
-        let a1Count = 0;
-        let b1Count = 0;
-        let c1Count = 0;
         
         questions.forEach(q => {
             const isCorrect = userAnswers[q.id] === q.correctAnswer;
             if (isCorrect) {
                 score++;
-                if (q.level.includes('A1')) a1Count++;
-                if (q.level.includes('B1')) b1Count++;
-                if (q.level.includes('C1')) c1Count++;
             }
         });
 
+        const levelMapping = [
+            { threshold: 15, level: 'C1' }, // 20 sorudan 15 doğru
+            { threshold: 10, level: 'B1' }, // 20 sorudan 10 doğru
+            { threshold: 0, level: 'A1' }
+        ];
+
         let resultLevel = 'A1';
-        if (b1Count >= 2) { 
-            resultLevel = 'B1';
-        }
-        if (c1Count >= 2) { 
-            resultLevel = 'C1';
+        for (const map of levelMapping) {
+            if (score >= map.threshold) {
+                resultLevel = map.level;
+                break;
+            }
         }
 
         localStorage.setItem('userLevel', resultLevel);
         
-        this.showLevelResult(resultLevel, score, maxScore);
+        this.showLevelResult(resultLevel, score, questions.length);
 
     },
     
@@ -288,9 +250,11 @@ const LearningPath = {
                 <button class="btn btn-lg btn-primary mt-3" onclick="LearningPath.displayLearningPath('${level}')">Öğrenme Yolunu Gör</button>
             </div>
         `;
+        const navButton = document.getElementById('navToPathButton');
+        if (navButton) navButton.classList.remove('d-none');
     },
 
-    // Modül kartlarını görüntüler
+    // Modül kartlarını görüntüler (Diğer tüm fonksiyonlar aynı kalır)
     displayLearningPath: function(level) {
         this.showSection('learningPathSection');
         const pathEl = document.getElementById('learningPathSection');
@@ -339,7 +303,7 @@ const LearningPath = {
                 ${moduleCards}
             </div>
 
-             <button class="btn btn-sm btn-outline-secondary mt-4" onclick="LearningPath.resetProgress()">Seviyeyi Sıfırla</button>
+             <button class="btn btn-sm btn-outline-danger mt-4" onclick="LearningPath.resetProgress()">Seviyeyi Sıfırla</button>
         `;
         
         // Local Storage'a en son seviyeyi ve modülleri kaydet
@@ -351,7 +315,7 @@ const LearningPath = {
         if (navButton) navButton.classList.remove('d-none');
     },
     
-    // Yardımcı fonksiyonlar
+    // Yardımcı fonksiyonlar (getIconForTopic, enrichModuleContent, vs.)
     getIconForTopic: function(topic) {
         const icons = {
             'Gramer': 'fa-graduation-cap',
@@ -378,7 +342,6 @@ const LearningPath = {
 
         const enrichedContent = this.enrichModuleContent(moduleId, baseModule);
         
-        // İçeriğin sola hizalanmasını sağla
         contentEl.style.alignItems = 'flex-start'; 
         contentEl.style.textAlign = 'left';
 
@@ -546,7 +509,7 @@ const LearningPath = {
         return enrichedContent;
     },
 
-    // Quiz başlatma fonksiyonu (Çoktan seçmeli soruları gösterir)
+    // Quiz başlatma fonksiyonu
     startQuiz: function(moduleId) {
         this.showSection('moduleQuizSection');
         const quizEl = document.getElementById('moduleQuizSection');
@@ -560,13 +523,11 @@ const LearningPath = {
         let currentQuestionIndex = 0;
         let userAnswers = {}; // {questionIndex: selectedOption}
 
-        // Quiz bölümünün hizalamasını soru göstermek için sola çek
         quizEl.style.alignItems = 'flex-start'; 
         quizEl.style.textAlign = 'left';
 
         const renderQuizQuestion = () => {
             if (currentQuestionIndex >= quizQuestions.length) {
-                // Test bitince hizalamayı tekrar ortala (sonuç kartı için)
                 quizEl.style.alignItems = 'center'; 
                 quizEl.style.textAlign = 'center';
 
@@ -575,7 +536,7 @@ const LearningPath = {
             }
 
             const q = quizQuestions[currentQuestionIndex];
-            const progress = Math.round((currentQuestionIndex / quizQuestions.length) * 100);
+            const progress = Math.round(((currentQuestionIndex + 1) / quizQuestions.length) * 100);
 
             let optionsHtml = '';
             q.options.forEach((option, index) => {
@@ -584,9 +545,7 @@ const LearningPath = {
                     <div class="quiz-option-item ${selectedClass}" 
                          data-option="${option}" 
                          onclick="
-                             // Cevabı kaydet
                              userAnswers[${currentQuestionIndex}] = '${option.replace(/'/g, "\\'")}';
-                             // Görsel sınıfı güncellemek için tekrar render et
                              renderQuizQuestion();
                          ">
                         ${option}
@@ -599,7 +558,7 @@ const LearningPath = {
                     <h3 class="mb-4">${baseModule.name} - Test (${currentQuestionIndex + 1} / ${quizQuestions.length})</h3>
                     <div class="progress-container">
                         <div class="progress" role="progressbar" style="height: 12px;">
-                            <div class="progress-bar" style="width: ${progress}%; background-color: #28a745;">${progress}%</div>
+                            <div class="progress-bar" style="width: ${progress}%; background-color: #28a745;"></div>
                         </div>
                     </div>
                     

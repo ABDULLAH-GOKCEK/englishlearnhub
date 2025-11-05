@@ -539,7 +539,7 @@ const LearningPath = {
                         <div class="mt-4">
                             <h4>3. Okuma Anlama Alıştırması</h4>
                             <div class="alert alert-warning" role="alert">
-                                <strong>Okuma Hikayesi Bulunamadı:</strong> Mevcut seviyeniz (${userLevel}) ve modül konusu (${baseModule.topic}) ile eşleşen bir okuma hikayesi/metni `reading_stories.json` dosyanızda bulunamadı. Bu bölüm **otomatik olarak tamamlanmış sayılacaktır**.
+                                <strong>Okuma Hikayesi Bulunamadı:</strong> Mevcut seviyeniz (${userLevel}) ve modül konusu (${baseModule.topic}) ile eşleşen bir okuma hikayesi/metni 'reading_stories.json' dosyanızda bulunamadı. Bu bölüm **otomatik olarak tamamlanmış sayılacaktır**.
                             </div>
                         </div>
                     `;
@@ -1158,3 +1158,4 @@ const LearningPath = {
 };
 
 document.addEventListener('DOMContentLoaded', () => LearningPath.init());
+

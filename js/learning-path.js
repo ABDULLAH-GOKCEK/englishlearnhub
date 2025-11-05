@@ -1,9 +1,10 @@
 const LearningPath = {
     TEST_FILE_PATH: 'data/level_test.json', 
-    MODULE_CONTENT_FILE_PATH: 'data/module_content.json.json', // YENİ EKLENDİ
-    
-    allModules: {}, // learning_modules.json içeriği
-    allModuleContents: {}, // module_content.json.json içeriği
+    MODULE_CONTENT_FILE_PATH: 'data/module_content.json.json', 
+    PASS_SCORE: 90, // Yeni başarı eşiği: %90
+
+    allModules: {}, 
+    allModuleContents: {}, 
     allWords: [],
     allSentences: [],
     allReadings: [],
@@ -35,14 +36,12 @@ const LearningPath = {
 
         }).catch(error => {
             console.error("Veri yüklenirken kritik hata oluştu:", error);
-            // Kritik hata durumunda bile başlangıç ekranını göster
             this.showSection('introSection');
         });
 
         const startTestButton = document.getElementById('startTestButton');
         if (startTestButton) {
              startTestButton.onclick = () => {
-                // Test başladığında, devam eden cevapları temizle
                 localStorage.removeItem('levelTestAnswers'); 
                 this.showSection('levelTestSection');
                 this.prepareAndDisplayLevelTest();
@@ -65,7 +64,7 @@ const LearningPath = {
 
         const [moduleData, moduleContentData, testData, wordsData, sentencesData, readingsData] = await Promise.all([
             fetchData('data/learning_modules.json'), 
-            fetchData(this.MODULE_CONTENT_FILE_PATH), // YENİ YÜKLEME
+            fetchData(this.MODULE_CONTENT_FILE_PATH), 
             fetchData(this.TEST_FILE_PATH), 
             fetchData('data/words.json'), 
             fetchData('data/sentences.json'), 
@@ -73,9 +72,8 @@ const LearningPath = {
         ]);
 
         this.allModules = moduleData || {};
-        this.allModuleContents = moduleContentData || {}; // YENİ VERİ
+        this.allModuleContents = moduleContentData || {}; 
         
-        // ... (Kalan yükleme mantığı aynı)
         let questionsArray = [];
         if (Array.isArray(testData)) {
             questionsArray = testData;
@@ -232,7 +230,7 @@ const LearningPath = {
                     const qId = this.getAttribute('data-question-id');
                     const selectedValue = this.getAttribute('data-option-value');
                     
-                    userAnswers[qId] = selectedValue;
+                    userAnswers[q.id] = selectedValue;
                     renderQuestion();
                 });
             });
@@ -289,13 +287,25 @@ const LearningPath = {
     
     showLevelResult: function(level, score, maxScore) {
         const testEl = document.getElementById('levelTestSection');
+        
+        // Yeni Kural: Seviye Testi Başarı Eşiği %90 (20 soruda 18)
+        const isPassedInitialTest = (score / maxScore) * 100 >= this.PASS_SCORE;
+        
+        let resultMessage = '';
+        if (isPassedInitialTest) {
+            resultMessage = `Tebrikler! ${level} seviyesindeki öğrenme yolunuz ${this.PASS_SCORE}% başarı ile belirlendi.`;
+        } else {
+             // Not: Henüz seviye testinde geri bildirim mantığını eklemedik. Şimdilik sadece seviyeyi atayalım.
+            resultMessage = `Seviyeniz **${level}** olarak belirlendi. Modüllere başlayabilirsiniz. Modülleri tamamlayıp ${this.PASS_SCORE}% başarı ile seviye sonu sınavını geçmeniz gerekecek.`;
+        }
+        
         testEl.innerHTML = `
             <div class="result-card">
                 <h3 class="text-success mb-4">Test Tamamlandı!</h3>
                 <p class="h5">Toplam doğru sayısı: ${score} / ${maxScore}</p>
                 <p class="h4 level-result">Seviyeniz: <span>${level}</span></p>
                 
-                <p class="mt-4">Öğrenme yolunuz ${level} seviyesine göre ayarlandı. Hemen derslere başlayabilirsiniz!</p>
+                <p class="mt-4">${resultMessage}</p>
                 
                 <button class="btn btn-lg btn-primary mt-3" onclick="LearningPath.displayLearningPath('${level}')">Öğrenme Yolunu Gör</button>
             </div>
@@ -328,7 +338,7 @@ const LearningPath = {
             return;
         }
         
-        // Eğer kaydedilen modüller yoksa, yeni listeyi başlangıç olarak ayarla
+        // Modülleri Local Storage'dan yükle veya başlangıç durumunu ayarla
         let modules = JSON.parse(localStorage.getItem('learningModules'));
         if (!modules || modules.length === 0) {
              modules = modulesList.map(m => ({
@@ -411,7 +421,6 @@ const LearningPath = {
         
         if (!staticContentData || !Array.isArray(staticContentData.content)) {
             contentEl.innerHTML = `<h2>Hata: Modül ${moduleId} statik içeriği (ders notları) <code>${this.MODULE_CONTENT_FILE_PATH}</code> dosyasında bulunamadı veya formatı bozuk.</h2>`;
-            // Devam edebilmesi için en azından boş bir content array'i ekleyelim.
             baseModule.content = []; 
         } else {
              // Statik içeriği baseModule'a ekleyelim
@@ -470,19 +479,15 @@ const LearningPath = {
         contentEl.innerHTML = contentHtml;
     },
 
-    // Modül içeriğini dinamik olarak zenginleştirir (Aynı kaldı)
+    // Dinamik içerik oluşturucu
     enrichModuleContent: function(moduleId, baseModule, userLevel) {
         
         const moduleLevel = userLevel.toUpperCase(); 
         const moduleTopic = baseModule.topic.toLowerCase(); 
         
-        // baseModule.content artık ya orijinal modül listesinden gelir (varsa) ya da yukarıda module_content.json.json'dan yüklenir.
         const staticContent = Array.isArray(baseModule.content) ? baseModule.content : [];
         let enrichedContent = [...staticContent]; 
         let quizIndexStart = enrichedContent.filter(item => item.type === 'quiz').length;
-
-        // ... (Kelime, Cümle ve Okuma Alıştırmaları oluşturma mantığı aynı kaldı)
-        // Bu kısımlar, kullanıcının seviyesine (userLevel) göre doğru zorlukta filtrelemeyi garanti eder.
 
         // --- 1. Kelime Alıştırmaları (words.json) ---
         const moduleWords = this.allWords.filter(w => 
@@ -516,7 +521,8 @@ const LearningPath = {
                     type: 'quiz', 
                     question: `(Kelime Sorusu ${quizIndexStart}): '${correctWord.word}' kelimesinin Türkçe karşılığı nedir?`, 
                     options: options.sort(() => 0.5 - Math.random()), 
-                    answer: correctWord.turkish 
+                    answer: correctWord.turkish,
+                    topic: `${baseModule.name} - Kelime Bilgisi` // Geri bildirim için eklendi
                 });
             }
         }
@@ -560,7 +566,8 @@ const LearningPath = {
                     type: 'quiz', 
                     question: `(Cümle Sorusu ${quizIndexStart}): Cümledeki boşluğu doldurun: "${questionText}"`, 
                     options: options.sort(() => 0.5 - Math.random()), 
-                    answer: missingWord 
+                    answer: missingWord,
+                    topic: `${baseModule.name} - Cümle Yapısı` // Geri bildirim için eklendi
                 });
             }
         }
@@ -584,7 +591,8 @@ const LearningPath = {
                     type: 'quiz', 
                     question: `(Okuma Sorusu ${quizIndexStart}): ${q.question}`, 
                     options: q.options, 
-                    answer: q.options[q.correctAnswer] 
+                    answer: q.options[q.correctAnswer],
+                    topic: `${moduleReading.title} - Okuma Anlama` // Geri bildirim için eklendi
                 });
             });
         }
@@ -592,14 +600,13 @@ const LearningPath = {
         return enrichedContent;
     },
     
-    // startQuiz, calculateModuleScore, showModuleResult ve resetProgress fonksiyonları aynı kaldı.
+    // Modül Quizini Başlatır
     startQuiz: function(moduleId) {
         this.showSection('moduleQuizSection');
         const quizEl = document.getElementById('moduleQuizSection');
         
         const userLevel = localStorage.getItem('userLevel'); 
 
-        // Modülün temel bilgilerini A1 listesinden bul
         const baseLevelCode = 'A1';
         const moduleListSource = (this.allModules[baseLevelCode] && Array.isArray(this.allModules[baseLevelCode].modules)) 
             ? this.allModules[baseLevelCode].modules 
@@ -612,7 +619,6 @@ const LearningPath = {
              return;
         }
 
-        // Statik içeriği al ve baseModule'a ekle (enrichModuleContent içinde kullanılacak)
         const staticContentData = this.allModuleContents[moduleId];
         if (staticContentData && Array.isArray(staticContentData.content)) {
              baseModule.content = staticContentData.content;
@@ -664,6 +670,7 @@ const LearningPath = {
                     
                     <div class="card p-4 my-4">
                         <h5>${q.question}</h5>
+                        <p><small class="text-muted">Konu: ${q.topic || 'Genel'}</small></p>
                         <div>
                             ${optionsHtml}
                         </div>
@@ -707,47 +714,100 @@ const LearningPath = {
         renderQuizQuestion();
     },
 
+    // YENİ/GÜNCEL: Modül Skorunu Hesaplar ve Geri Bildirim Toplar
     calculateModuleScore: function(moduleId, questions, userAnswers) {
         let correctCount = 0;
+        let requiredTopics = new Set();
         
         questions.forEach((q, index) => {
-            if (userAnswers[index] === q.answer) {
+            const isCorrect = userAnswers[index] === q.answer;
+            if (isCorrect) {
                 correctCount++;
+            } else {
+                // Yanlış cevaplanan soruların konularını (varsa) topla
+                if (q.topic) {
+                    requiredTopics.add(q.topic);
+                } else {
+                    requiredTopics.add('Genel Konu Tekrarı');
+                }
             }
         });
 
         const score = Math.round((correctCount / questions.length) * 100);
         
+        let isPassed = false;
+        let feedback = Array.from(requiredTopics);
+        
         const userLevel = localStorage.getItem('userLevel');
         let modules = JSON.parse(localStorage.getItem('learningModules'));
         
         const moduleIndex = modules.findIndex(m => m.id === moduleId);
+        
         if (moduleIndex !== -1) {
+            // Yeni kural: Skor 90 ve üzeri ise başarılı
+            isPassed = (score >= this.PASS_SCORE);
+
             modules[moduleIndex].lastScore = score;
-            modules[moduleIndex].progress = 100; 
-            modules[moduleIndex].status = (score >= 70) ? 'Tamamlandı' : 'Tekrar Gerekli';
+            // Başarısız olsa bile ilerlemeyi 100 yapmayalım, sadece tamamlandı ise 100 yapalım
+            modules[moduleIndex].progress = isPassed ? 100 : modules[moduleIndex].progress; 
+            modules[moduleIndex].status = isPassed ? 'Tamamlandı' : 'Tekrar Gerekli';
             modules[moduleIndex].lastDuration = Math.floor(Math.random() * 15) + 5; 
 
             localStorage.setItem('learningModules', JSON.stringify(modules));
         }
 
-        this.showModuleResult(moduleId, score, questions.length, correctCount);
+        // Sonuç ekranını, geçip geçmediği ve geri bildirim listesi ile çağır
+        this.showModuleResult(moduleId, score, questions.length, correctCount, isPassed, feedback);
     },
 
-    showModuleResult: function(moduleId, score, totalQuestions, correctCount) {
+    // YENİ/GÜNCEL: Modül Sonucunu ve Geri Bildirimi Gösterir
+    showModuleResult: function(moduleId, score, totalQuestions, correctCount, isPassed, feedback) {
         const quizEl = document.getElementById('moduleQuizSection');
         const userLevel = localStorage.getItem('userLevel');
         
+        const baseLevelCode = 'A1';
+        const moduleName = this.allModules[baseLevelCode]?.modules?.find(m => m.id === moduleId)?.name || 'Modül'; 
+
+        let feedbackHtml = '';
+        let actionButton = '';
+        
+        if (isPassed) {
+            feedbackHtml = '<p class="mt-4 lead text-success">Mükemmel! Bu modülü başarıyla tamamladınız ve bir sonraki adıma geçmeye hazırsınız.</p>';
+            actionButton = `<button class="btn btn-lg btn-primary mt-3" onclick="LearningPath.displayLearningPath('${userLevel}')">Öğrenme Yoluna Dön</button>`;
+        } else {
+            feedbackHtml = `<p class="mt-4 lead text-danger">Tekrar Gerekli! Modülü tamamlamak için en az **${this.PASS_SCORE}%** puan almalısınız.</p>`;
+            
+            if (feedback.length > 0) {
+                feedbackHtml += '<p class="mt-3">Yanlış cevaplarınıza göre **tekrar çalışmanız gereken alanlar**:</p>';
+                feedbackHtml += '<ul class="list-group mb-4" style="max-width: 400px; margin: 0 auto; text-align: left;">';
+                feedback.forEach(topic => {
+                    feedbackHtml += `<li class="list-group-item list-group-item-warning">${topic}</li>`;
+                });
+                feedbackHtml += '</ul>';
+            } else {
+                 feedbackHtml += '<p class="mt-3">Lütfen modül içeriğini tekrar gözden geçirin.</p>';
+            }
+
+            actionButton = `
+                <button class="btn btn-lg btn-success mt-3" onclick="LearningPath.displayModuleContent('${moduleId}', '${userLevel}')">
+                    <i class="fas fa-redo me-2"></i> ${moduleName} İçeriğini Tekrar Gözden Geçir
+                </button>
+                <button class="btn btn-lg btn-outline-success mt-3" onclick="LearningPath.startQuiz('${moduleId}')">
+                    <i class="fas fa-play me-2"></i> Testi Yeniden Başlat
+                </button>
+            `;
+        }
+
         const resultHtml = `
             <div class="result-card">
-                <h3 class="mb-4 ${score >= 70 ? 'text-success' : 'text-danger'}">${score >= 70 ? 'Tebrikler!' : 'Tekrar Gerekli'}</h3>
-                <p class="h5">Toplam soru: ${totalQuestions}</p>
-                <p class="h5">Doğru cevap sayısı: ${correctCount}</p>
-                <p class="h4 level-result">Başarı Puanı: <span style="color: ${score >= 70 ? '#28a745' : '#dc3545'};">${score}%</span></p>
+                <h3 class="mb-4 ${isPassed ? 'text-success' : 'text-danger'}">${isPassed ? 'Tebrikler!' : 'Daha Fazla Çalışma Gerekli!'}</h3>
+                <p class="h5">${moduleName} Sonucu</p>
+                <p class="h5">Doğru cevap sayısı: ${correctCount} / ${totalQuestions}</p>
+                <p class="h4 level-result">Başarı Puanı: <span style="color: ${isPassed ? '#28a745' : '#dc3545'};">${score}%</span></p>
                 
-                ${score >= 70 ? '<p class="mt-4">Bu modülü başarıyla tamamladınız. Bir sonraki modüle geçebilirsiniz.</p>' : '<p class="mt-4">Modülü tekrar gözden geçirerek test için hazırlanabilirsiniz.</p>'}
+                ${feedbackHtml}
                 
-                <button class="btn btn-lg btn-primary mt-3" onclick="LearningPath.displayLearningPath('${userLevel}')">Öğrenme Yoluna Dön</button>
+                ${actionButton}
             </div>
         `;
         quizEl.innerHTML = resultHtml;
@@ -765,5 +825,3 @@ const LearningPath = {
 };
 
 document.addEventListener('DOMContentLoaded', () => LearningPath.init());
-
-

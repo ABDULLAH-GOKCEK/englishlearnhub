@@ -338,12 +338,11 @@ const LearningPath = {
         const baseLevelCode = 'A1'; 
         const baseLevelData = this.allModules[baseLevelCode];
 
-        // GÜVENLİK KONTROLÜ: allModules[baseLevelCode] objesinin varlığını kontrol et
+        // GÜVENLİK KONTROLÜ
         if (baseLevelData && Array.isArray(baseLevelData.modules)) {
             modulesList = baseLevelData.modules;
             levelTitle = `${baseLevelData.title} (${level} Seviyesi için)`;
         } else {
-             // Modül verisi yüklenemediğinde hata mesajı göster
              pathEl.innerHTML = `
                 <div class="alert alert-danger" role="alert" style="max-width: 800px; margin-top: 50px;">
                     <h4>Hata: Öğrenme Modülleri Yüklenemedi!</h4>
@@ -371,7 +370,7 @@ const LearningPath = {
              }));
              localStorage.setItem('learningModules', JSON.stringify(modules));
         } else {
-             // Mevcut modülleri güncelle (yeni bölüm eklenmesi vb. durumlar için)
+             // Mevcut modülleri güncelle 
              const updatedModules = modules.map(m => {
                  let updatedSections = [...(m.sectionProgress || [])];
                  this.STANDARD_SECTIONS.forEach(stdSec => {
@@ -412,19 +411,25 @@ const LearningPath = {
             const testButtonText = isSectionsCompleted ? 'Genel Testi Başlat' : `${completedSections}/${totalSections} Bölüm Tamamlanmalı`;
 
             return `
-                <div class="module-card ${module.status.toLowerCase().replace(/ /g, '-')}" >
-                    <i class="fas ${this.getIconForTopic(module.topic)}"></i>
-                    <h5>${module.name}</h5>
-                    <p class="module-topic">${module.topic} Konusu</p>
+                <div class="module-card ${module.status.toLowerCase().replace(/ /g, '-')}" 
+                     data-module-id="${module.id}" 
+                     data-module-level="${level}"
+                     onclick="LearningPath.displayModuleContent('${module.id}', '${level}')"> 
                     
-                    <div class="module-status badge ${badgeClass}">${module.status}</div>
-                    
-                    <div class="progress mt-2">
-                        <div class="progress-bar" style="width: ${module.progress}%;" role="progressbar">${module.progress}%</div>
+                    <div class="module-card-content">
+                        <i class="fas ${this.getIconForTopic(module.topic)}"></i>
+                        <h5>${module.name}</h5>
+                        <p class="module-topic">${module.topic} Konusu</p>
+                        
+                        <div class="module-status badge ${badgeClass}">${module.status}</div>
+                        
+                        <div class="progress mt-2">
+                            <div class="progress-bar" style="width: ${module.progress}%;" role="progressbar">${module.progress}%</div>
+                        </div>
                     </div>
                     
-                    <div class="module-actions mt-3">
-                        <button class="btn btn-sm btn-primary me-2" onclick="LearningPath.displayModuleContent('${module.id}', '${level}')">İçeriği Gör (${completedSections}/${totalSections})</button>
+                    <div class="module-actions mt-3" onclick="event.stopPropagation()">
+                         <button class="btn btn-sm btn-primary me-2" onclick="LearningPath.displayModuleContent('${module.id}', '${level}')">İçeriği Gör (${completedSections}/${totalSections})</button>
                         <button class="btn btn-sm ${testButtonClass}" ${moduleTestDisabled} onclick="LearningPath.startQuiz('${module.id}', 'all')">${testButtonText}</button>
                     </div>
                 </div>
@@ -468,7 +473,6 @@ const LearningPath = {
         
         const modules = JSON.parse(localStorage.getItem('learningModules'));
         const moduleIndex = modules.findIndex(m => m.id === moduleId);
-        // currentModule'ün null olmaması gerekiyor, bu yüzden güvenle alıyoruz.
         const currentModule = modules[moduleIndex];
 
         // 1. Modülün temel bilgilerini A1 listesinden bul
@@ -485,7 +489,6 @@ const LearningPath = {
         }
         
         // 2. Modülün statik içeriğini (ders notlarını) 'module_content.json' dosyasından al
-        // allModuleContents'in bir nesne olduğundan emin olduk (loadAllData içinde)
         const staticContentData = this.allModuleContents[moduleId];
         baseModule.content = (staticContentData && Array.isArray(staticContentData.content)) ? staticContentData.content : [];
 
@@ -499,6 +502,7 @@ const LearningPath = {
         contentHtml += `<button class="btn btn-sm btn-outline-primary mb-4" onclick="LearningPath.displayLearningPath('${userLevel}')">← Modüllere Geri Dön</button>`;
         contentHtml += `<h3 class="mb-4">${baseModule.name}</h3>`;
         
+        // --- 1. Statik ve Dinamik Modül İçeriği ---
         const enrichedContent = this.getModuleContentHTML(moduleId, baseModule, userLevel);
 
         enrichedContent.forEach(item => {
@@ -527,7 +531,7 @@ const LearningPath = {
             }
         });
         
-        // Bölümler ve Sınav Düğümleri
+        // --- 2. Çalışma Bölümleri (İçeriğin hemen altına taşındı) ---
         contentHtml += `<hr class="my-5"><h4>Modül Çalışma Bölümleri (${userLevel} Seviyesi)</h4>`;
         
         const totalSections = this.STANDARD_SECTIONS.length;
@@ -546,6 +550,12 @@ const LearningPath = {
              
              const isAvailable = questionCount > 0;
              const buttonDisabled = !isAvailable ? 'disabled' : '';
+             
+             // UYARI: Sadece buton disabled ise gösterilir.
+             const availabilityWarning = !isAvailable 
+                ? '<span class="badge bg-warning text-dark ms-2">Yeterli Soru Yok</span>' 
+                : '';
+
 
              contentHtml += `
                  <div class="card p-3 mb-3 d-flex flex-row align-items-center justify-content-between">
@@ -554,7 +564,7 @@ const LearningPath = {
                         <p class="mb-0">
                             <span class="badge ${badgeClass} me-2">${sectionData.status}</span>
                             <small class="text-muted">Son Puan: ${sectionData.lastScore}%</small>
-                            ${!isAvailable ? '<span class="badge bg-warning text-dark ms-2">Yeterli Soru Yok</span>' : ''}
+                            ${availabilityWarning}
                         </p>
                      </div>
                      <button class="btn btn-sm btn-info" ${buttonDisabled} onclick="LearningPath.startQuiz('${moduleId}', '${section.id}')">
@@ -565,7 +575,7 @@ const LearningPath = {
         });
 
 
-        // Modül Final Testi Butonu
+        // --- 3. Modül Final Testi Butonu ---
         const testButtonClass = isSectionsCompleted ? 'btn-success' : 'btn-secondary';
         const testButtonText = isSectionsCompleted ? 'Genel Modül Testini Başlat' : `Tüm bölümler tamamlanmalı (${completedSections}/${totalSections})`;
 
@@ -852,7 +862,7 @@ const LearningPath = {
                 quizEl.style.alignItems = 'center'; 
                 quizEl.style.textAlign = 'center';
 
-                this.calculateModuleScore(moduleId, quizQuestions, userAnswers, quizType);
+                this.calculateModuleScore(moduleId, questions, userAnswers, quizType);
                 return;
             }
             

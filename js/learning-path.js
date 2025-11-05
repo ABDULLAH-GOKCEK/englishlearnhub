@@ -42,7 +42,8 @@ const LearningPath = {
 
         }).catch(error => {
             console.error("Veri yüklenirken kritik hata oluştu:", error);
-            this.showSection('introSection');
+            // Hata durumunda bile introSection'ı göster
+            this.showSection('introSection'); 
         });
 
         const startTestButton = document.getElementById('startTestButton');
@@ -539,7 +540,7 @@ const LearningPath = {
                         <div class="mt-4">
                             <h4>3. Okuma Anlama Alıştırması</h4>
                             <div class="alert alert-warning" role="alert">
-                                <strong>Okuma Hikayesi Bulunamadı:</strong> Mevcut seviyeniz (${userLevel}) ve modül konusu (${baseModule.topic}) ile eşleşen bir okuma hikayesi/metni 'reading_stories.json' dosyanızda bulunamadı. Bu bölüm **otomatik olarak tamamlanmış sayılacaktır**.
+                                <strong>Okuma Hikayesi Bulunamadı:</strong> Mevcut seviyeniz (${userLevel}) ve modül konusu (${baseModule.topic}) ile eşleşen bir okuma hikayesi/metni <code>reading_stories.json</code> dosyanızda bulunamadı. Bu bölüm **otomatik olarak tamamlanmış sayılacaktır**.
                             </div>
                         </div>
                     `;
@@ -769,10 +770,26 @@ const LearningPath = {
         let readingQuizQuestions = [];
         const readingLevelCode = allowedDifficulties.map(d => d.toLowerCase()).find(d => ['beginner', 'intermediate', 'advanced'].includes(d)) || 'beginner';
         
-        const moduleReading = this.allReadings.find(r => 
+        let moduleReading = null;
+        
+        // 1. Aşama: KONU + SEVİYE bazlı eşleşme ara
+        moduleReading = this.allReadings.find(r => 
             r.level.toLowerCase().includes(readingLevelCode) && 
-            (['okuma', 'reading'].includes(baseModuleTopic) || !baseModuleTopic || r.category.toLowerCase().includes(baseModuleTopic) || baseModuleTopic.includes(r.category.toLowerCase()))
+            (['okuma', 'reading'].includes(baseModuleTopic) || // Eğer modül konusu zaten 'okuma' ise, seviye yeterlidir
+             !baseModuleTopic || // Modül konusu boşsa (genel modül)
+             r.category.toLowerCase().includes(baseModuleTopic) || // Hikaye kategorisi modül konusunu içeriyorsa
+             baseModuleTopic.includes(r.category.toLowerCase())) // Modül konusu hikaye kategorisini içeriyorsa
         );
+        
+        // 2. Aşama: Eğer Konu bazlı eşleşme bulunamazsa, SADECE SEVİYE bazlı GENEL bir hikaye ara
+        if (!moduleReading) {
+            const generalCategories = ['general', 'daily life', 'nature', 'food', 'travel', 'people', 'music']; // JSON dosyanızdaki kategoriler eklendi
+            
+            moduleReading = this.allReadings.find(r => 
+                 r.level.toLowerCase().includes(readingLevelCode) &&
+                 generalCategories.some(cat => r.category.toLowerCase().includes(cat))
+            );
+        }
 
         if (moduleReading) {
             // Başarılı bir şekilde hikaye bulundu
@@ -796,7 +813,7 @@ const LearningPath = {
                 });
             });
         } else {
-             // Hikaye bulunamadıysa yer tutucu ekle
+             // Hala bulunamadıysa yer tutucu ekle (Genel hikaye bile yoksa)
              enrichedContent.push({type: 'reading_placeholder', text: 'Okuma hikayesi bulunamadı.'});
              baseModule.moduleReading = null;
         }
@@ -1067,7 +1084,7 @@ const LearningPath = {
             localStorage.setItem('learningModules', JSON.stringify(modules));
         }
 
-        this.showModuleResult(moduleId, score, questions.length, correctCount, isPassed, Array.from(requiredTopics), quizType);
+        this.showModuleResult(moduleId, score, totalQuestions, correctCount, isPassed, Array.from(requiredTopics), quizType);
     },
 
     showModuleResult: function(moduleId, score, totalQuestions, correctCount, isPassed, feedback, quizType) {
@@ -1158,4 +1175,3 @@ const LearningPath = {
 };
 
 document.addEventListener('DOMContentLoaded', () => LearningPath.init());
-

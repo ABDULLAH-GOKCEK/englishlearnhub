@@ -58,8 +58,8 @@ const LearningPath = {
         }
     },
 
-    // --- Seslendirme Fonksiyonları ---
-    speak: function(text) {
+    // --- Seslendirme Fonksiyonları (V9 Güncellendi) ---
+    speak: function(text, rate = 0.9) { // Yeni: rate parametresi eklendi
         if (this.synth.speaking) {
             this.synth.cancel();
         }
@@ -75,7 +75,7 @@ const LearningPath = {
             this.speechUtterance.lang = 'en-US'; 
         }
 
-        this.speechUtterance.rate = 0.9; // Konuşma hızını ayarla
+        this.speechUtterance.rate = parseFloat(rate); // Hızı dinamik olarak ayarla
         this.speechUtterance.pitch = 1.0; 
 
         this.synth.speak(this.speechUtterance);
@@ -150,12 +150,9 @@ const LearningPath = {
         return 'bg-secondary';
     },
 
-    // Ana Sayfa butonu HTML'i
+    // Ana Sayfa butonu HTML'i (V8.1 Güncellendi)
     getHomeButton: function(userLevel) {
-        // ESKİ KOD (V8): const pathFunction = userLevel ? `LearningPath.displayLearningPath('${userLevel}')` : `window.location.reload()`;
-        
-        // YENİ KOD (V8.1): Yönlendirmeyi 'index.html' olarak sabitle
-        const homeHref = 'index.html'; 
+        const homeHref = 'index.html'; // Ana sayfaya yönlendirme
 
         return `
             <div style="position: sticky; top: 0; z-index: 10;">
@@ -166,7 +163,7 @@ const LearningPath = {
         `;
     },
     
-    // --- Seviye Tespit Testi Fonksiyonları (V4 ile aynı) ---
+    // --- Seviye Tespit Testi Fonksiyonları ---
 
     prepareAndDisplayLevelTest: function() {
         const MAX_QUESTIONS = 20;
@@ -378,7 +375,7 @@ const LearningPath = {
         if (navButton) navButton.classList.remove('d-none');
     },
 
-    // --- Öğrenme Yolu ve Modül İçeriği Fonksiyonları (V8 Güncellendi) ---
+    // --- Öğrenme Yolu ve Modül İçeriği Fonksiyonları ---
     displayLearningPath: function(level) {
         this.showSection('learningPathSection');
         const pathEl = document.getElementById('learningPathSection');
@@ -492,9 +489,14 @@ const LearningPath = {
                 ${this.getHomeButton(level)}
             </div>
             
-            <div class="level-header" style="max-width: 900px; width: 100%;">
-                <h2>${levelTitle}</h2>
-                <p class="lead">Seviyeniz **${level}** olarak belirlendi. Modüller **${level}** seviyesine uygun çalışmalar içerecektir.</p>
+            <div class="level-header" style="max-width: 900px; width: 100%; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h2>${levelTitle}</h2>
+                    <p class="lead">Seviyeniz **${level}** olarak belirlendi. Modüller **${level}** seviyesine uygun çalışmalar içerecektir.</p>
+                </div>
+                <button class="btn btn-lg btn-outline-info" onclick="LearningPath.displayStats()">
+                    <i class="fas fa-chart-bar me-2"></i> İstatistikler
+                </button>
             </div>
             
             <h4 class="topic-header" style="max-width: 900px; width: 100%; text-align: left; margin-top: 30px;">Öğrenme Modülleri (${modules.length} Adet)</h4>
@@ -508,19 +510,53 @@ const LearningPath = {
         localStorage.setItem('userLevel', level);
     },
     
+    // getIconForTopic Fonksiyonu (V10 Güncellendi)
     getIconForTopic: function(topic) {
+        // Konuyu küçük harfe çevirerek daha esnek hale getirelim
+        const normalizedTopic = topic.toLowerCase();
+        
         const icons = {
-            'Gramer': 'fa-graduation-cap',
-            'Kelime': 'fa-spell-check',
-            'Konuşma': 'fa-comments',
-            'Okuma': 'fa-book-open',
-            'Structure': 'fa-sitemap',
-            'Nouns': 'fa-cube',
-            'Prepositions': 'fa-location-arrow'
+            // Yapı ve Gramer Konuları
+            'fiil': 'fa-running', // To Be Fiili
+            'zamir': 'fa-users',  // Temel Zamirler
+            'tense': 'fa-clock',
+            'zaman': 'fa-calendar-alt',
+            'structure': 'fa-sitemap',
+            'conditionals': 'fa-project-diagram',
+            'passive': 'fa-hands-wash',
+            
+            // Kelime Konuları
+            'kelime': 'fa-spell-check',
+            'vocabulary': 'fa-font',
+            'animals': 'fa-paw',
+            'food': 'fa-utensils',
+            'time': 'fa-hourglass-half',
+            'daily life': 'fa-bed',
+            
+            // Beceri Konuları
+            'konuşma': 'fa-comments',
+            'speaking': 'fa-microphone-alt',
+            'okuma': 'fa-book-open',
+            'reading': 'fa-book',
+            'yazma': 'fa-pen-fancy',
+            
+            // Genel
+            'gramer': 'fa-graduation-cap',
+            'nouns': 'fa-cube',
+            'prepositions': 'fa-location-arrow'
         };
-        return icons[topic] || 'fa-cubes';
+        
+        // Eşleşme bulmaya çalış
+        for (const key in icons) {
+            if (normalizedTopic.includes(key)) {
+                return icons[key];
+            }
+        }
+        
+        return 'fa-cubes'; // Varsayılan ikon
     },
     
+    // displayModuleContent (V9 Güncellendi)
     displayModuleContent: function(moduleId, userLevel) {
         this.showSection('moduleContentSection');
         const contentEl = document.getElementById('moduleContentSection');
@@ -581,16 +617,24 @@ const LearningPath = {
                     break;
                 case 'reading_text':
                     // Okuma içeriğini ve ses butonunu ekle
+                    // ----------------------------------------------------
+                    const currentRate = localStorage.getItem('speechRate') || '0.9'; // Mevcut hızı çek (V9)
+
                     contentHtml += `
                         <div class="mt-4">
                             <h4>3. Okuma: ${baseModule.reading_story_title || 'Hikaye Başlığı'}</h4>
                             <p class="mb-2"><small class="text-muted">**Seviye:** ${item.level} - **Konu:** ${item.category}. Parçayı okuyun ve aşağıdaki soruları cevaplayın.</small></p>
                             
-                            <div class="d-flex justify-content-end mb-2">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
                                 <button id="speechButton" class="btn btn-sm btn-outline-info" 
                                     data-text="${item.text.replace(/"/g, '')}">
                                     <i class="fas fa-volume-up me-1"></i> Sesli Oku / Durdur
                                 </button>
+                                
+                                <div class="d-flex align-items-center" style="width: 250px;">
+                                    <label for="speechRateSlider" class="form-label me-2 mb-0" style="font-size: 0.8rem;">Konuşma Hızı (<span id="rateValue">${currentRate}</span>x)</label>
+                                    <input type="range" class="form-range" min="0.5" max="2.0" step="0.1" value="${currentRate}" id="speechRateSlider">
+                                </div>
                             </div>
 
                             <div class="reading-text-box" style="border: 1px dashed #ccc; padding: 15px; margin: 15px 0;">${item.text.replace(/\n/g, '<p>')}</div>
@@ -598,6 +642,7 @@ const LearningPath = {
                     `;
                     contentHtml += this.renderInlineQuizSection('reading', baseModule, currentModule);
                     break;
+                    // ----------------------------------------------------
                 case 'reading_placeholder':
                     // Okuma hikayesi bulunamadıysa gösterilecek yer tutucu
                     contentHtml += `
@@ -634,19 +679,37 @@ const LearningPath = {
 
         contentEl.innerHTML = contentHtml;
         
-        // --- SES BUTONU DİNLEYİCİSİ ---
+        // --- SES BUTONU DİNLEYİCİSİ ve HIZ KONTROLÜ (V9 Güncellendi) ---
         const speechButton = document.getElementById('speechButton');
+        const rateSlider = document.getElementById('speechRateSlider');
+        const rateValueSpan = document.getElementById('rateValue');
+
         if (speechButton) {
             speechButton.addEventListener('click', () => {
                 const textToRead = speechButton.getAttribute('data-text');
+                const rate = localStorage.getItem('speechRate') || '0.9'; // Güncel hızı çek
+                
                 if (this.synth.speaking && this.speechUtterance && this.speechUtterance.text === textToRead) {
                     this.stopSpeaking();
                 } else {
-                    this.speak(textToRead);
+                    this.speak(textToRead, rate); // Yeni speak fonksiyonunu kullan
                 }
             });
         }
-        // --- SES BUTONU DİNLEYİCİSİ BİTİŞİ ---
+        
+        if (rateSlider) {
+             rateSlider.addEventListener('input', (e) => {
+                 const newRate = e.target.value;
+                 localStorage.setItem('speechRate', newRate); // Hızı kaydet
+                 rateValueSpan.textContent = newRate; // UI'ı güncelle
+                 
+                 // Ses çalarken hızı anlık olarak uygula (isteğe bağlı)
+                 if (this.synth.speaking && this.speechUtterance) {
+                      this.speechUtterance.rate = parseFloat(newRate);
+                 }
+             });
+        }
+        // --- SES BUTONU DİNLEYİCİSİ ve HIZ KONTROLÜ BİTİŞİ ---
     },
 
     renderInlineQuizSection: function(sectionId, baseModule, currentModule) {
@@ -730,7 +793,7 @@ const LearningPath = {
         return arr[Math.floor(Math.random() * arr.length)];
     },
 
-    // Dinamik içerik oluşturucu (V8 Güncellendi)
+    // Dinamik içerik oluşturucu
     enrichModuleContent: function(moduleId, baseModule, userLevel) {
         
         const moduleLevel = userLevel.toUpperCase(); 
@@ -797,6 +860,7 @@ const LearningPath = {
                 options.push(...wrongOptions);
                     
                 wordQuizQuestions.push({
+                    id: `word_q${i}`, // ID Eklendi
                     type: 'quiz', 
                     question: `(Kelime Sorusu): '${correctWord.word}' kelimesinin Türkçe karşılığı nedir?`, 
                     options: options.sort(() => 0.5 - Math.random()), 
@@ -853,6 +917,7 @@ const LearningPath = {
                 options.push(...wrongOptions);
 
                 sentenceQuizQuestions.push({
+                    id: `sentence_q${i}`, // ID Eklendi
                     type: 'quiz', 
                     question: `(Cümle Sorusu): Cümledeki boşluğu doldurun: "${questionText}"`, 
                     options: options.sort(() => 0.5 - Math.random()), 
@@ -862,7 +927,7 @@ const LearningPath = {
             }
         }
 
-        // --- 3. Okuma Parçası (reading_stories.json) - KRİTİK GÜNCELLEME V8 ---
+        // --- 3. Okuma Parçası (reading_stories.json) ---
         let readingQuizQuestions = [];
         const readingLevelCodes = allowedDifficulties.filter(d => ['beginner', 'intermediate', 'advanced'].includes(d)) 
 
@@ -889,7 +954,7 @@ const LearningPath = {
 
         const finalMatches = topicAndLevelMatches.length > 0 ? topicAndLevelMatches : levelOnlyMatches;
 
-        // KRİTİK DÜZELTME V8: Eşleşen hikayelerden rastgele birini seç
+        // Eşleşen hikayelerden rastgele birini seç
         if (finalMatches.length > 0) {
              moduleReading = this.getRandomElement(finalMatches);
         }
@@ -906,9 +971,8 @@ const LearningPath = {
             });
             baseModule.reading_story_title = moduleReading.title;
             
-            // --- KRİTİK SORU ALMA VE HATA YÖNETİMİ DÜZELTMESİ V6 ---
             if (Array.isArray(moduleReading.questions)) {
-                moduleReading.questions.forEach((q) => {
+                moduleReading.questions.forEach((q, index) => {
                      if (!Array.isArray(q.options) || q.options.length < 2) {
                         console.warn(`Okuma hikayesi "${moduleReading.title}" - Soru geçersiz (Options eksik): ${q.question}`);
                         return; // Geçersiz soruyu atla
@@ -918,14 +982,12 @@ const LearningPath = {
                      let correctAnswerValue = q.correctAnswer;
                      
                      if (typeof correctAnswerValue === 'number') {
-                         // Cevap bir index (sayı) ise
                          const correctAnswerIndex = parseInt(correctAnswerValue, 10); 
                          if (correctAnswerIndex >= 0 && correctAnswerIndex < q.options.length) {
                             correctAnswerText = q.options[correctAnswerIndex]; 
                          }
                      } else if (typeof correctAnswerValue === 'string') {
-                          // Cevap metin (string) ise, seçeneklerde metin olarak ara
-                         const match = q.options.find(opt => opt === correctAnswerValue);
+                          const match = q.options.find(opt => opt === correctAnswerValue);
                          if (match) {
                              correctAnswerText = match;
                          } else {
@@ -936,6 +998,7 @@ const LearningPath = {
                      
                      if (correctAnswerText) { // Soru ve cevaplar geçerliyse ekle
                          readingQuizQuestions.push({
+                            id: `reading_q${index}`, // ID Eklendi
                             type: 'quiz', 
                             question: `(Okuma Sorusu): ${q.question}`, 
                             options: q.options, 
@@ -960,8 +1023,11 @@ const LearningPath = {
             ...readingQuizQuestions
         ];
         
+        // Genel quiz sorularının ID'lerini set et (önceden set edilmemişse)
         allQuizQuestions.forEach((q, index) => {
-            q.id = `q${index}`;
+            if (!q.id.startsWith('all_')) {
+                 q.id = `all_q${index}`;
+            }
         });
         
         // Bu fonksiyon, filtreleme için gerekli tüm bilgileri baseModule'a ekler
@@ -973,7 +1039,7 @@ const LearningPath = {
         return enrichedContent;
     },
     
-    // --- Quiz ve Skor Fonksiyonları (V4 ile aynı) ---
+    // --- Quiz ve Skor Fonksiyonları (V9 Güncellendi) ---
 
     startQuiz: function(moduleId, quizType = 'all') { 
         this.showSection('moduleQuizSection');
@@ -1037,6 +1103,30 @@ const LearningPath = {
             quizTitle = `${baseModule.name} - Genel Test`;
         }
         
+        // Yeni: Yanlış yapılan soruları önceliklendirme mekanizması (V9)
+        const wrongKey = `wrong_${moduleId}_${quizType}`;
+        const savedWrongIds = JSON.parse(localStorage.getItem(wrongKey) || '[]');
+        
+        if (savedWrongIds.length > 0) {
+             const wrongQuestions = quizQuestions.filter(q => savedWrongIds.includes(q.id));
+             const otherQuestions = quizQuestions.filter(q => !savedWrongIds.includes(q.id));
+             
+             // Yanlışları başa al, diğerlerini rastgele karıştır
+             const shuffledOtherQuestions = otherQuestions.sort(() => 0.5 - Math.random());
+             
+             // Yeni soru listesini oluştur
+             quizQuestions = [
+                 ...wrongQuestions, 
+                 ...shuffledOtherQuestions
+             ];
+             
+             quizTitle += ` (Tekrar: ${wrongQuestions.length} Yanlış Soru Öncelikli)`;
+        } else {
+            // Yanlış yoksa veya ilk kez yapılıyorsa normal rastgele sırala
+            quizQuestions.sort(() => 0.5 - Math.random());
+        }
+        // V9 Kodu Bitişi
+
         if (quizQuestions.length === 0) {
             quizEl.style.alignItems = 'center'; 
             quizEl.style.textAlign = 'center';
@@ -1156,12 +1246,14 @@ const LearningPath = {
     calculateModuleScore: function(moduleId, questions, userAnswers, quizType) {
         let correctCount = 0;
         let requiredTopics = new Set();
-        
+        let wrongQuestionIds = []; // Yeni: Yanlış yapılan soru ID'leri (V9)
+
         questions.forEach((q, index) => {
             const isCorrect = userAnswers[index] === q.answer;
             if (isCorrect) {
                 correctCount++;
             } else {
+                wrongQuestionIds.push(q.id); // Yanlış cevabı kaydet (V9)
                 if (q.topic) {
                     requiredTopics.add(q.topic);
                 } else {
@@ -1169,6 +1261,11 @@ const LearningPath = {
                 }
             }
         });
+
+        // Yanlış cevaplanan soruları kaydetme mekanizması (V9)
+        const wrongKey = `wrong_${moduleId}_${quizType}`;
+        localStorage.setItem(wrongKey, JSON.stringify(wrongQuestionIds));
+        // V9 Kodu Bitişi
 
         const score = Math.round((correctCount / questions.length) * 100);
         const isPassed = (score >= this.PASS_SCORE);
@@ -1290,6 +1387,103 @@ const LearningPath = {
         quizEl.innerHTML = resultHtml;
     },
 
+// =========================================================================
+// YENİ FONKSİYONLAR: İSTATİSTİK SAYFASI (V10)
+// =========================================================================
+
+    getStatsData: function() {
+        const modules = JSON.parse(localStorage.getItem('learningModules') || '[]');
+        const userLevel = localStorage.getItem('userLevel') || 'Belirlenmedi';
+        
+        let completedModules = 0;
+        let totalModules = modules.length;
+        let totalScoreSum = 0;
+        let scoredModules = 0;
+        let progress = 0;
+
+        modules.forEach(m => {
+            if (m.status === 'Tamamlandı') {
+                completedModules++;
+            }
+            if (m.lastScore > 0) {
+                totalScoreSum += m.lastScore;
+                scoredModules++;
+            }
+        });
+        
+        if (totalModules > 0) {
+             progress = Math.round((completedModules / totalModules) * 100);
+        }
+
+        const avgScore = scoredModules > 0 ? Math.round(totalScoreSum / scoredModules) : 0;
+        
+        return {
+            userLevel: userLevel,
+            completedModules: completedModules,
+            totalModules: totalModules,
+            progress: progress,
+            avgScore: avgScore
+        };
+    },
+
+    displayStats: function() {
+        this.showSection('statsSection');
+        const statsEl = document.getElementById('statsSection');
+        const stats = this.getStatsData();
+        
+        statsEl.style.alignItems = 'center'; 
+        statsEl.style.textAlign = 'center';
+        
+        let statsHtml = `
+            <div style="max-width: 800px; width: 100%;">
+                 ${this.getHomeButton(stats.userLevel)}
+                <h3 class="mb-5 text-primary">📊 Genel İlerleme İstatistikleri</h3>
+                
+                <div class="row text-center mb-5">
+                    <div class="col-12 col-md-4 mb-3">
+                        <div class="card p-3 shadow-sm h-100">
+                            <h4 class="text-secondary">Mevcut Seviye</h4>
+                            <p class="display-4 fw-bold text-success">${stats.userLevel}</p>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-4 mb-3">
+                        <div class="card p-3 shadow-sm h-100">
+                            <h4 class="text-secondary">Tamamlanan Modül</h4>
+                            <p class="display-4 fw-bold">${stats.completedModules} / ${stats.totalModules}</p>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-4 mb-3">
+                        <div class="card p-3 shadow-sm h-100">
+                            <h4 class="text-secondary">Modül Ortalama Puanı</h4>
+                            <p class="display-4 fw-bold">${stats.avgScore}%</p>
+                        </div>
+                    </div>
+                </div>
+
+                <h4>Öğrenme Yolu İlerlemesi</h4>
+                <div class="progress mb-4" style="height: 30px;">
+                    <div class="progress-bar progress-bar-striped ${stats.progress === 100 ? 'bg-success' : 'bg-info'}" 
+                         role="progressbar" 
+                         style="width: ${stats.progress}%;"
+                         aria-valuenow="${stats.progress}" 
+                         aria-valuemin="0" 
+                         aria-valuemax="100">
+                        %${stats.progress} Tamamlandı
+                    </div>
+                </div>
+
+                <p class="mt-4 lead">Devam etmek için modüllerinize geri dönün veya seviyenizi yükseltmek için çalışın.</p>
+                <button class="btn btn-lg btn-primary mt-3" onclick="LearningPath.displayLearningPath('${stats.userLevel}')">
+                    <i class="fas fa-route me-2"></i> Öğrenme Yoluna Devam Et
+                </button>
+            </div>
+        `;
+        statsEl.innerHTML = statsHtml;
+    },
+    // =========================================================================
+    // İSTATİSTİK SAYFASI FONKSİYONLARI BİTİŞ
+    // =========================================================================
+
     resetUserLevel: function() {
         if (confirm("Seviye belirleme testini yeniden yaparak mevcut seviyenizi güncelleyebilirsiniz. Bu işlem modüllerdeki ilerlemenizi (tamamlama durumunuzu) silmez, sadece yeni seviyenize göre içerik filtrelemeyi sağlar. Emin misiniz?")) {
             localStorage.removeItem('userLevel');
@@ -1304,6 +1498,15 @@ const LearningPath = {
             localStorage.removeItem('userLevel');
             localStorage.removeItem('learningModules');
             localStorage.removeItem('levelTestAnswers');
+            
+            // Tüm yanlış cevap kayıtlarını da sil
+            for (let i = 0; i < localStorage.length; i++) {
+                 const key = localStorage.key(i);
+                 if (key.startsWith('wrong_')) {
+                     localStorage.removeItem(key);
+                 }
+            }
+            
             alert("Tüm ilerleme sıfırlandı. Seviye tespit testi yeniden başlayacak.");
             window.location.reload(); 
         }
@@ -1311,4 +1514,3 @@ const LearningPath = {
 };
 
 document.addEventListener('DOMContentLoaded', () => LearningPath.init());
-

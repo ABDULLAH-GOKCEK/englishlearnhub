@@ -130,58 +130,41 @@ const LearningPath = {
         let userAnswers = {}; // {questionId: selectedOption}
 
         // Test bölümünün hizalamasını soru göstermek için sola çek
-        testEl.style.alignItems = 'flex-start'; 
-        testEl.style.textAlign = 'left';
+    testEl.style.alignItems = 'flex-start'; 
+    testEl.style.textAlign = 'left';
 
-        const renderQuestion = () => {
-            if (currentQuestionIndex >= questions.length) {
-                // Test bitince hizalamayı tekrar ortala (sonuç kartı için)
-                testEl.style.alignItems = 'center'; 
-                testEl.style.textAlign = 'center';
+    const renderQuestion = () => {
+        // ... (Test bitiş kontrolü)
 
-                this.calculateLevel(questions, userAnswers);
-                return;
-            }
+        const q = questions[currentQuestionIndex];
+        const progress = Math.round((currentQuestionIndex / questions.length) * 100);
 
-            const q = questions[currentQuestionIndex];
-            const progress = Math.round((currentQuestionIndex / questions.length) * 100);
+        // ... (optionsHtml oluşturma kısmı)
 
-            let optionsHtml = '';
-            const shuffledOptions = q.options.sort(() => 0.5 - Math.random()); 
-            shuffledOptions.forEach((option, index) => {
-                const checked = userAnswers[q.id] === option ? 'checked' : '';
-                optionsHtml += `
-                    <div class="form-check question-option">
-                        <input class="form-check-input" type="radio" name="question_${q.id}" id="option_${q.id}_${index}" value="${option}" ${checked}>
-                        <label class="form-check-label w-100" for="option_${q.id}_${index}">${option}</label>
-                    </div>
-                `;
-            });
-
-            const testContent = `
-                <div style="max-width: 800px; width: 100%;">
-                    <h3 class="mb-4">Seviye Tespit Testi (${currentQuestionIndex + 1} / ${questions.length})</h3>
-                    <div class="progress-container">
-                        <div class="progress" role="progressbar" style="height: 12px;">
-                            <div class="progress-bar" style="width: ${progress}%; background-color: #4361ee;">${progress}%</div>
-                        </div>
-                    </div>
-                    
-                    <div class="card p-4 my-4">
-                        <h5>${q.questionText}</h5>
-                        <p><small class="text-muted">Konu: ${q.topic} (Seviye: ${q.level})</small></p>
-                        <div class="question-options-group">
-                            ${optionsHtml}
-                        </div>
-                    </div>
-
-                    <div class="d-flex justify-content-between">
-                        <button class="btn btn-secondary ${currentQuestionIndex === 0 ? 'd-none' : ''}" id="prevButton">Geri</button>
-                        <button class="btn btn-primary" id="nextButton">${currentQuestionIndex === questions.length - 1 ? 'Testi Bitir' : 'Sonraki'}</button>
+        const testContent = `
+            <div style="max-width: 800px; width: 100%;">
+                <h3 class="mb-4">Seviye Tespit Testi (${currentQuestionIndex + 1} / ${questions.length})</h3>
+                <div class="progress-container">
+                    <div class="progress" role="progressbar" style="height: 12px;">
+                        <div class="progress-bar" style="width: ${progress}%; background-color: #4361ee;">${progress}%</div>
                     </div>
                 </div>
-            `;
-            testEl.innerHTML = testContent;
+                
+                <div class="card p-4 my-4">
+                    <h5 class="question-text">${q.questionText}</h5> 
+                    <p><small class="text-muted">Konu: ${q.topic} (Seviye: ${q.level})</small></p> 
+                    <div class="question-options-group">
+                        ${optionsHtml}
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between">
+                    <button class="btn btn-secondary ${currentQuestionIndex === 0 ? 'd-none' : ''}" id="prevButton">Geri</button>
+                    <button class="btn btn-primary" id="nextButton">${currentQuestionIndex === questions.length - 1 ? 'Testi Bitir' : 'Sonraki'}</button>
+                </div>
+            </div>
+        `;
+        testEl.innerHTML = testContent;
 
             // Event Listener'lar
             document.querySelectorAll(`input[name="question_${q.id}"]`).forEach(input => {
@@ -686,4 +669,5 @@ const LearningPath = {
 };
 
 document.addEventListener('DOMContentLoaded', () => LearningPath.init());
+
 

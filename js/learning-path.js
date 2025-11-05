@@ -10,28 +10,42 @@ const LearningPath = {
     init: function() {
         this.loadAllData().then(() => {
             console.log("Tüm veriler yüklendi.");
-            // Kullanıcının seviyesini kontrol et
+            
+            // 1. Kullanıcının seviyesini kontrol et
             const userLevel = localStorage.getItem('userLevel');
+            
+            // 2. Testi Başlat butonu elementini al
+            const startTestButton = document.getElementById('startTestButton');
+            
             if (userLevel) {
+                // Seviye kayıtlıysa, öğrenme yolunu göster
                 this.displayLearningPath(userLevel);
+            } else if (startTestButton) {
+                // Seviye kayıtlı değilse ve "Test Başlat" butonu varsa:
+                // Sadece tanıtım bölümünü gösterip, butona basılmasını bekle.
+                this.showSection('introSection');
             } else {
-                this.showSection('levelTestSection');
-                this.displayLevelTest();
+                 // Eğer seviye yok ve HTML'de buton yoksa (örneğin test sayfası direkt açılıyorsa), testi başlat.
+                 this.showSection('levelTestSection');
+                 this.displayLevelTest();
             }
+
         }).catch(error => {
             console.error("Veri yüklenirken kritik hata oluştu:", error);
             // Hata durumunda, kullanıcıya bilgi vererek test sayfasını göster
             this.showSection('levelTestSection');
             const testEl = document.getElementById('levelTestSection');
-            testEl.innerHTML = `
-                <div class="alert alert-danger" role="alert">
-                    <h4>Veri Yükleme Hatası!</h4>
-                    <p>Uygulama temel verileri yükleyemedi. Sunucu bağlantınızı ve dosya yollarınızı kontrol edin (Örn: data/words.json).</p>
-                </div>
-            `;
+            if (testEl) {
+                testEl.innerHTML = `
+                    <div class="alert alert-danger" role="alert">
+                        <h4>Veri Yükleme Hatası!</h4>
+                        <p>Uygulama temel verileri yükleyemedi. Lütfen konsoldaki detayları kontrol edin.</p>
+                    </div>
+                `;
+            }
         });
 
-        // Test Başlat butonuna event listener ekle
+        // Test Başlat butonuna event listener ekle (Tekrar sağlamlaştırma)
         const startTestButton = document.getElementById('startTestButton');
         if (startTestButton) {
              startTestButton.onclick = () => {
@@ -40,7 +54,6 @@ const LearningPath = {
              };
         }
     },
-
     // Tüm JSON dosyalarını yükleyen asenkron fonksiyon
     loadAllData: async function() {
         // Module ve Level Test verisi
@@ -610,4 +623,5 @@ const LearningPath = {
 };
 
 document.addEventListener('DOMContentLoaded', () => LearningPath.init());
+
 

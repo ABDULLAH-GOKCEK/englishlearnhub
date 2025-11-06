@@ -1011,6 +1011,7 @@ const LearningPath = {
         document.querySelectorAll('.question-options-group .question-option').forEach(optionEl => {
             optionEl.addEventListener('click', function() {
                 const selectedValue = this.querySelector('input').value;
+                // Cevabı state'e kaydet
                 currentQuizState.answers[questionIndex] = {
                     questionId: question.id,
                     selected: selectedValue,
@@ -1037,9 +1038,24 @@ const LearningPath = {
     submitQuiz: function() {
         let currentQuizState = JSON.parse(localStorage.getItem('currentQuiz'));
         const currentQuestion = currentQuizState.questions[currentQuizState.currentQuestionIndex];
+        const questionIndex = currentQuizState.currentQuestionIndex;
         
-        // Cevap zaten kaydedilmiş olmalı (click listener ile)
-        const currentAnswer = currentQuizState.answers[currentQuizState.currentQuestionIndex];
+        // V14.4: Hata Düzeltme 1 - DOM'dan seçilen cevabı al
+        const selectedOption = document.querySelector('input[name="quiz_question"]:checked')?.value;
+        
+        // DOM'dan alınan cevabı state'e kaydet (Eğer click event'i kaçırıldıysa)
+        if (selectedOption) {
+            currentQuizState.answers[questionIndex] = {
+                questionId: currentQuestion.id,
+                selected: selectedOption,
+                correct: currentQuestion.answer,
+                isCorrect: selectedOption === currentQuestion.answer
+            };
+            localStorage.setItem('currentQuiz', JSON.stringify(currentQuizState));
+        }
+
+        // Cevap zaten kaydedilmiş olmalı (click listener veya yukarıdaki DOM kontrolü ile)
+        const currentAnswer = currentQuizState.answers[questionIndex];
 
         if (!currentAnswer) {
             alert("Lütfen bir seçenek işaretleyiniz.");
@@ -1068,9 +1084,28 @@ const LearningPath = {
 
         this.updateModuleSectionStatus(moduleId, sectionId, true, score, status);
 
-        const resultsContainer = document.getElementById('quizResults');
+        // V14.4: Hata Düzeltme 2 - İki olası sonuç konteynerini kontrol et (HTML çökmesini önler)
+        let resultsContainer = document.getElementById('quizResults');
+        if (!resultsContainer) {
+             resultsContainer = document.getElementById('quizResultsSection'); // Fallback to the section container
+        }
+        
         const userLevel = localStorage.getItem('userLevel');
         
+        // Eğer hala null ise, hata mesajı gösterip çık.
+        if (!resultsContainer) {
+             console.error("Kritik Hata: Quiz sonuçları için HTML konteyneri bulunamadı (quizResults veya quizResultsSection). Lütfen index.html dosyanızı kontrol edin.");
+             // quizResultsSection'ı da bulamadıysa, quizSection'ı kullan
+             let emergencyContainer = document.getElementById('quizSection');
+             if(emergencyContainer) {
+                 emergencyContainer.innerHTML = `<div class="alert alert-danger" style="max-width: 800px;">Kritik Hata: Sonuçlar gösterilemedi. Lütfen HTML yapınızı kontrol edin.</div>`;
+                 this.showSection('quizSection');
+             } else {
+                 alert("Kritik Hata: Sonuçlar gösterilemedi.");
+             }
+             return; 
+        }
+
         resultsContainer.innerHTML = `
             <h3 class="text-center mb-4">Quiz Sonuçları</h3>
             <div class="alert ${score >= this.PASS_SCORE ? 'alert-success' : 'alert-danger'} text-center">

@@ -507,7 +507,7 @@ const LearningPath = {
     },
     
     // =========================================================================
-    // 4. MODÜL İÇERİK YÜKLEME VE ZENGİNLEŞTİRME (KRİTİK GÜNCELLEME - V14.0)
+    // 4. MODÜL İÇERİK YÜKLEME VE ZENGİNLEŞTİRME (KRİTİK GÜNCELLEME - V14.1)
     // =========================================================================
     
     // Modül içeriğini zenginleştirir (Soru havuzunu hazırlar)
@@ -530,14 +530,13 @@ const LearningPath = {
         let sentenceQuizQuestions = [];
         let readingQuizQuestions = [];
         
-        const turkishToEnglishCategoryMap = {
-            'günlük hayat': 'daily life', 'günlük rutin': 'daily life', 'doğa': 'nature', 'hayvanlar': 'animals', 'müzik': 'music',
-            'yiyecek': 'food', 'beslenme': 'food', 'alışveriş': 'shopping', 'aile': 'family', 'seyahat': 'travel', 'geçmiş zaman': 'history', 
-            'konuşma': 'daily life', 'cümle yapısı': 'structure', 'dilbilgisi': 'grammar', 'be fiili': 'introduction', 'sahiplik': 'possession'
-        };
-        
-        const simplifiedTopic = baseModuleTopic.split(' ')[0];
-        const mappedCategory = turkishToEnglishCategoryMap[baseModuleTopic] || simplifiedTopic;
+        // V14.1 GÜNCELLEMESİ: Grammar modülleri için daha güvenilir konu tanımı
+        let effectiveTopic = baseModuleTopic;
+        if (baseModule.name.toLowerCase().includes('fiili') || baseModule.name.toLowerCase().includes('zamirler')) {
+             effectiveTopic = 'be fiili'; // Daha kısa ve veritabanı ile eşleşme ihtimali yüksek bir konu
+        } else if (baseModuleTopic.includes('be fiili') || baseModuleTopic.includes('sahiplik')) { 
+             effectiveTopic = baseModuleTopic.includes('be fiili') ? 'be fiili' : 'sahiplik';
+        }
 
         // --- 1. Kelime Alıştırmaları (words.json) ---
         // Önce modül konusuna ve seviyeye tam uyanları filtrele
@@ -545,7 +544,8 @@ const LearningPath = {
             const isLevelMatch = w.difficulty && allowedDifficulties.includes(w.difficulty.toLowerCase());
             if (!isLevelMatch) return false;
             const wordCategory = w.category ? w.category.toLowerCase() : '';
-            return wordCategory.includes(baseModuleTopic) || baseModuleTopic.includes(wordCategory);
+            // Konu eşleşmesi için effectiveTopic kullanılıyor (Fix 2)
+            return wordCategory.includes(effectiveTopic) || effectiveTopic.includes(wordCategory); 
         }).sort(() => 0.5 - Math.random());
         
         // V.14 GÜNCELLEMESİ: Yeterli kelime bulunamazsa (5'ten az), sadece seviyeye uyanlardan rastgele seç (Yedekleme Mantığı)
@@ -584,10 +584,11 @@ const LearningPath = {
             const isLevelMatch = s.difficulty && allowedDifficulties.includes(s.difficulty.toLowerCase());
             if (!isLevelMatch) return false;
             
+            // Dilbilgisi modülleri için seviyeye uygun tüm cümlelere izin ver (isModuleGrammar sayesinde)
             if (isModuleGrammar || ['konuşma', 'speaking', 'sentence', 'cümle'].includes(baseModuleTopic) || !baseModuleTopic) { return true; }
             
             const sentenceCategory = s.category ? s.category.toLowerCase() : '';
-            return sentenceCategory.includes(baseModuleTopic) || baseModuleTopic.includes(sentenceCategory);
+            return sentenceCategory.includes(effectiveTopic) || effectiveTopic.includes(sentenceCategory);
         }).sort(() => 0.5 - Math.random());
         
         // V.14 GÜNCELLEMESİ: Yeterli cümle bulunamazsa (5'ten az), sadece seviyeye uyanlardan rastgele seç (Yedekleme Mantığı)
@@ -605,8 +606,9 @@ const LearningPath = {
             enrichedContent.push({type: 'sentences', html: sentencesHtml});
             
             moduleSentences.slice(0, 10).forEach((s, index) => {
-                 if (s.english.split(' ').length < 3) return;
                  const words = s.english.split(' ');
+                 if (words.length < 3) return; // En az 3 kelimelik cümlede eksik kelime testi yap
+                 
                  const missingWordIndex = Math.floor(Math.random() * (words.length - 2)) + 1;
                  const missingWord = words[missingWordIndex].replace(/[.,?!]/g, '');
                  
@@ -626,12 +628,18 @@ const LearningPath = {
         }
         
         // --- 3. Okuma Anlama (reading_stories.json) ---
+        
+        // Okuma için konu eşleşmesi genellikle İngilizce kategorilere göre yapılır
+        const turkishToEnglishCategoryMap = {
+            'günlük hayat': 'daily life', 'günlük rutin': 'daily life', 'doğa': 'nature', 'hayvanlar': 'animals', 'müzik': 'music',
+            'yiyecek': 'food', 'beslenme': 'food', 'alışveriş': 'shopping', 'aile': 'family', 'seyahat': 'travel', 'geçmiş zaman': 'history', 
+            'konuşma': 'daily life', 'cümle yapısı': 'structure', 'dilbilgisi': 'grammar', 'be fiili': 'introduction', 'sahiplik': 'possession'
+        };
+        const mappedCategory = turkishToEnglishCategoryMap[effectiveTopic] || 'general';
+
         let moduleReading = this.allReadings.find(r => 
             (r.level && allowedDifficulties.includes(r.level.toLowerCase())) && 
-            (
-                (r.category ? r.category.toLowerCase() : '').includes(mappedCategory) ||
-                (r.title ? r.title.toLowerCase() : '').includes(simplifiedTopic) || baseModuleTopic.includes(r.category ? r.category.toLowerCase() : '')
-            )
+            (r.category ? r.category.toLowerCase() : '').includes(mappedCategory)
         );
 
         if (!moduleReading && this.allReadings.length > 0) {
@@ -796,6 +804,7 @@ const LearningPath = {
         // Render etmeden önce enrichModuleContent çağrısı, quiz sorularını baseModule'e ekler.
         const contentDetailHTML = this.renderModuleContentDetail(moduleId, baseModule, currentModule);
         
+        // V14.1 DÜZELTME 1: Ses Hızı kontrolünü yukarı taşıma
         contentEl.innerHTML = `
             <div style="max-width: 900px; width: 100%;">
                 <button class="btn btn-secondary mb-3" onclick="LearningPath.displayLearningPath('${userLevel}')">
@@ -803,15 +812,16 @@ const LearningPath = {
                 </button>
                 <h3 class="mb-4">${baseModule.name} Modülü (Seviye: ${userLevel})</h3>
                 
+                <div id="speechControls" class="d-flex align-items-center mb-3 p-3 bg-white rounded shadow-sm">
+                    <label for="speechRate" class="form-label mb-0 me-3">Ses Hızı:</label>
+                    <input type="range" class="form-range" id="speechRate" min="0.5" max="2" step="0.1" value="${localStorage.getItem('speechRate') || '0.9'}" style="width: 150px;">
+                    <span id="rateValue" class="ms-2">${localStorage.getItem('speechRate') || '0.9'}</span>
+                </div>
+                
                 <hr class="mt-4 mb-4">
                 
                 <div id="moduleContentDetail" class="p-4 bg-light rounded shadow-sm">
                     <h4>İçerik Anlatımı ve Alıştırmalar</h4>
-                    <div id="speechControls" class="d-flex align-items-center mb-3">
-                        <label for="speechRate" class="form-label mb-0 me-3">Ses Hızı:</label>
-                        <input type="range" class="form-range" id="speechRate" min="0.5" max="2" step="0.1" value="${localStorage.getItem('speechRate') || '0.9'}" style="width: 150px;">
-                        <span id="rateValue" class="ms-2">${localStorage.getItem('speechRate') || '0.9'}</span>
-                    </div>
                     ${contentDetailHTML} 
                 </div>
             </div>

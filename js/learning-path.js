@@ -794,16 +794,25 @@ const LearningPath = {
         
         // --- 3. Okuma Anlama (reading_stories.json) ---
         // Okuma parçası eşleştirme düzeltmesi
-        const moduleReading = this.allReadings.find(r => 
+        let moduleReading = this.allReadings.find(r => 
             allowedDifficulties.includes(r.level.toLowerCase()) && 
             (
                 r.category.toLowerCase() === mappedCategory || 
-                r.category.toLowerCase() === baseModuleTopic || 
                 r.category.toLowerCase().includes(mappedCategory) ||
-                r.title.toLowerCase().includes(simplifiedTopic)
+                r.title.toLowerCase().includes(simplifiedTopic) || 
+                baseModuleTopic.includes(r.category.toLowerCase())
             )
         );
-
+            // KRİTİK YEDEK: Eğer spesifik kategori eşleşmezse, rastgele birini seç
+        if (!moduleReading && this.allReadings.length > 0) {
+             const suitableReadings = this.allReadings.filter(r => 
+                 (r.level && allowedDifficulties.includes(r.level.toLowerCase()))
+             );
+             if (suitableReadings.length > 0) {
+                 // Sadece seviyeye uygun olanlar arasından rastgele birini seç
+                 moduleReading = suitableReadings[Math.floor(Math.random() * suitableReadings.length)];
+             }
+        }
         if (moduleReading && moduleReading.content) {
             baseModule.reading_story_title = moduleReading.title;
             enrichedContent.push({
@@ -1514,3 +1523,4 @@ document.addEventListener('DOMContentLoaded', () => {
     window.LearningPath = LearningPath; 
     LearningPath.init();
 });
+

@@ -804,21 +804,19 @@ const LearningPath = {
         // Render etmeden önce enrichModuleContent çağrısı, quiz sorularını baseModule'e ekler.
         const contentDetailHTML = this.renderModuleContentDetail(moduleId, baseModule, currentModule);
         
-        // V14.1 DÜZELTME 1: Ses Hızı kontrolünü yukarı taşıma
+        // V14.1 Düzeltme: Ses Hızı kontrolünü, Modül Başlığının hemen altına yerleştirildi
         contentEl.innerHTML = `
             <div style="max-width: 900px; width: 100%;">
                 <button class="btn btn-secondary mb-3" onclick="LearningPath.displayLearningPath('${userLevel}')">
                     <i class="fas fa-arrow-left me-2"></i> Öğrenme Yoluna Geri Dön
                 </button>
-                <h3 class="mb-4">${baseModule.name} Modülü (Seviye: ${userLevel})</h3>
+                <h3 class="mb-3">${baseModule.name} Modülü (Seviye: ${userLevel})</h3>
                 
-                <div id="speechControls" class="d-flex align-items-center mb-3 p-3 bg-white rounded shadow-sm">
+                <div id="speechControls" class="d-flex align-items-center mb-4 p-3 bg-white rounded shadow-sm border border-primary">
                     <label for="speechRate" class="form-label mb-0 me-3">Ses Hızı:</label>
                     <input type="range" class="form-range" id="speechRate" min="0.5" max="2" step="0.1" value="${localStorage.getItem('speechRate') || '0.9'}" style="width: 150px;">
                     <span id="rateValue" class="ms-2">${localStorage.getItem('speechRate') || '0.9'}</span>
                 </div>
-                
-                <hr class="mt-4 mb-4">
                 
                 <div id="moduleContentDetail" class="p-4 bg-light rounded shadow-sm">
                     <h4>İçerik Anlatımı ve Alıştırmalar</h4>
@@ -1318,3 +1316,4 @@ document.addEventListener('DOMContentLoaded', () => {
     window.LearningPath = LearningPath; 
     LearningPath.init();
 });
+

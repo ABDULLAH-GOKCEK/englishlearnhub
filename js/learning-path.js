@@ -1,12 +1,12 @@
 // =========================================================================
-// js/learning-path.js (V10 FINAL - Kapsamlı ve Bölüm Bazlı Öğrenme Modeli)
-// ~1700 Satır - Tam özellikli, detaylı ilerleme takibi ve dinamik içerik oluşturma içerir.
+// js/learning-path.js (V12 FINAL - Kapsamlı Öğrenme Yolu, Hata Önceliklendirme ve Seviye Atlama)
 // =========================================================================
 
 const LearningPath = {
     // Sabitler
     TEST_FILE_PATH: 'data/level_test.json',
     MODULE_CONTENT_FILE_PATH: 'data/module_content.json',
+    LEVEL_UP_EXAM_FILE_PATH: 'data/exam.json', // Yeni: Seviye Atlama Sınavı soruları
     PASS_SCORE: 90, // Başarı eşiği: %90
 
     // Veri Depoları
@@ -16,6 +16,7 @@ const LearningPath = {
     allSentences: [],
     allReadings: [],
     allLevelTestQuestions: [],
+    allExamQuestions: [], // Yeni: Seviye Atlama Sınavı soruları
     shuffledTestQuestions: [],
     
     // Seslendirme
@@ -27,7 +28,7 @@ const LearningPath = {
         { id: 'word', name: '1. Kelime Bilgisi Alıştırması', type: 'word' },
         { id: 'sentence', name: '2. Cümle Yapısı Alıştırması', type: 'sentence' },
         { id: 'reading', name: '3. Okuma Anlama Alıştırması', type: 'reading' },
-        { id: 'module_test', name: '4. Modül Genel Testi', type: 'all' }, // Modül final testi
+        { id: 'module_test', name: '4. Modül Genel Testi', type: 'all' }, // Modül final testi (V11 Güncellemesi)
     ],
 
     // =========================================================================
@@ -77,17 +78,20 @@ const LearningPath = {
                 return res.json();
             } catch (error) {
                 console.error(`Kritik JSON Yükleme Hatası: ${path}`, error);
+                // Hata durumunda boş obje veya dizi döndür
                 return path.includes('json') ? {} : []; 
             }
         };
 
-        const [moduleData, moduleContentData, testData, wordsData, sentencesData, readingsData] = await Promise.all([
+        // Yeni: examData yüklemesi eklendi
+        const [moduleData, moduleContentData, testData, wordsData, sentencesData, readingsData, examData] = await Promise.all([
             fetchData('data/learning_modules.json'), 
             fetchData(this.MODULE_CONTENT_FILE_PATH), 
             fetchData(this.TEST_FILE_PATH),
             fetchData('data/words.json'), 
             fetchData('data/sentences.json'), 
-            fetchData('data/reading_stories.json')
+            fetchData('data/reading_stories.json'),
+            fetchData(this.LEVEL_UP_EXAM_FILE_PATH) // Yeni seviye atlama sınavı dosyası
         ]);
 
         this.allModules = moduleData || {};
@@ -99,8 +103,10 @@ const LearningPath = {
         } else if (typeof testData === 'object' && testData !== null && Array.isArray(testData.questions)) {
             questionsArray = testData.questions;
         }
-        
         this.allLevelTestQuestions = questionsArray; 
+        
+        // Yeni: Seviye Atlama Sınavı Sorularını yükle
+        this.allExamQuestions = Array.isArray(examData) ? examData : (examData && Array.isArray(examData.questions) ? examData.questions : []);
 
         this.allWords = Array.isArray(wordsData) ? wordsData : []; 
         this.allSentences = Array.isArray(sentencesData) ? sentencesData : []; 
@@ -397,6 +403,7 @@ const LearningPath = {
         let modulesList = [];
         let levelTitle = `${level} Seviyesi Öğrenme Yolu`;
 
+        // Modül verileri her seviye için 'A1' anahtarı altında tutuluyor varsayımı
         const baseLevelCode = 'A1'; 
         const baseLevelData = this.allModules[baseLevelCode];
 
@@ -423,9 +430,9 @@ const LearningPath = {
                  progress: 0,
                  status: 'Başlanmadı',
                  lastScore: 0,
+                 // SectionProgress'e final testini de ekliyoruz ama ilerleme hesaplamasına katmıyoruz.
                  sectionProgress: this.STANDARD_SECTIONS
-                     .filter(s => s.id !== 'module_test') 
-                     .map(s => ({
+                     .map(s => ({ 
                          id: s.id,
                          status: 'Başlanmadı',
                          lastScore: 0
@@ -440,7 +447,7 @@ const LearningPath = {
                  m.topic = baseModuleData.topic;
 
                  let updatedSections = [...(m.sectionProgress || [])];
-                 this.STANDARD_SECTIONS.filter(s => s.id !== 'module_test').forEach(stdSec => {
+                 this.STANDARD_SECTIONS.forEach(stdSec => {
                      if (!updatedSections.find(s => s.id === stdSec.id)) {
                          updatedSections.push({
                              id: stdSec.id,
@@ -454,18 +461,22 @@ const LearningPath = {
                  const totalSections = relevantSections.length;
                  const completedSections = relevantSections.filter(s => s.status === 'Tamamlandı' || s.status === 'Atlandı (Soru Yok)').length;
                  
+                 // İlerleme, sadece Kelime/Cümle/Okuma bölümleri üzerinden hesaplanır.
                  m.progress = totalSections > 0 ? Math.round((completedSections / totalSections) * 100) : 0;
                  m.sectionProgress = updatedSections;
                  
                  const moduleTestSection = m.sectionProgress.find(s => s.id === 'module_test');
                  
-                 if (m.progress === 100 && (!moduleTestSection || moduleTestSection.status !== 'Tamamlandı')) {
-                    m.status = 'Testi Bekliyor';
-                 } else if (moduleTestSection && moduleTestSection.status === 'Tamamlandı') {
+                 // Modülün genel durumu
+                 if (moduleTestSection && moduleTestSection.status === 'Tamamlandı') {
                     m.status = 'Tamamlandı';
                     m.progress = 100;
-                 } else if (m.progress < 100 && m.status === 'Tamamlandı') {
-                     m.status = 'Başlanmadı'; 
+                 } else if (m.progress === 100 && moduleTestSection && moduleTestSection.status !== 'Tamamlandı') {
+                    m.status = 'Testi Bekliyor';
+                 } else if (m.progress > 0 && m.progress < 100) {
+                     m.status = 'Devam Ediyor';
+                 } else {
+                     m.status = 'Başlanmadı';
                  }
                  
                  return m;
@@ -547,6 +558,9 @@ const LearningPath = {
         `;
         
         localStorage.setItem('userLevel', level);
+        
+        // Yeni V12: Tüm modüller tamamlandıysa seviye atlama kontrolünü çağır
+        this.checkIfLevelUpReady(level); 
     },
 
     // =========================================================================
@@ -662,8 +676,6 @@ const LearningPath = {
     
     enrichModuleContent: function(moduleId, baseModule, userLevel) {
         // Bu fonksiyon, V10'un karmaşık mantığıyla dinamik içerik oluşturur.
-        // Kelime/Cümle/Okuma verilerinden kullanıcının seviyesine ve modül konusuna uygun içerik seçer 
-        // ve bu içeriklere ait quiz sorularını üretip modül objesine ekler.
         
         const moduleLevel = userLevel.toUpperCase();
         const baseModuleTopic = baseModule.topic ? baseModule.topic.toLowerCase() : '';
@@ -787,6 +799,7 @@ const LearningPath = {
                      let correctAnswerText = null;
                      
                      if (typeof correctAnswerValue === 'number') {
+                         // Okuma sorularında cevap indeks yerine metin olarak tutuluyor olabilir
                          correctAnswerText = q.options[parseInt(correctAnswerValue, 10)];
                      } else if (typeof correctAnswerValue === 'string') {
                          correctAnswerText = q.options.find(opt => opt === correctAnswerValue);
@@ -888,6 +901,7 @@ const LearningPath = {
         const baseModule = this.allModules[baseLevelCode]?.modules?.find(m => m.id === moduleId);
         const userLevel = localStorage.getItem('userLevel') || 'A1';
 
+        // Modül içeriğini zenginleştir ve quiz sorularını hazırla
         this.enrichModuleContent(moduleId, baseModule, userLevel); 
         
         let quizQuestions = [];
@@ -919,6 +933,7 @@ const LearningPath = {
             return;
         }
         
+        // V11: Hatalı Soru Önceliklendirme Mantığı
         const wrongKey = `wrong_${moduleId}_${quizType}`;
         const savedWrongIds = JSON.parse(localStorage.getItem(wrongKey) || '[]');
         
@@ -927,6 +942,7 @@ const LearningPath = {
         
         const shuffledOtherQuestions = otherQuestions.sort(() => 0.5 - Math.random());
         
+        // Önce yanlışlar, sonra diğerleri (rastgele sırayla)
         const finalQuizQuestions = [...wrongQuestions, ...shuffledOtherQuestions]; 
 
         this.currentQuiz = {
@@ -1033,6 +1049,16 @@ const LearningPath = {
     },
 
     calculateModuleScore: function(moduleId, questions, userAnswers, quizType) {
+        // Yeni V12: Seviye Atlama Sınavı ise özel olarak ele al
+        if (quizType === 'level_up') {
+             const currentLevel = localStorage.getItem('userLevel') || 'A1';
+             const correctCount = questions.filter((q, index) => userAnswers[index] === q.answer).length;
+             const score = Math.round((correctCount / questions.length) * 100);
+             
+             this.processLevelUpExamResult(score, questions, userAnswers, currentLevel);
+             return; 
+        }
+        
         let correctCount = 0;
         let wrongQuestionIds = new Set();
         let requiredTopics = new Set();
@@ -1087,6 +1113,7 @@ const LearningPath = {
                  currentModule.progress = 100;
             }
             
+            // V11: Hatalı soruları kaydet
             const wrongKey = `wrong_${moduleId}_${quizType}`;
             localStorage.setItem(wrongKey, JSON.stringify(Array.from(wrongQuestionIds)));
             
@@ -1096,6 +1123,11 @@ const LearningPath = {
         }
 
         this.showModuleResult(moduleId, score, questions.length, correctCount, isPassed, Array.from(requiredTopics), quizType);
+        
+        // Modül testinden sonra seviye atlama kontrolünü tekrar çağır
+        if (quizType === 'module_test') {
+             this.checkIfLevelUpReady(localStorage.getItem('userLevel'));
+        }
     },
     
     updateModuleSectionStatus: function(moduleId, sectionId, isCompleted, score) {
@@ -1257,9 +1289,129 @@ const LearningPath = {
 
         statsEl.innerHTML = statsHtml;
     },
-    
+
     // =========================================================================
-    // 7. SESLENDİRME İŞLEVLERİ
+    // 7. SEVİYE ATLATMA MEKANİZMASI (V12 Güncellemesi)
+    // =========================================================================
+
+    getNextLevel: function(currentLevel) {
+        const levels = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
+        const currentIndex = levels.indexOf(currentLevel.toUpperCase());
+        // Son seviyede ise C2'yi döndür
+        return currentIndex < levels.length - 1 ? levels[currentIndex + 1] : 'C2'; 
+    },
+
+    checkIfLevelUpReady: function(currentLevel) {
+        const modules = JSON.parse(localStorage.getItem('learningModules') || '[]');
+        const totalModules = modules.length;
+        const completedModules = modules.filter(m => m.status === 'Tamamlandı').length;
+
+        // Tüm modüller tamamlandıysa ve seviye C2 değilse seviye atlama butonunu göster
+        if (completedModules === totalModules && totalModules > 0 && currentLevel.toUpperCase() !== 'C2') {
+            
+            const pathEl = document.getElementById('learningPathSection');
+            if (pathEl) {
+                 const levelUpButtonHtml = `
+                     <div class="level-up-alert alert alert-success p-3 mt-4 text-center" style="max-width: 900px; width: 100%;">
+                         <h4 class="alert-heading">Tebrikler! ${currentLevel} Seviyesini Tamamladınız!</h4>
+                         <p>Bir üst seviyeye geçiş yapmak için **Seviye Atlama Sınavı**'nı çözmelisiniz.</p>
+                         <button class="btn btn-lg btn-warning mt-2" onclick="LearningPath.startLevelUpExam('${currentLevel}')">
+                            <i class="fas fa-arrow-up me-2"></i> Seviye Atlama Sınavını Başlat
+                         </button>
+                     </div>
+                 `;
+                 
+                 // Zaten bir seviye atlama butonu varsa tekrar eklememek için kontrol
+                 if (!document.querySelector('.level-up-alert')) {
+                    const levelHeader = pathEl.querySelector('.level-header');
+                    if(levelHeader) {
+                         levelHeader.insertAdjacentHTML('afterend', levelUpButtonHtml);
+                    }
+                 }
+            }
+        }
+    },
+
+    startLevelUpExam: function(currentLevel) {
+        this.showSection('moduleQuizSection');
+        
+        const nextLevel = this.getNextLevel(currentLevel);
+        
+        // Seviye Atlama Sınavı için tüm exam.json sorularını kullan
+        const allQuestions = this.allExamQuestions.map(q => ({
+             id: q.id || q.question.substring(0, 10),
+             question: q.question,
+             options: q.options,
+             answer: q.answer,
+             topic: q.category || 'Seviye Atlama',
+             level: q.difficulty // Sorunun zorluk seviyesi
+        }));
+        
+        // Mevcut ve bir sonraki seviyenin sorularını al (veya sadece tümünü)
+        const examQuestions = allQuestions
+            // Soruların zorluk seviyesi, mevcut ve bir sonraki seviyeye uygun olmalı
+            .filter(q => q.level.toLowerCase().includes(currentLevel.toLowerCase()) || q.level.toLowerCase().includes(nextLevel.toLowerCase()))
+            .sort(() => 0.5 - Math.random()) 
+            .slice(0, 30); // Örnek olarak 30 soru
+
+        if (examQuestions.length === 0) {
+             document.getElementById('moduleQuizSection').innerHTML = `
+                <div class="alert alert-danger">
+                    <p>Seviye Atlama Sınavı için soru bulunamadı. Lütfen <code>exam.json</code> dosyasını kontrol edin ve seviyelere uygun sorular içerdiğinden emin olun.</p>
+                    <button class="btn btn-primary mt-3" onclick="LearningPath.displayLearningPath('${currentLevel}')"> Geri Dön </button>
+                </div>
+            `;
+            return;
+        }
+
+        this.currentQuiz = {
+            moduleId: 'level_up_exam',
+            quizType: 'level_up', // Özel quiz tipi
+            questions: examQuestions,
+            userAnswers: {},
+            currentQuestionIndex: 0,
+            quizTitle: `${currentLevel} -> ${nextLevel} Seviye Atlama Sınavı`
+        };
+
+        this.displayQuizQuestion();
+    },
+
+    processLevelUpExamResult: function(score, questions, userAnswers, currentLevel) {
+        const nextLevel = this.getNextLevel(currentLevel);
+        const isPassed = score >= this.PASS_SCORE; // Başarı eşiği %90
+
+        if (isPassed) {
+             localStorage.setItem('userLevel', nextLevel);
+             localStorage.removeItem('learningModules'); // Yeni seviye için modülleri sıfırla
+             
+             document.getElementById('moduleQuizSection').innerHTML = `
+                 <div class="result-card p-5 shadow-lg text-center">
+                     <h3 class="card-title mb-4 text-success"><i class="fas fa-trophy me-2"></i> TEBRİKLER!</h3>
+                     <p class="h5">Sınav Skoru: %${score}</p>
+                     <p class="h1 mb-4 level-result">Yeni Seviyeniz: <span>${nextLevel}</span></p>
+                     <p class="lead">Başarıyla ${currentLevel} seviyesini tamamladınız ve ${nextLevel} seviyesine geçtiniz. Yeni öğrenme yolunuzu görün.</p>
+                     <button class="btn btn-primary btn-lg mt-3" onclick="LearningPath.displayLearningPath('${nextLevel}')">
+                         <i class="fas fa-route me-2"></i> Yeni Öğrenme Yolunu Gör
+                     </button>
+                 </div>
+             `;
+        } else {
+             document.getElementById('moduleQuizSection').innerHTML = `
+                 <div class="result-card p-5 shadow-lg text-center">
+                     <h3 class="card-title mb-4 text-danger"><i class="fas fa-exclamation-triangle me-2"></i> Tekrar Gerekli</h3>
+                     <p class="h5">Sınav Skoru: %${score}</p>
+                     <p class="h1 mb-4">Başarı Eşiği: %${this.PASS_SCORE}</p>
+                     <p class="lead">Başarıyla atlamak için %${this.PASS_SCORE} skoruna ulaşmalısınız. Lütfen ${currentLevel} seviyesindeki modülleri tekrar gözden geçirin.</p>
+                     <button class="btn btn-warning btn-lg mt-3" onclick="LearningPath.displayLearningPath('${currentLevel}')">
+                         <i class="fas fa-arrow-left me-2"></i> Öğrenme Yoluna Geri Dön
+                     </button>
+                 </div>
+             `;
+        }
+    },
+
+    // =========================================================================
+    // 8. SESLENDİRME İŞLEVLERİ
     // =========================================================================
 
     speak: function(text, rate = 0.9) { 
@@ -1320,7 +1472,7 @@ const LearningPath = {
     },
     
     // =========================================================================
-    // 8. TEMİZLEME VE SIFIRLAMA FONKSİYONLARI
+    // 9. TEMİZLEME VE SIFIRLAMA FONKSİYONLARI
     // =========================================================================
 
     resetUserLevel: function() {

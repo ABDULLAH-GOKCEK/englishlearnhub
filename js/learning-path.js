@@ -1,6 +1,5 @@
 // =========================================================================
-// js/learning-path.js (V13.2 - V12 FINAL Üzerine İnşa Edilmiş Stabil Versiyon)
-// Kart Yerleşimi ve Quiz Başlatma/Veri Kalıcılığı Düzeltmeleri Uygulandı.
+// js/learning-path.js (V13.3 - Mantıksal Akış ve Veri Eksikliği Düzeltmeleri)
 // =========================================================================
 
 const LearningPath = {
@@ -512,7 +511,7 @@ const LearningPath = {
     },
     
     // =========================================================================
-    // 4. MODÜL İÇERİK YÜKLEME VE ZENGİNLEŞTİRME (V13.1 Robust Versiyonları)
+    // 4. MODÜL İÇERİK YÜKLEME VE ZENGİNLEŞTİRME (V13.3)
     // =========================================================================
     
     // Modül içeriğini zenginleştirir (Soru havuzunu hazırlar)
@@ -545,15 +544,26 @@ const LearningPath = {
         const mappedCategory = turkishToEnglishCategoryMap[baseModuleTopic] || simplifiedTopic;
 
         // --- 1. Kelime Alıştırmaları (words.json) ---
-        const moduleWords = this.allWords.filter(w => {
+        // Önce modül konusuna ve seviyeye tam uyanları filtrele
+        let moduleWords = this.allWords.filter(w => {
             const isLevelMatch = w.difficulty && allowedDifficulties.includes(w.difficulty.toLowerCase());
             if (!isLevelMatch) return false;
             const wordCategory = w.category ? w.category.toLowerCase() : '';
             return wordCategory.includes(baseModuleTopic) || baseModuleTopic.includes(wordCategory);
-        }).sort(() => 0.5 - Math.random()).slice(0, 20);
-
+        }).sort(() => 0.5 - Math.random());
+        
+        // Yeterli kelime bulunamazsa, sadece seviyeye uyanlardan rastgele seç
+        if (moduleWords.length < 5) { 
+             moduleWords = this.allWords.filter(w => {
+                 return w.difficulty && allowedDifficulties.includes(w.difficulty.toLowerCase());
+             }).sort(() => 0.5 - Math.random());
+        }
+        
+        moduleWords = moduleWords.slice(0, 20); // Maksimum 20 kelime göster
+        
         if (moduleWords.length > 0) {
             const wordsHtml = moduleWords.map(w => `<div class="word-item col-md-4 col-sm-6"><strong>${w.word}</strong> (${w.turkish})</div>`).join('');
+            // Kelime listesini içerik olarak ekle
             enrichedContent.push({type: 'words', html: wordsHtml});
             
             moduleWords.slice(0, 10).forEach((w, index) => {
@@ -573,7 +583,8 @@ const LearningPath = {
         }
 
         // --- 2. Cümle Alıştırmaları (sentences.json) ---
-        const moduleSentences = this.allSentences.filter(s => {
+        // Önce modül konusuna ve seviyeye tam uyanları filtrele
+        let moduleSentences = this.allSentences.filter(s => {
             const isLevelMatch = s.difficulty && allowedDifficulties.includes(s.difficulty.toLowerCase());
             if (!isLevelMatch) return false;
             
@@ -581,10 +592,20 @@ const LearningPath = {
             
             const sentenceCategory = s.category ? s.category.toLowerCase() : '';
             return sentenceCategory.includes(baseModuleTopic) || baseModuleTopic.includes(sentenceCategory);
-        }).sort(() => 0.5 - Math.random()).slice(0, 15);
+        }).sort(() => 0.5 - Math.random());
+        
+        // Yeterli cümle bulunamazsa, sadece seviyeye uyanlardan rastgele seç
+        if (moduleSentences.length < 5) { 
+             moduleSentences = this.allSentences.filter(s => {
+                 return s.difficulty && allowedDifficulties.includes(s.difficulty.toLowerCase());
+             }).sort(() => 0.5 - Math.random());
+        }
 
+        moduleSentences = moduleSentences.slice(0, 15); // Maksimum 15 cümle göster
+        
         if (moduleSentences.length > 0) {
             const sentencesHtml = moduleSentences.map(s => `<div class="sentence-item py-1"><strong>${s.english}</strong> (${s.turkish})</div>`).join('');
+            // Cümle listesini içerik olarak ekle
             enrichedContent.push({type: 'sentences', html: sentencesHtml});
             
             moduleSentences.slice(0, 10).forEach((s, index) => {
@@ -705,34 +726,55 @@ const LearningPath = {
     },
 
 
-    // Kart yerleşimi sorununu çözen ana fonksiyon (KRİTİK DÜZELTME)
+    // Kart yerleşimi sorununu çözen ana fonksiyon (KRİTİK DÜZELTME - V13.3)
     renderModuleContentDetail: function(moduleId, baseModule, currentModule) {
         const userLevel = localStorage.getItem('userLevel') || 'A1';
         
-        // Bu adım, quiz sorularını baseModule objesine ekler.
+        // Bu adım, quiz sorularını baseModule objesine ekler ve enrichedContentList'i oluşturur.
         const enrichedContentList = this.enrichModuleContent(moduleId, baseModule, userLevel); 
         
         let contentHtml = '';
         
-        // 1. Kelime ve Cümle alıştırma kartlarını en üste yerleştir
-        let topCards = `<div class="row g-4 mb-4">`;
-        topCards += this.renderInlineQuizSection('word', baseModule, currentModule);
-        topCards += this.renderInlineQuizSection('sentence', baseModule, currentModule);
-        topCards += `</div>`;
-        contentHtml += topCards;
+        // Quiz kartlarını önceden oluştur, ancak henüz render etme
+        const quizCards = {
+            word: this.renderInlineQuizSection('word', baseModule, currentModule),
+            sentence: this.renderInlineQuizSection('sentence', baseModule, currentModule),
+            reading: this.renderInlineQuizSection('reading', baseModule, currentModule)
+        };
 
-        // 2. Modül içeriklerini (Dilbilgisi, Okuma Metni vb.) sırayla render et
+        // Modül içeriklerini sırayla render et ve ilgili alıştırma kartını hemen altına ekle
         enrichedContentList.forEach(item => {
             contentHtml += this.renderContentItem(item); 
             
-            // Okuma Alıştırması kartını, okuma metninin hemen arkasına ekle
-            if (item.type === 'reading_text' || item.type === 'reading_placeholder') {
-                 let readingCard = `<div class="row g-4 mb-4">`;
-                 readingCard += this.renderInlineQuizSection('reading', baseModule, currentModule);
-                 readingCard += `</div>`;
-                 contentHtml += readingCard;
+            let cardToAppend = '';
+            let appendSectionId = null;
+
+            if (item.type === 'words') {
+                appendSectionId = 'word';
+            } else if (item.type === 'sentences') {
+                appendSectionId = 'sentence';
+            } else if (item.type === 'reading_text' || item.type === 'reading_placeholder') {
+                appendSectionId = 'reading';
+            }
+            
+            if (appendSectionId && quizCards[appendSectionId]) {
+                // Alıştırma kartını, içeriğin hemen altına row yapısı içinde ekle
+                cardToAppend = `<div class="row g-4 mb-4">${quizCards[appendSectionId]}</div>`;
+                contentHtml += cardToAppend;
+                // Kartı kullandıktan sonra null yap ki tekrar render edilmesin
+                quizCards[appendSectionId] = null; 
             }
         });
+
+        // Eğer modül içeriğinde hiç kelime/cümle/okuma listesi yoksa ve kartlar hala render edilmemişse (örneğin sadece grammar_text varsa), bunları en sona ekle
+        if (quizCards.word || quizCards.sentence || quizCards.reading) {
+             let remainingCardsHtml = `<div class="row g-4 mb-4 mt-4">`;
+             if (quizCards.word) remainingCardsHtml += quizCards.word;
+             if (quizCards.sentence) remainingCardsHtml += quizCards.sentence;
+             if (quizCards.reading) remainingCardsHtml += quizCards.reading;
+             remainingCardsHtml += `</div>`;
+             contentHtml += remainingCardsHtml;
+        }
 
         return contentHtml;
     },
@@ -785,7 +827,7 @@ const LearningPath = {
     },
     
     // =========================================================================
-    // 5. QUIZ VE ALISTIRMA YÖNETİMİ (V13.1 Robust Versiyonları)
+    // 5. QUIZ VE ALISTIRMA YÖNETİMİ (V13.3)
     // =========================================================================
 
     renderInlineQuizSection: function(sectionId, baseModule, currentModule) {
@@ -799,6 +841,7 @@ const LearningPath = {
         const questionCount = quizQuestions ? quizQuestions.length : 0;
         const sectionData = currentModule.sectionProgress.find(s => s.id === sectionId) || {status: 'Başlanmadı', lastScore: 0};
         
+        // Eğer hiç soru yoksa, otomatik olarak atlandı (Atlandı (Soru Yok)) durumuna getir.
         if (sectionData.status === 'Başlanmadı' && questionCount === 0) {
              sectionData.status = 'Atlandı (Soru Yok)';
              this.updateModuleSectionStatus(currentModule.id, sectionId, true, 0, 'Atlandı (Soru Yok)'); 
@@ -847,14 +890,19 @@ const LearningPath = {
         const userLevel = localStorage.getItem('userLevel') || 'A1';
         
         // 1. Gerekirse Quiz Sorularını Oluştur ve Kaydet (KRİTİK)
-        if (!moduleData.all_quiz_questions || moduleData.all_quiz_questions.length === 0) {
+        // Modül verisinde quiz soruları yoksa veya boşsa, yeniden oluştur
+        if (!moduleData.all_quiz_questions || moduleData.all_quiz_questions.length === 0 || 
+            (sectionId === 'word' && (!moduleData.word_quiz_questions || moduleData.word_quiz_questions.length === 0)) ||
+            (sectionId === 'sentence' && (!moduleData.sentence_quiz_questions || moduleData.sentence_quiz_questions.length === 0)) ||
+            (sectionId === 'reading' && (!moduleData.reading_quiz_questions || moduleData.reading_quiz_questions.length === 0))
+        ) {
             const baseLevelCode = 'A1';
             const baseModule = this.allModules[baseLevelCode]?.modules?.find(m => m.id === moduleId);
             if (!baseModule) { alert("Modül veri yapısı bulunamadı."); return; }
             const staticContentData = this.allModuleContents[moduleId];
             baseModule.content = (staticContentData && Array.isArray(staticContentData.content)) ? staticContentData.content : [];
             
-            // Soruları oluşturur ve baseModule'e ekler
+            // Soruları oluşturur ve baseModule'e ekler (bu, V13.3'teki fallback mantığını da içerir)
             this.enrichModuleContent(moduleId, baseModule, userLevel);
             
             // Oluşturulan soruları modül verisine kalıcı olarak ata ve kaydet
@@ -1105,15 +1153,19 @@ const LearningPath = {
                 </div>
             `;
             // Öğrenme Yolu sayfasına sınav kartını ekler
-            pathEl.querySelector('.container-xxl > div') ? pathEl.querySelector('.container-xxl > div').insertAdjacentHTML('afterend', examCard) : pathEl.querySelector('#modulesContainer').insertAdjacentHTML('afterend', examCard);
+            const container = pathEl.querySelector('#modulesContainer');
+            if (container) {
+                container.insertAdjacentHTML('afterend', examCard);
+            }
             return examCard;
         }
         return '';
     },
     
     startLevelUpExam: function(currentLevel) {
+        const nextLevel = this.getNextLevel(currentLevel);
         const examQuestions = this.allExamQuestions
-            .filter(q => q.difficulty.toLowerCase() === currentLevel.toLowerCase() || q.difficulty.toLowerCase() === this.getNextLevel(currentLevel).toLowerCase())
+            .filter(q => q.difficulty.toLowerCase() === currentLevel.toLowerCase() || q.difficulty.toLowerCase() === nextLevel.toLowerCase())
             .sort(() => 0.5 - Math.random())
             .slice(0, 20); 
 
@@ -1183,8 +1235,6 @@ const LearningPath = {
             this.synth.cancel();
         }
     },
-    
-    // ... Diğer V12 fonksiyonları (Stats, Reset) ...
     
     // YARDIMCI VE SIFIRLAMA FONKSİYONLARI
     resetUserLevel: function() {

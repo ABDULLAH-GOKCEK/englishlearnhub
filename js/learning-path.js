@@ -704,12 +704,23 @@ const LearningPath = {
                         </button>
                     </div>`;
         } else if (item.type === 'reading_text') {
+            
+            // V14.2 GÜNCELLEMESİ: Ses hızı kontrolü hikayenin dinle butonu yanına eklendi.
+            const initialRate = localStorage.getItem('speechRate') || '0.9';
+            const uniqueId = `speechRate_${item.title.hashCode()}`;
+            
             html = `<div class="reading-section p-4 mb-4 bg-white shadow-lg rounded">
                         <h5 class="text-primary mb-3">${item.title || 'Okuma Hikayesi'} (Seviye: ${item.level})</h5>
                         <p class="reading-content">${item.text}</p>
-                        <button class="btn btn-outline-success btn-sm tts-button mt-3" data-text-to-speak="${item.text}">
-                            <i class="fas fa-volume-up"></i> Hikayeyi Dinle
-                        </button>
+                        
+                        <div class="d-flex align-items-center mt-3 p-2 bg-light rounded border border-secondary" style="gap: 10px; max-width: 350px;">
+                            <button class="btn btn-success btn-sm tts-button" data-text-to-speak="${item.text}">
+                                <i class="fas fa-volume-up me-1"></i> Dinle
+                            </button>
+                            <label for="${uniqueId}" class="form-label mb-0" style="white-space: nowrap;">Hız:</label>
+                            <input type="range" class="form-range speech-rate-slider" id="${uniqueId}" min="0.5" max="2" step="0.1" value="${initialRate}" style="width: 100px;">
+                            <span class="rate-value-span ms-auto" style="min-width: 25px;">${initialRate}</span>
+                        </div>
                     </div>`;
         } else if (item.type === 'reading_placeholder') {
              html = `<div class="alert alert-warning mb-4">
@@ -804,7 +815,7 @@ const LearningPath = {
         // Render etmeden önce enrichModuleContent çağrısı, quiz sorularını baseModule'e ekler.
         const contentDetailHTML = this.renderModuleContentDetail(moduleId, baseModule, currentModule);
         
-        // V14.1 Düzeltme: Ses Hızı kontrolünü, Modül Başlığının hemen altına yerleştirildi
+        // V14.2 GÜNCELLEMESİ: speechControls div'i buradan kaldırıldı, içeriğe taşındı.
         contentEl.innerHTML = `
             <div style="max-width: 900px; width: 100%;">
                 <button class="btn btn-secondary mb-3" onclick="LearningPath.displayLearningPath('${userLevel}')">
@@ -812,11 +823,7 @@ const LearningPath = {
                 </button>
                 <h3 class="mb-3">${baseModule.name} Modülü (Seviye: ${userLevel})</h3>
                 
-                <div id="speechControls" class="d-flex align-items-center mb-4 p-3 bg-white rounded shadow-sm border border-primary">
-                    <label for="speechRate" class="form-label mb-0 me-3">Ses Hızı:</label>
-                    <input type="range" class="form-range" id="speechRate" min="0.5" max="2" step="0.1" value="${localStorage.getItem('speechRate') || '0.9'}" style="width: 150px;">
-                    <span id="rateValue" class="ms-2">${localStorage.getItem('speechRate') || '0.9'}</span>
-                </div>
+                <hr class="mt-4 mb-4">
                 
                 <div id="moduleContentDetail" class="p-4 bg-light rounded shadow-sm">
                     <h4>İçerik Anlatımı ve Alıştırmalar</h4>
@@ -1192,22 +1199,27 @@ const LearningPath = {
     // =========================================================================
     
     attachSpeechListeners: function() {
-        const speechRateRange = document.getElementById('speechRate');
-        const rateValueSpan = document.getElementById('rateValue');
-        
-        const updateRate = (rate) => {
-            rateValueSpan.textContent = rate;
-            localStorage.setItem('speechRate', rate);
-            this.stopSpeech(); 
-        };
+        // Dinamik olarak oluşturulan tüm hız ayar kaydırıcıları için dinleyici ekle
+        document.querySelectorAll('.speech-rate-slider').forEach(slider => {
+            // İlgili hız değeri gösterimini bul (aynı reading-section içinde)
+            const rateValueSpan = slider.closest('.reading-section').querySelector('.rate-value-span');
 
-        const initialRate = localStorage.getItem('speechRate') || '0.9';
-        if (speechRateRange) {
-            speechRateRange.value = initialRate;
-            updateRate(initialRate);
+            const updateRate = (rate) => {
+                // Tüm kaydırıcıları senkronize et ve localStorage'ı güncelle
+                document.querySelectorAll('.speech-rate-slider').forEach(s => s.value = rate);
+                document.querySelectorAll('.rate-value-span').forEach(s => s.textContent = rate);
+                
+                localStorage.setItem('speechRate', rate); 
+                this.stopSpeech(); 
+            };
+            
+            // Başlangıç değerini ayarla ve göster
+            const initialRate = localStorage.getItem('speechRate') || '0.9';
+            slider.value = initialRate;
+            if (rateValueSpan) rateValueSpan.textContent = initialRate;
 
-            speechRateRange.oninput = (e) => updateRate(e.target.value);
-        }
+            slider.oninput = (e) => updateRate(e.target.value);
+        });
         
         this.addTTSListeners();
     },
@@ -1216,7 +1228,8 @@ const LearningPath = {
         document.querySelectorAll('.tts-button').forEach(button => {
             button.onclick = (e) => {
                 const text = e.target.closest('.tts-button').dataset.textToSpeak;
-                this.speak(text);
+                // Speak fonksiyonu localStorage'dan değeri okuyacağı için rate parametresine gerek yok.
+                this.speak(text); 
             };
         });
     },
@@ -1230,6 +1243,7 @@ const LearningPath = {
         }
 
         this.speechUtterance = new SpeechSynthesisUtterance(text);
+        // Her zaman localStorage'daki güncel rate'i kullan
         this.speechUtterance.rate = parseFloat(localStorage.getItem('speechRate') || '0.9');
         this.speechUtterance.lang = 'en-US'; 
         
@@ -1316,4 +1330,3 @@ document.addEventListener('DOMContentLoaded', () => {
     window.LearningPath = LearningPath; 
     LearningPath.init();
 });
-

@@ -2,7 +2,7 @@ const LearningPath = {
     TEST_FILE_PATH: 'data/level_test.json',
     MODULE_CONTENT_FILE_PATH: 'data/module_content.json', 
     PASS_SCORE: 90, // Başarı eşiği: %90
-
+    LEVEL_SEQUENCE: ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'],
     allModules: {},
     allModuleContents: {},
     allWords: [],
@@ -440,9 +440,23 @@ const LearningPath = {
              });
              modules = updatedModules;
              localStorage.setItem('learningModules', JSON.stringify(modules));
-        }
+            }
 
+             // YENİ KRİTİK KONTROL: Seviye Atlama Mekanizması (V11)
+    const totalModules = modules.length;
+    const completedModulesCount = modules.filter(m => m.status === 'Tamamlandı').length;
+
+    if (totalModules > 0 && completedModulesCount === totalModules) {
+        const currentLevelIndex = this.LEVEL_SEQUENCE.indexOf(level);
+        const nextLevel = this.LEVEL_SEQUENCE[currentLevelIndex + 1];
         
+        // Eğer seviye atlanabilir durumdaysa (C2'de değilse) ve kullanıcı hala eski seviyesindeyse
+        if (nextLevel && localStorage.getItem('userLevel') === level) {
+            // Seviye atlama ekranını göster
+            this.advanceLevel(level);
+            return; // Modül kartlarını render etmeyi durdur.
+        }
+    }
         const moduleCards = modules.map(module => {
             const badgeClass = this.getBadgeClass(module.status); 
             
@@ -1492,7 +1506,60 @@ const LearningPath = {
             window.location.reload();
         }
     },
+         // YENİ FONKSİYON: SEVİYE ATLATMA MEKANİZMASI (V11)
+    // =========================================================================
+    advanceLevel: function(currentLevel) {
+        const currentLevelIndex = this.LEVEL_SEQUENCE.indexOf(currentLevel);
+        const nextLevelIndex = currentLevelIndex + 1;
+        
+        if (nextLevelIndex < this.LEVEL_SEQUENCE.length) {
+            const nextLevel = this.LEVEL_SEQUENCE[nextLevelIndex];
+            
+            // Yeni seviyeyi kaydet (ancak modül verilerini silme)
+            localStorage.setItem('userLevel', nextLevel);
+            
+            const pathEl = document.getElementById('learningPathSection');
+            pathEl.style.alignItems = 'center'; 
+            pathEl.style.textAlign = 'center';
 
+            // Başarı mesajını göster
+            pathEl.innerHTML = `
+                <div class="result-card">
+                    <h3 class="text-success mb-4"><i class="fas fa-trophy me-2"></i> TEBRİKLER! Seviye Atladınız!</h3>
+                    <p class="h4">Başarıyla **${currentLevel}** seviyesindeki tüm modülleri tamamladınız.</p>
+                    <p class="h1 level-result mt-3 mb-4">Yeni Seviyeniz: <span>${nextLevel}</span></p>
+                    <p class="mt-4">Öğrenme yolunuza **${nextLevel}** seviyesinde devam edebilirsiniz. Yeni modüller ve zorluklar sizi bekliyor!</p>
+                    
+                    <button class="btn btn-lg btn-primary mt-4" onclick="LearningPath.displayLearningPath('${nextLevel}')">
+                        Yeni Öğrenme Yolunu Başlat
+                    </button>
+                    
+                    <p class="mt-3"><small class="text-muted">Not: Önceki seviye ilerlemeniz istatistikler için tutulmaya devam edecektir.</small></p>
+                </div>
+            `;
+            
+        } else {
+             // C2'den sonra seviye kalmadıysa
+             const pathEl = document.getElementById('learningPathSection');
+             pathEl.innerHTML = `
+                 <div class="result-card">
+                     <h3 class="text-success mb-4"><i class="fas fa-crown me-2"></i> UZMAN SEVİYESİNE ULAŞILDI!</h3>
+                     <p class="h4">Tebrikler! **${currentLevel}** dahil tüm seviyelerdeki modülleri başarıyla tamamladınız.</p>
+                     <p class="mt-4">Artık İngilizcede uzman bir kullanıcı olarak kabul ediliyorsunuz. Pratik yapmaya devam edin!</p>
+                     <button class="btn btn-lg btn-primary mt-4" onclick="LearningPath.displayLearningPath('${currentLevel}')">
+                        Modüllere Geri Dön
+                    </button>
+                 </div>
+             `;
+        }
+    },
+    // =========================================================================
+    // SEVİYE ATLATMA MEKANİZMASI BİTİŞİ
+    // =========================================================================
+    
+    resetUserLevel: function() {
+        // ... (rest of resetUserLevel function)
+    
     resetProgress: function() {
         if (confirm("Tüm ilerlemeniz, modül tamamlama durumunuz ve seviyeniz sıfırlanacaktır. Emin misiniz?")) {
             localStorage.removeItem('userLevel');
@@ -1514,3 +1581,4 @@ const LearningPath = {
 };
 
 document.addEventListener('DOMContentLoaded', () => LearningPath.init());
+

@@ -864,7 +864,41 @@ const LearningPath = {
     },
     
     // --- Bölüm Kartı Oluşturma ve Durum Yönetimi (Aynı Bırakıldı) ---
-    
+    // YENİ EKLEME: Modül içeriğindeki tek bir öğeyi HTML'e çevirir.
+    renderContentItem: function(item) {
+        let html = '';
+        if (item.type === 'grammar_text') {
+            html = `<div class="content-text p-3 mb-4 border-start border-4 border-primary bg-white shadow-sm rounded">
+                        <p>${item.text}</p>
+                        <button class="btn btn-outline-primary btn-sm tts-button mt-2" data-text-to-speak="${item.text}">
+                            <i class="fas fa-volume-up"></i> Dinle
+                        </button>
+                    </div>`;
+        } else if (item.type === 'reading_text') {
+            html = `<div class="reading-section p-4 mb-4 bg-white shadow-lg rounded">
+                        <h5 class="text-primary mb-3">${item.title || 'Okuma Hikayesi'} (Seviye: ${item.level})</h5>
+                        <p class="reading-content">${item.text}</p>
+                        <button class="btn btn-outline-success btn-sm tts-button mt-3" data-text-to-speak="${item.text}">
+                            <i class="fas fa-volume-up"></i> Hikayeyi Dinle
+                        </button>
+                    </div>`;
+        } else if (item.type === 'reading_placeholder') {
+             html = `<div class="alert alert-warning mb-4">
+                        <i class="fas fa-exclamation-triangle"></i> ${item.text}
+                    </div>`;
+        } else if (item.type === 'words') {
+             html = `<div class="vocabulary-list p-3 mb-4 bg-light rounded">
+                         <h6>Kelime Listesi:</h6>
+                         <div class="d-flex flex-wrap">${item.html}</div>
+                     </div>`;
+        } else if (item.type === 'sentences') {
+             html = `<div class="sentence-list p-3 mb-4 bg-light rounded">
+                         <h6>Örnek Cümleler:</h6>
+                         <div class="d-flex flex-column">${item.html}</div>
+                     </div>`;
+        }
+        return html;
+    },
     renderInlineQuizSection: function(sectionId, baseModule, currentModule) {
         const sectionInfo = this.STANDARD_SECTIONS.find(s => s.id === sectionId);
         
@@ -1571,5 +1605,6 @@ document.addEventListener('DOMContentLoaded', () => {
     window.LearningPath = LearningPath; 
     LearningPath.init();
 });
+
 
 

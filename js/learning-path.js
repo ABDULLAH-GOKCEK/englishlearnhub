@@ -902,10 +902,11 @@ const LearningPath = {
         
         // 1. Gerekirse Quiz Sorularını Oluştur ve Kaydet (KRİTİK)
         // Modül verisinde quiz soruları yoksa veya boşsa, yeniden oluştur
-        if (!moduleData.all_quiz_questions || moduleData.all_quiz_questions.length === 0 || 
-            (sectionId === 'word' && (!moduleData.word_quiz_questions || moduleData.word_quiz_questions.length === 0)) ||
-            (sectionId === 'sentence' && (!moduleData.sentence_quiz_questions || moduleData.sentence_quiz_questions.length === 0)) ||
-            (sectionId === 'reading' && (!moduleData.reading_quiz_questions || moduleData.reading_quiz_questions.length === 0))
+        if (!moduleData.all_quiz_questions || (moduleData.all_quiz_questions.length || 0) === 0 || 
+            (sectionId === 'word' && (!moduleData.word_quiz_questions || (moduleData.word_quiz_questions.length || 0) === 0)) ||
+            (sectionId === 'sentence' && (!moduleData.sentence_quiz_questions || (moduleData.sentence_quiz_questions.length || 0) === 0)) ||
+            (sectionId === 'reading' && (!moduleData.reading_quiz_questions || (moduleData.reading_quiz_questions.length || 0) === 0)) ||
+            (sectionId === 'module_test' && (!moduleData.all_quiz_questions || (moduleData.all_quiz_questions.length || 0) < 5)) // length check added to all, using || 0 for safety
         ) {
             const baseLevelCode = 'A1';
             const baseModule = this.allModules[baseLevelCode]?.modules?.find(m => m.id === moduleId);
@@ -913,7 +914,7 @@ const LearningPath = {
             const staticContentData = this.allModuleContents[moduleId];
             baseModule.content = (staticContentData && Array.isArray(staticContentData.content)) ? staticContentData.content : [];
             
-            // Soruları oluşturur ve baseModule'e ekler (bu, V14.0'daki fallback mantığını içerir)
+            // Soruları oluşturur ve baseModule'e ekler
             this.enrichModuleContent(moduleId, baseModule, userLevel);
             
             // Oluşturulan soruları modül verisine kalıcı olarak ata ve kaydet
@@ -924,18 +925,19 @@ const LearningPath = {
             localStorage.setItem('learningModules', JSON.stringify(modules));
         }
 
-        // 2. Quiz sorularını filtrele
+        // 2. Quiz sorularını filtrele ve **UNDEFİNED HATASINI DÜZELTME**
         let quizQuestions = [];
-        if (sectionId === 'word') { quizQuestions = moduleData.word_quiz_questions; }
-        else if (sectionId === 'sentence') { quizQuestions = moduleData.sentence_quiz_questions; }
-        else if (sectionId === 'reading') { quizQuestions = moduleData.reading_quiz_questions; }
+        if (sectionId === 'word') { quizQuestions = moduleData.word_quiz_questions || []; } // || [] eklemesi ile çökme engellendi.
+        else if (sectionId === 'sentence') { quizQuestions = moduleData.sentence_quiz_questions || []; } // || [] eklemesi ile çökme engellendi.
+        else if (sectionId === 'reading') { quizQuestions = moduleData.reading_quiz_questions || []; } // || [] eklemesi ile çökme engellendi.
         else if (sectionId === 'module_test') { 
             // Genel test için rastgele 15 soru seç
-            quizQuestions = moduleData.all_quiz_questions.sort(() => 0.5 - Math.random()).slice(0, 15); 
+            const allQuestions = moduleData.all_quiz_questions || [];
+            quizQuestions = allQuestions.sort(() => 0.5 - Math.random()).slice(0, 15); 
         }
         
         if (quizQuestions.length === 0) {
-            alert("Bu bölüm için henüz soru bulunmamaktadır veya sorular yüklenemedi.");
+            alert("Bu bölüm için henüz soru bulunmamaktadır veya sorular yüklenemedi. Modül içeriğini kontrol edin.");
             return;
         }
 
@@ -954,12 +956,26 @@ const LearningPath = {
         const quizTitle = document.getElementById('quizTitle');
         const currentQuizState = JSON.parse(localStorage.getItem('currentQuiz'));
         
+        // V14.3 Sağlamlaştırma: HTML elementlerinin varlığını kontrol et
+        if (!quizContainer || !quizTitle) {
+             console.error("Kritik Hata: Quiz arayüz elementleri (quizQuestions/quizTitle) HTML'de bulunamadı. Lütfen index.html dosyanızdaki quizSection elementini kontrol edin.");
+             document.getElementById('quizSection').innerHTML = `<div class="alert alert-danger" style="max-width: 800px;">Kritik Hata: Quiz arayüzü elementleri eksik. Lütfen HTML yapınızı kontrol edin.</div>`;
+             return;
+        }
+        
+        if (!question) {
+            alert("Hata: Gösterilecek soru bulunamadı. QuizState'i kontrol edin.");
+            this.showSection('learningPathSection'); 
+            return;
+        }
+
         const questionIndex = currentQuizState.currentQuestionIndex;
         const totalQuestions = currentQuizState.questions.length;
 
-        quizTitle.textContent = `${this.STANDARD_SECTIONS.find(s => s.id === currentQuizState.sectionId).name} - Soru ${questionIndex + 1} / ${totalQuestions}`;
+        const sectionName = this.STANDARD_SECTIONS.find(s => s.id === currentQuizState.sectionId)?.name || 'Quiz';
+        quizTitle.textContent = `${sectionName} - Soru ${questionIndex + 1} / ${totalQuestions}`;
 
-        // HashCode kullanarak dinamik ID oluşturma (V13.1'den alındı)
+        // HashCode kullanarak dinamik ID oluşturma
         const optionsHtml = question.options.map((option, index) => {
             const isSelected = currentQuizState.answers[questionIndex] && currentQuizState.answers[questionIndex].selected === option;
             const selectedClass = isSelected ? 'selected-answer' : '';
@@ -991,7 +1007,7 @@ const LearningPath = {
             </div>
         `;
         
-        // Seçim olay dinleyicisi (seçimi anında kaydetmek için)
+        // Seçim olay dinleyicisi
         document.querySelectorAll('.question-options-group .question-option').forEach(optionEl => {
             optionEl.addEventListener('click', function() {
                 const selectedValue = this.querySelector('input').value;
@@ -1202,7 +1218,7 @@ const LearningPath = {
         // Dinamik olarak oluşturulan tüm hız ayar kaydırıcıları için dinleyici ekle
         document.querySelectorAll('.speech-rate-slider').forEach(slider => {
             // İlgili hız değeri gösterimini bul (aynı reading-section içinde)
-            const rateValueSpan = slider.closest('.reading-section').querySelector('.rate-value-span');
+            const rateValueSpan = slider.closest('.reading-section')?.querySelector('.rate-value-span');
 
             const updateRate = (rate) => {
                 // Tüm kaydırıcıları senkronize et ve localStorage'ı güncelle

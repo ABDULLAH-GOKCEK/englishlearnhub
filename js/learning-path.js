@@ -560,6 +560,7 @@ const LearningPath = {
         this.showSection('moduleContentSection');
         const contentEl = document.getElementById('moduleContentSection');
         
+        // userLevel'ı fonksiyona parametre olarak geçirdiğiniz için localStorage kontrolü yapmıyoruz
         const baseLevelCode = 'A1';
         const baseModule = this.allModules[baseLevelCode]?.modules?.find(m => m.id === moduleId);
         if (!baseModule) {
@@ -573,14 +574,10 @@ const LearningPath = {
         const staticContentData = this.allModuleContents[moduleId];
         baseModule.content = (staticContentData && Array.isArray(staticContentData.content)) ? staticContentData.content : [];
         
-        const enrichedContent = this.getModuleContentHTML(moduleId, baseModule, userLevel);
+        // getModuleContentHTML yerine, yeni fonksiyonu çağırıyoruz
+        const contentDetailHTML = this.renderModuleContentDetail(moduleId, baseModule, currentModule);
         
-        let sectionCards = '';
-        this.STANDARD_SECTIONS.forEach(section => {
-            if (section.id === 'module_test') return; 
-            
-            sectionCards += this.renderInlineQuizSection(section.id, baseModule, currentModule);
-        });
+        // Önceki "Modül Alıştırmaları" başlığı ve toplu kart div'i kaldırıldı.
         
         contentEl.innerHTML = `
             <div style="max-width: 900px; width: 100%;">
@@ -588,11 +585,6 @@ const LearningPath = {
                     <i class="fas fa-arrow-left me-2"></i> Öğrenme Yoluna Geri Dön
                 </button>
                 <h3 class="mb-4">${baseModule.name} Modülü (Seviye: ${userLevel})</h3>
-                
-                <h4 class="mt-4">Modül Alıştırmaları</h4>
-                <div id="moduleSections" class="row g-4 mb-4">
-                    ${sectionCards}
-                </div>
                 
                 <hr class="mt-4 mb-4">
                 
@@ -603,8 +595,7 @@ const LearningPath = {
                         <input type="range" class="form-range" id="speechRate" min="0.5" max="2" step="0.1" value="${localStorage.getItem('speechRate') || '0.9'}" style="width: 150px;">
                         <span id="rateValue" class="ms-2">${localStorage.getItem('speechRate') || '0.9'}</span>
                     </div>
-                    ${enrichedContent}
-                </div>
+                    ${contentDetailHTML} </div>
             </div>
         `;
         
@@ -822,29 +813,42 @@ const LearningPath = {
                 category: moduleReading.category
             });
             
-            moduleReading.questions.forEach((q, index) => {
-                if (q.options && q.options.length > 2) {
-                     const correctAnswerValue = q.correctAnswer;
-                     let correctAnswerText = null;
-                     
-                     if (typeof correctAnswerValue === 'number') {
-                         correctAnswerText = q.options[parseInt(correctAnswerValue, 10)];
-                     } else if (typeof correctAnswerValue === 'string') {
-                         correctAnswerText = q.options.find(opt => opt === correctAnswerValue);
+            // Okuma sorularını işleme kısmı - KRİTİK DÜZELTME
+            if (Array.isArray(moduleReading.questions)) {
+                 moduleReading.questions.forEach((q, index) => {
+                     // Soru ve en az 3 seçenek olmalı
+                     if (q.options && q.options.length > 2) {
+                          let correctAnswerText = null;
+                          
+                          // Doğru cevabı bulma mantığı:
+                          if (typeof q.correctAnswer === 'number') {
+                              // Cevap bir indeks ise (0, 1, 2...)
+                              if (q.options[q.correctAnswer] !== undefined) {
+                                  correctAnswerText = q.options[q.correctAnswer];
+                              }
+                          } else if (typeof q.correctAnswer === 'string') {
+                              // Cevap direkt metin ise
+                              // options dizisinde olması gerekliliği kontrol edilmeden direkt metin kullanılır, zira format bu şekilde olabilir
+                              correctAnswerText = q.correctAnswer; 
+                          } 
+                          
+                          if (correctAnswerText) {
+                              readingQuizQuestions.push({
+                                  id: `reading_q${moduleId}_${index}`,
+                                  type: 'quiz',
+                                  question: `(Okuma Sorusu): ${q.question}`,
+                                  options: q.options,
+                                  answer: correctAnswerText,
+                                  topic: `${moduleReading.title} - Okuma Anlama`
+                              });
+                          } else {
+                              console.warn(`Okuma sorusu ${index} için doğru cevap metni bulunamadı: ${q.question}`);
+                          }
                      }
-                     
-                     if (correctAnswerText) {
-                         readingQuizQuestions.push({
-                             id: `reading_q${moduleId}_${index}`,
-                             type: 'quiz',
-                             question: `(Okuma Sorusu): ${q.question}`,
-                             options: q.options,
-                             answer: correctAnswerText,
-                             topic: `${moduleReading.title} - Okuma Anlama`
-                         });
-                     }
-                }
-            });
+                 });
+            } else {
+                console.warn(`Okuma parçası ${moduleReading.title} için questions dizisi boş veya tanımsız.`);
+            }
 
         } else {
             enrichedContent.push({type: 'reading_placeholder', text: 'Okuma hikayesi bulunamadı. Modül konusu ile okuma kategorileri eşleşmedi veya bu seviyeye uygun hikaye yok.'});
@@ -1310,7 +1314,51 @@ const LearningPath = {
 
         statsEl.innerHTML = statsHtml;
     },
+           // Yeni fonksiyon: İçeriği ve Alıştırma Kartlarını Gömülü Olarak Hazırlar
+    renderModuleContentDetail: function(moduleId, baseModule, currentModule) {
+        const userLevel = localStorage.getItem('userLevel') || 'A1';
+        
+        // Önce içeriği zenginleştirilmiş (enriched) liste olarak al
+        const enrichedContentList = this.enrichModuleContent(moduleId, baseModule, userLevel); 
+        
+        let contentHtml = '';
+        let hasWordContent = false;
+        let hasSentenceContent = false;
+        
+        // İçeriği ve Alıştırma Kartlarını Gömme Mantığı
+        enrichedContentList.forEach(item => {
+            // Sadece bir kere Kelime ve Cümle kartlarını en üste koy
+            if (!hasWordContent && item.type === 'grammar_text') {
+                 // 1. Kelime Alıştırması
+                 contentHtml += this.renderInlineQuizSection('word', baseModule, currentModule);
+                 hasWordContent = true;
+            }
+            if (!hasSentenceContent && item.type === 'grammar_text') {
+                 // 2. Cümle Alıştırması
+                 contentHtml += this.renderInlineQuizSection('sentence', baseModule, currentModule);
+                 hasSentenceContent = true;
+            }
+            
+            // Tüm içerik tiplerini HTML'e dönüştür
+            contentHtml += this.renderContentItem(item); 
+            
+            // 3. Okuma Alıştırması: Okuma içeriğinin hemen arkasına kartı ekle
+            if (item.type === 'reading_text' || item.type === 'reading_placeholder') {
+                contentHtml += this.renderInlineQuizSection('reading', baseModule, currentModule);
+            }
+        });
+        
+        // Eğer hiç 'grammar_text' yoksa (Kelime ve Cümle kartlarını koyacak yer yoksa)
+        if (!hasWordContent) {
+            contentHtml = this.renderInlineQuizSection('word', baseModule, currentModule) + contentHtml;
+        }
+        if (!hasSentenceContent) {
+            contentHtml = this.renderInlineQuizSection('sentence', baseModule, currentModule) + contentHtml;
+        }
 
+
+        return contentHtml;
+    },     
     // =========================================================================
     // 7. SEVİYE ATLATMA MEKANİZMASI (Aynı Bırakıldı)
     // =========================================================================
@@ -1523,4 +1571,5 @@ document.addEventListener('DOMContentLoaded', () => {
     window.LearningPath = LearningPath; 
     LearningPath.init();
 });
+
 

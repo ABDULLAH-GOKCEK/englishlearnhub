@@ -426,17 +426,24 @@ const LearningPath = {
     },
 
     // =========================================================================
-    // 4. GENEL SINAV MANTIĞI (prepareAndDisplayLevelTest - V14.7)
-    // Hata: Uncaught TypeError: Cannot read properties of undefined (reading 'question') Çözümü
+    // 4. GENEL SINAV MANTIĞI (prepareAndDisplayLevelTest - V14.8)
+    // Soruların Boş Yüklenmesi (404/Yükleme Hatası) Durumu için Çözüm
     // =========================================================================
 
     prepareAndDisplayLevelTest: function() {
         const MAX_QUESTIONS = 20;
         
-        // 1. Sıkı Filtreleme ve Formatlama: Geçerli şıkkı, cevabı ve sorusu olanları al
+        // 1. Önce soruların genel olarak yüklenip yüklenmediğini kontrol et
+        if (!this.allLevelTestQuestions || this.allLevelTestQuestions.length === 0) {
+            // Yükleme hatası veya dosyanın boş olması durumunda net hata mesajı
+            this.showQuizError("Seviye tespit testi başlatılamadı. **data/level_test.json** dosyası sunucuda bulunamadı veya boş yüklendi. Lütfen dosya yolunu ve içeriğini kontrol edin.");
+            return;
+        }
+
+        // 2. Filtreleme ve Formatlama: Geçerli şıkkı, cevabı ve sorusu olanları al
         let validQuestions = this.allLevelTestQuestions
             .filter(q => 
-                q.options && q.options.length > 1 && // Şıklar olmalı
+                q.options && Array.isArray(q.options) && q.options.length > 1 && // Şıklar array olmalı ve en az 2 şık olmalı
                 q.correctAnswer && // Doğru cevap olmalı
                 (q.questionText || q.question) // Soru metni olmalı
             )
@@ -450,11 +457,12 @@ const LearningPath = {
             }));
             
         if (validQuestions.length === 0) {
-            this.showQuizError("Seviye tespit testi başlatılamadı. Lütfen `level_test.json` dosyasında doğru formatta (şıklar, soru ve cevap) soru olduğundan emin olun.");
+            // Bu hata sadece yüklenen dosyadaki tüm soruların formatı bozuksa görünür.
+            this.showQuizError("Yüklenen tüm sorular hatalı formatta olduğu için test başlatılamadı. Lütfen `level_test.json` dosyasındaki tüm soruların `options`, `questionText` ve `correctAnswer` alanlarının dolu olduğundan emin olun.");
             return;
         }
-        
-        // 2. Soruları karıştır ve maksimum soru sayısını al
+
+        // 3. Soruları karıştır ve maksimum soru sayısını al
         this.currentQuizQuestions = this.shuffleArray(validQuestions)
             .slice(0, MAX_QUESTIONS)
             .map(q => {
@@ -464,18 +472,11 @@ const LearningPath = {
                 options: this.shuffleArray([...q.options])
             };
         });
-        
-        // 3. KRİTİK KONTROL: Sınav dizisi yine de boş mu?
-        if (this.currentQuizQuestions.length === 0) {
-            this.showQuizError("Sınav oluşturma sırasında beklenmedik bir hata oluştu ve soru dizisi boş kaldı. Veri dosyanızı kontrol edin.");
-            return;
-        }
 
         // Testi Başlatma
         this.currentQuestionIndex = 0;
         this.currentQuizAnswers = [];
         document.getElementById('quizTitle').textContent = `Seviye Tespit Testi`;
-        // Hatanın oluştuğu satır (this.currentQuizQuestions[0] artık tanımlı olmalı)
         this.showQuizQuestion(this.currentQuizQuestions[this.currentQuestionIndex]);
         this.showSection('quizSection');
     },
@@ -866,5 +867,6 @@ document.addEventListener('DOMContentLoaded', () => {
     window.LearningPath = LearningPath; 
     LearningPath.init();
 });
+
 
 

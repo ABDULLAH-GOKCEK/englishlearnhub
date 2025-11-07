@@ -426,35 +426,56 @@ const LearningPath = {
     },
 
     // =========================================================================
-    // 4. GENEL SINAV MANTIĞI (Modül ve Seviye Testi İçin)
-    // (V14.4'ten gerekli fonksiyonlar sadeleştirilerek alındı)
+    // 4. GENEL SINAV MANTIĞI (prepareAndDisplayLevelTest - V14.7)
+    // Hata: Uncaught TypeError: Cannot read properties of undefined (reading 'question') Çözümü
     // =========================================================================
 
-    // Seviye Testini Hazırla ve Göster (V14.4'ten sadeleştirildi)
     prepareAndDisplayLevelTest: function() {
         const MAX_QUESTIONS = 20;
         
-        // Sadece sorusu ve cevabı olanları al
-        let rawQuestions = this.allLevelTestQuestions
-            .filter(q => q.correctAnswer && (q.questionText || q.question))
+        // 1. Sıkı Filtreleme ve Formatlama: Geçerli şıkkı, cevabı ve sorusu olanları al
+        let validQuestions = this.allLevelTestQuestions
+            .filter(q => 
+                q.options && q.options.length > 1 && // Şıklar olmalı
+                q.correctAnswer && // Doğru cevap olmalı
+                (q.questionText || q.question) // Soru metni olmalı
+            )
             .map((q, index) => ({
-                id: q.id || `lq${index}`, question: q.questionText || q.question, options: q.options,
-                answer: q.correctAnswer || q.answer, topic: q.topic || 'Genel', level: q.level || 'A1' 
-            }))
-            .sort(() => 0.5 - Math.random())
-            .slice(0, MAX_QUESTIONS);
+                id: q.id || `lq${index}`, 
+                question: q.questionText || q.question, 
+                options: q.options,
+                answer: q.correctAnswer || q.answer, 
+                topic: q.topic || 'Genel', 
+                level: q.level || 'A1' 
+            }));
             
-        this.currentQuizQuestions = rawQuestions.map(q => {
-            // Seviye testinde şıkları karıştır
+        if (validQuestions.length === 0) {
+            this.showQuizError("Seviye tespit testi başlatılamadı. Lütfen `level_test.json` dosyasında doğru formatta (şıklar, soru ve cevap) soru olduğundan emin olun.");
+            return;
+        }
+        
+        // 2. Soruları karıştır ve maksimum soru sayısını al
+        this.currentQuizQuestions = this.shuffleArray(validQuestions)
+            .slice(0, MAX_QUESTIONS)
+            .map(q => {
+            // Şıkları da karıştır
             return {
                 ...q,
                 options: this.shuffleArray([...q.options])
             };
         });
+        
+        // 3. KRİTİK KONTROL: Sınav dizisi yine de boş mu?
+        if (this.currentQuizQuestions.length === 0) {
+            this.showQuizError("Sınav oluşturma sırasında beklenmedik bir hata oluştu ve soru dizisi boş kaldı. Veri dosyanızı kontrol edin.");
+            return;
+        }
 
+        // Testi Başlatma
         this.currentQuestionIndex = 0;
         this.currentQuizAnswers = [];
         document.getElementById('quizTitle').textContent = `Seviye Tespit Testi`;
+        // Hatanın oluştuğu satır (this.currentQuizQuestions[0] artık tanımlı olmalı)
         this.showQuizQuestion(this.currentQuizQuestions[this.currentQuestionIndex]);
         this.showSection('quizSection');
     },
@@ -845,4 +866,5 @@ document.addEventListener('DOMContentLoaded', () => {
     window.LearningPath = LearningPath; 
     LearningPath.init();
 });
+
 

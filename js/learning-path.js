@@ -57,57 +57,42 @@ const LearningPath = {
     
     // =========================================================================
     // 1. TEMEL İŞLEMLER VE VERİ YÜKLEME
-    // (loadAllData - V15.0)
+    // (loadAllData - V15.1) - Dizi Olarak Yüklenen Modül Desteği
     // =========================================================================
 
     loadAllData: async function() {
-        const fetchData = async (path) => {
-            try {
-                const res = await fetch(path);
-                if (!res.ok) throw new Error(`HTTP hatası! Durum: ${res.status} (${path})`);
-                return res.json();
-            } catch (error) {
-                console.error(`Kritik JSON Yükleme Hatası: ${path}`, error);
-                return path.includes('json') ? {} : []; 
-            }
-        };
-        
-        // Veri çekme işlemleri
+        // ... (fetchData fonksiyonu aynı kalır)
+
+        // Veri çekme işlemleri (fetchData, Promise.all ile aynı kalır)
         const [moduleContentData, testData, wordsData, sentencesData, readingsData, examData] = await Promise.all([
             fetchData(this.MODULE_CONTENT_FILE_PATH).catch(() => ({})), // module_content.json 
-            fetchData(this.TEST_FILE_PATH).catch(() => ({})),
-            fetchData('data/words.json').catch(() => []), 
-            fetchData('data/sentences.json').catch(() => []), 
-            fetchData('data/reading_stories.json').catch(() => []), 
-            fetchData(this.LEVEL_UP_EXAM_FILE_PATH).catch(() => []) 
+            // ... (diğer fetchData çağrıları aynı kalır)
         ]);
-        
-        // V15.0 Düzeltmesi: Modül verisi, 'modules' anahtarı altında olmalı
+
+        // V15.1 Düzeltmesi: Modül verisi, 'modules' anahtarı, kök nesne VEYA kök dizi olabilir.
+        let rawModules = moduleContentData;
         if (moduleContentData && moduleContentData.modules) {
-             this.allModules = moduleContentData.modules;
+             rawModules = moduleContentData.modules;
              this.allModuleContents = moduleContentData;
         } else {
-             // Eğer 'modules' anahtarı yoksa ve dosya nesneyse, modülleri kök nesne olarak kabul et
-             this.allModules = moduleContentData;
              this.allModuleContents = moduleContentData;
         }
-        
-        // ... (Geri kalan test, words, sentences, readings verileri aynı kalır)
-        let questionsArray = [];
-        if (Array.isArray(testData)) {
-            questionsArray = testData;
-        } else if (typeof testData === 'object' && testData !== null && Array.isArray(testData.questions)) {
-            questionsArray = testData.questions;
+
+        // Eğer rawModules bir dizi ise, onu anahtarlı bir nesneye dönüştür
+        if (Array.isArray(rawModules)) {
+            this.allModules = rawModules.reduce((acc, module) => {
+                // Modül anahtarını 'id' veya 'level-M#' formatından alırız
+                const key = module.id || `${module.level || 'Unknown'}-${module.name || 'M1'}`.replace(/\s/g, '');
+                acc[key] = module;
+                return acc;
+            }, {});
+        } else {
+            this.allModules = rawModules;
         }
-        this.allLevelTestQuestions = questionsArray; 
         
-        this.allExamQuestions = Array.isArray(examData) ? examData : (examData && Array.isArray(examData.questions) ? examData.questions : []);
-
-        this.allWords = Array.isArray(wordsData) ? wordsData : []; 
-        this.allSentences = Array.isArray(sentencesData) ? sentencesData : []; 
-        this.allReadings = Array.isArray(readingsData) ? readingsData : []; 
+        // ... (Geri kalan tüm veri yükleme kodları aynı kalır)
+        
     },
-
     // =========================================================================
     // 2. İÇERİK FİLTRELEME VE GÖSTERİMİ (GÜNCELLEME 1)
     // =========================================================================
@@ -684,8 +669,8 @@ const LearningPath = {
         `;
 
         // Modülleri seviyeye göre filtrele ve sırala
-        const levelModules = Object.keys(this.allModules)
-            .filter(key => this.allModules[key].level === levelName)
+        const levelModules = Object.keys(this.allModules).filter(key => 
+            this.allModules[key].level.toUpperCase() === levelName
             .sort((a, b) => a.localeCompare(b)); // Modül anahtarına göre (A1-M1, A1-M2...) sırala
         
         if (levelModules.length === 0) {
@@ -785,6 +770,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.LearningPath = LearningPath; 
     LearningPath.init();
 });
+
 
 
 

@@ -61,17 +61,32 @@ const LearningPath = {
     // =========================================================================
 
     loadAllData: async function() {
-        // ... (fetchData fonksiyonu aynı kalır)
+        const fetchData = async (path) => {
+            try {
+                const res = await fetch(path);
+                if (!res.ok) throw new Error(`HTTP hatası! Durum: ${res.status} (${path})`);
+                return res.json();
+            } catch (error) {
+                console.error(`Kritik JSON Yükleme Hatası: ${path}`, error);
+                // Hata durumunda, yüklenen dosya türüne göre boş nesne veya boş dizi döndür
+                return path.includes('json') ? {} : []; 
+            }
+        };
 
-        // Veri çekme işlemleri (fetchData, Promise.all ile aynı kalır)
+        // Veri çekme işlemleri
         const [moduleContentData, testData, wordsData, sentencesData, readingsData, examData] = await Promise.all([
             fetchData(this.MODULE_CONTENT_FILE_PATH).catch(() => ({})), // module_content.json 
-            // ... (diğer fetchData çağrıları aynı kalır)
+            fetchData(this.TEST_FILE_PATH).catch(() => ({})),
+            fetchData('data/words.json').catch(() => []), 
+            fetchData('data/sentences.json').catch(() => []), 
+            fetchData('data/reading_stories.json').catch(() => []), 
+            fetchData(this.LEVEL_UP_EXAM_FILE_PATH).catch(() => []) 
         ]);
 
         // V15.1 Düzeltmesi: Modül verisi, 'modules' anahtarı, kök nesne VEYA kök dizi olabilir.
         let rawModules = moduleContentData;
         if (moduleContentData && moduleContentData.modules) {
+             // Eğer "modules" anahtarı varsa, onu al
              rawModules = moduleContentData.modules;
              this.allModuleContents = moduleContentData;
         } else {
@@ -87,11 +102,24 @@ const LearningPath = {
                 return acc;
             }, {});
         } else {
+            // Zaten anahtarlı bir nesneyse direkt kullan
             this.allModules = rawModules;
         }
         
-        // ... (Geri kalan tüm veri yükleme kodları aynı kalır)
+        // Geri kalan test verilerinin yüklenmesi
+        let questionsArray = [];
+        if (Array.isArray(testData)) {
+            questionsArray = testData;
+        } else if (typeof testData === 'object' && testData !== null && Array.isArray(testData.questions)) {
+            questionsArray = testData.questions;
+        }
+        this.allLevelTestQuestions = questionsArray; 
         
+        this.allExamQuestions = Array.isArray(examData) ? examData : (examData && Array.isArray(examData.questions) ? examData.questions : []);
+
+        this.allWords = Array.isArray(wordsData) ? wordsData : []; 
+        this.allSentences = Array.isArray(sentencesData) ? sentencesData : []; 
+        this.allReadings = Array.isArray(readingsData) ? readingsData : []; 
     },
     // =========================================================================
     // 2. İÇERİK FİLTRELEME VE GÖSTERİMİ (GÜNCELLEME 1)
@@ -769,6 +797,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.LearningPath = LearningPath; 
     LearningPath.init();
 });
+
 
 
 

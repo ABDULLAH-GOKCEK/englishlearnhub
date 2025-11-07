@@ -426,39 +426,37 @@ const LearningPath = {
     },
 
     // =========================================================================
-    // 4. GENEL SINAV MANTIĞI (prepareAndDisplayLevelTest - V14.8)
-    // Soruların Boş Yüklenmesi (404/Yükleme Hatası) Durumu için Çözüm
+    // 4. GENEL SINAV MANTIĞI (prepareAndDisplayLevelTest - V14.9)
+    // Hata Çözümü: JSON formatındaki 'answer' anahtarını desteklemek için güncelleme
     // =========================================================================
 
     prepareAndDisplayLevelTest: function() {
         const MAX_QUESTIONS = 20;
         
-        // 1. Önce soruların genel olarak yüklenip yüklenmediğini kontrol et
+        // 1. Soruların genel olarak yüklenip yüklenmediğini kontrol et
         if (!this.allLevelTestQuestions || this.allLevelTestQuestions.length === 0) {
-            // Yükleme hatası veya dosyanın boş olması durumunda net hata mesajı
             this.showQuizError("Seviye tespit testi başlatılamadı. **data/level_test.json** dosyası sunucuda bulunamadı veya boş yüklendi. Lütfen dosya yolunu ve içeriğini kontrol edin.");
             return;
         }
 
-        // 2. Filtreleme ve Formatlama: Geçerli şıkkı, cevabı ve sorusu olanları al
+        // 2. Filtreleme ve Formatlama: Geçerli şıkkı, cevabı (correctAnswer VEYA answer) ve sorusu olanları al
         let validQuestions = this.allLevelTestQuestions
             .filter(q => 
                 q.options && Array.isArray(q.options) && q.options.length > 1 && // Şıklar array olmalı ve en az 2 şık olmalı
-                q.correctAnswer && // Doğru cevap olmalı
-                (q.questionText || q.question) // Soru metni olmalı
+                (q.correctAnswer || q.answer) && // KRİTİK DÜZELTME: Doğru cevap 'correctAnswer' VEYA 'answer' olmalı
+                (q.questionText || q.question) // Soru metni 'questionText' VEYA 'question' olmalı
             )
             .map((q, index) => ({
                 id: q.id || `lq${index}`, 
                 question: q.questionText || q.question, 
                 options: q.options,
-                answer: q.correctAnswer || q.answer, 
+                answer: q.correctAnswer || q.answer, // Doğru cevabı 'answer' anahtarına atar
                 topic: q.topic || 'Genel', 
                 level: q.level || 'A1' 
             }));
             
         if (validQuestions.length === 0) {
-            // Bu hata sadece yüklenen dosyadaki tüm soruların formatı bozuksa görünür.
-            this.showQuizError("Yüklenen tüm sorular hatalı formatta olduğu için test başlatılamadı. Lütfen `level_test.json` dosyasındaki tüm soruların `options`, `questionText` ve `correctAnswer` alanlarının dolu olduğundan emin olun.");
+            this.showQuizError("Yüklenen tüm sorular hatalı formatta olduğu için test başlatılamadı. Lütfen `level_test.json` dosyasındaki tüm soruların `options`, `questionText` ve **`answer`** (veya `correctAnswer`) alanlarının dolu olduğundan emin olun.");
             return;
         }
 
@@ -480,7 +478,6 @@ const LearningPath = {
         this.showQuizQuestion(this.currentQuizQuestions[this.currentQuestionIndex]);
         this.showSection('quizSection');
     },
-
     showQuizQuestion: function(question) {
         const quizQuestionsContainer = document.getElementById('quizQuestions');
         quizQuestionsContainer.innerHTML = ''; 
@@ -867,6 +864,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.LearningPath = LearningPath; 
     LearningPath.init();
 });
+
 
 
 

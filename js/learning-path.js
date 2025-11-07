@@ -790,13 +790,94 @@ const LearningPath = {
             alert("Tüm ilerleme sıfırlandı. Seviye tespit testi yeniden başlayacak.");
             window.location.reload(); 
         }
+    },
+    // EKSİK FONKSİYONLAR (V15.2 Düzeltmesi)
+
+// init: Sayfa yüklendiğinde veri yükle ve seviye kontrol et
+init: function() {
+    this.loadAllData().then(() => {
+        const userLevel = this.getCurrentUserLevel();
+        if (userLevel) {
+            this.displayLearningPath(userLevel);
+            document.getElementById('navToPathButton').classList.remove('d-none');
+        } else {
+            this.showSection('introSection'); // Başlangıç ekranı
+        }
+    }).catch(error => {
+        console.error('Init Hatası:', error);
+        alert('Veri yüklenemedi. Lütfen internetinizi kontrol edin.');
+    });
+},
+
+// getCurrentUserLevel: localStorage'dan al
+getCurrentUserLevel: function() {
+    return localStorage.getItem('userLevel') || 'A1';
+},
+
+// getNextLevel: Seviye ilerletme (A1 → A2 → B1 vb.)
+getNextLevel: function(currentLevel) {
+    const levels = ['A1', 'A2', 'B1', 'B2', 'C1'];
+    const index = levels.indexOf(currentLevel.toUpperCase());
+    return index >= 0 && index < levels.length - 1 ? levels[index + 1] : null;
+},
+
+// markLevelUp: Seviye yükselt
+markLevelUp: function(newLevel) {
+    this.saveUserLevel(newLevel);
+    localStorage.removeItem('learningModules'); // Eski modülleri sıfırla
+},
+
+// isModuleCompleted: Tamamlandı mı?
+isModuleCompleted: function(moduleKey) {
+    const completedModules = JSON.parse(localStorage.getItem('learningModules') || '{}');
+    return !!completedModules[moduleKey];
+},
+
+// markModuleCompleted: Tamamla işaretle
+markModuleCompleted: function(moduleKey) {
+    const completedModules = JSON.parse(localStorage.getItem('learningModules') || '{}');
+    completedModules[moduleKey] = true;
+    localStorage.setItem('learningModules', JSON.stringify(completedModules));
+},
+
+// checkAllModulesCompleted: Seviye tamamlandı mı?
+checkAllModulesCompleted: function(level) {
+    const levelModules = Object.keys(this.allModules).filter(key => this.allModules[key].level.toUpperCase() === level.toUpperCase());
+    return levelModules.every(key => this.isModuleCompleted(key));
+},
+
+// shuffleArray: Rastgele karıştır
+shuffleArray: function(array) {
+    return array.sort(() => Math.random() - 0.5);
+},
+
+// showSection: Bölüm göster/gizle
+showSection: function(sectionId) {
+    document.querySelectorAll('.module-section').forEach(section => {
+        section.classList.remove('active');
+        section.style.display = 'none';
+    });
+    const targetSection = document.getElementById(sectionId);
+    if (targetSection) {
+        targetSection.style.display = 'flex';
+        targetSection.classList.add('active');
     }
+},
+
+// speakText: Sesli okuma (Text-to-Speech)
+speakText: function(text) {
+    if (this.synth.speaking) this.synth.cancel();
+    this.speechUtterance = new SpeechSynthesisUtterance(text);
+    this.speechUtterance.lang = 'en-US';
+    this.synth.speak(this.speechUtterance);
+}
 };
 
 document.addEventListener('DOMContentLoaded', () => {
     window.LearningPath = LearningPath; 
     LearningPath.init();
 });
+
 
 
 

@@ -57,32 +57,42 @@ const LearningPath = {
     
     // =========================================================================
     // 1. TEMEL İŞLEMLER VE VERİ YÜKLEME
-    // (V14.4'teki ana yükleme mantığı korunmuştur)
+    // (DÜZELTME: 'this' referans hatası giderildi - V14.6)
     // =========================================================================
     
     init: function() {
+        // 'this' bağlamını (LearningPath objesini) korumak için referans oluştur
+        const self = this; 
+        
         this.loadAllData().then(() => {
             console.log("Tüm veriler yüklendi.");
             
             const userLevel = localStorage.getItem('userLevel');
+            console.log(`Mevcut Kullanıcı Seviyesi: ${userLevel || 'Yok'}.`); 
             
+            // self.showSection ve self.displayLearningPath kullanılarak 'this' hatası çözülür
             if (userLevel) {
-                this.displayLearningPath(userLevel);
+                self.displayLearningPath(userLevel);
             } 
             else {
-                this.showSection('introSection');
+                self.showSection('introSection');
             }
             
-            // V14.4'teki başlatma kodu restore edildi
+            // Seviye Tespit Butonunun dinleyicisi ekleniyor
             const startTestButton = document.getElementById('startTestButton');
             if (startTestButton) {
                  startTestButton.onclick = () => {
+                    console.log("Seviye Tespit Butonuna Tıklandı. Test Başlatılıyor..."); 
                     localStorage.removeItem('levelTestAnswers'); 
-                    this.prepareAndDisplayLevelTest();
+                    self.prepareAndDisplayLevelTest(); // self kullanıldı
                  };
+            } else {
+                console.warn("HTML Uyarısı: 'startTestButton' ID'li buton DOM'da bulunamadı. Lütfen HTML dosyanızı kontrol edin."); 
             }
         }).catch(error => {
-            console.error("Veri yüklenirken hata oluştu:", error);
+            console.error("Kritik Hata: Veri yüklenirken hata oluştu:", error);
+            // Hata durumunda da introSection'ı göstermeye çalışalım (eğer showSection metodu çalışıyorsa)
+            // self.showSection('introSection'); 
             alert("Uygulama başlatılamadı. Veri dosyalarını kontrol edin.");
         });
     },
@@ -835,3 +845,4 @@ document.addEventListener('DOMContentLoaded', () => {
     window.LearningPath = LearningPath; 
     LearningPath.init();
 });
+

@@ -1,5 +1,5 @@
 // =========================================================================
-// js/learning-path.js (V16.1 – %100 ÇALIŞIR + module_content.json UYUMLU)
+// js/learning-path.js (V17.0 – ORİJİNAL YAPI + TAM ÇALIŞIR)
 // =========================================================================
 
 const LearningPath = {
@@ -11,9 +11,11 @@ const LearningPath = {
     allModules: {},
     allLevelTestQuestions: [],
     currentModuleKey: null,
+    currentSection: null,
     currentQuestionIndex: 0,
     currentQuizAnswers: [],
     currentQuizQuestions: [],
+    sectionProgress: {}, // { "a1_m1": { "word": true, "sentence": false } }
 
     synth: window.speechSynthesis,
 
@@ -37,11 +39,11 @@ const LearningPath = {
             fetchData(this.TEST_FILE_PATH)
         ]);
 
-        // Modül verisi: { "a1_m1": { ... } }
         this.allModules = moduleData;
-
-        // Test soruları
         this.allLevelTestQuestions = Array.isArray(testData) ? testData : (testData.questions || []);
+
+        // localStorage'dan ilerleme yükle
+        this.sectionProgress = JSON.parse(localStorage.getItem('sectionProgress') || '{}');
     },
 
     // =========================================================================
@@ -49,53 +51,95 @@ const LearningPath = {
     // =========================================================================
     startLevelTest: function() {
         if (this.allLevelTestQuestions.length === 0) {
-            alert('Test soruları yüklenemedi. Lütfen data/level_test.json dosyasını kontrol edin.');
+            alert('Test soruları yüklenemedi. data/level_test.json dosyasını kontrol edin.');
             return;
         }
         this.currentQuizQuestions = this.shuffleArray([...this.allLevelTestQuestions]).slice(0, 5);
         this.currentQuestionIndex = 0;
         this.currentQuizAnswers = [];
+        this.currentModuleKey = null;
         document.getElementById('quizTitle').textContent = 'Seviye Tespit Testi';
         this.showQuizQuestion(this.currentQuizQuestions[0]);
         this.showSection('quizSection');
     },
 
     // =========================================================================
-    // 3. MODÜL İÇERİK GÖSTER
+    // 3. ÖĞRENME YOLU
     // =========================================================================
-    displayModuleContent: function(moduleKey) {
+    displayLearningPath: function(level) {
+        const container = document.getElementById('learningPathSection');
+        const levelName = level.toUpperCase();
+        let html = `<h1 class="text-center mb-4">Öğrenme Yolum: ${levelName}</h1><div class="row g-4">`;
+
+        const levelModules = Object.keys(this.allModules).filter(k => k.startsWith(levelName.toLowerCase()));
+
+        if (levelModules.length === 0) {
+            html += `<div class="alert alert-warning">Bu seviyede modül yok.</div>`;
+        } else {
+            levelModules.forEach(key => {
+                const mod = this.allModules[key];
+                const progress = this.sectionProgress[key] || {};
+                const completed = Object.values(progress).every(v => v);
+                const status = completed ? 'Tamamlandı' : 'Devam Ediyor';
+
+                html += `
+                    <div class="col-md-4">
+                        <div class="card module-card ${completed ? 'completed' : 'in-progress'} h-100">
+                            <div class="card-body d-flex flex-column">
+                                <h5>${mod.title}</h5>
+                                <p class="text-muted small">${mod.topic}</p>
+                                <div class="mt-auto">
+                                    <button class="btn btn-sm btn-outline-primary w-100 mb-2" onclick="LearningPath.displayModuleSection('${key}', 'word')">
+                                        Kelime
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-primary w-100 mb-2" onclick="LearningPath.displayModuleSection('${key}', 'sentence')">
+                                        Cümle
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-primary w-100 mb-2" onclick="LearningPath.displayModuleSection('${key}', 'reading')">
+                                        Okuma
+                                    </button>
+                                    ${completed ? '' : `<button class="btn btn-success btn-sm w-100 mt-2" onclick="LearningPath.startModuleFinalExam('${key}')">
+                                        Bitirme Sınavı
+                                    </button>`}
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
+            });
+        }
+
+        html += `</div>`;
+        container.innerHTML = html;
+        this.showSection('learningPathSection');
+        document.getElementById('navToPathButton').classList.remove('d-none');
+    },
+
+    // =========================================================================
+    // 4. BÖLÜM İÇERİĞİ GÖSTER
+    // =========================================================================
+    displayModuleSection: function(moduleKey, sectionType) {
         const module = this.allModules[moduleKey];
-        if (!module) return alert('Modül bulunamadı.');
+        if (!module) return alert('Modül yok.');
+
+        this.currentModuleKey = moduleKey;
+        this.currentSection = sectionType;
 
         const container = document.getElementById('moduleContentSection');
-        let html = `<h3>${module.title}</h3>`;
+        let html = `<h3>${module.title} - ${this.getSectionName(sectionType)}</h3>`;
 
+        // İçerik göster
         module.content.forEach(item => {
             if (item.type === 'heading') html += `<h5>${item.text}</h5>`;
             if (item.type === 'paragraph') html += `<p>${item.text}</p>`;
             if (item.type === 'code_block') html += `<pre class="bg-light p-3 rounded">${item.text}</pre>`;
             if (item.type === 'example') html += `<div class="alert alert-info">${item.text.replace(/\n/g, '<br>')}</div>`;
-            if (item.type === 'quiz_intro') html += `<p class="text-muted">${item.text}</p>`;
-            if (item.type === 'quiz') {
-                html += `
-                    <div class="card mb-3">
-                        <div class="card-body">
-                            <p><strong>${item.question}</strong></p>
-                            ${item.options.map((opt, i) => `
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="quiz_${moduleKey}" id="q${i}">
-                                    <label class="form-check-label" for="q${i}">${opt}</label>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>`;
-            }
         });
 
+        // Bölüm sınavı butonu
         html += `
             <div class="text-center mt-4">
-                <button class="btn btn-success btn-lg" onclick="LearningPath.startModuleQuiz('${moduleKey}')">
-                    Modül Sınavına Başla
+                <button class="btn btn-primary btn-lg" onclick="LearningPath.startSectionQuiz('${moduleKey}', '${sectionType}')">
+                    ${this.getSectionName(sectionType)} Sınavı
                 </button>
             </div>`;
 
@@ -103,28 +147,57 @@ const LearningPath = {
         this.showSection('moduleContentSection');
     },
 
+    getSectionName: function(type) {
+        const names = { word: 'Kelime', sentence: 'Cümle', reading: 'Okuma' };
+        return names[type] || type;
+    },
+
     // =========================================================================
-    // 4. SINAV
+    // 5. BÖLÜM SINAVI
     // =========================================================================
-    startModuleQuiz: function(moduleKey) {
-        this.currentModuleKey = moduleKey;
+    startSectionQuiz: function(moduleKey, sectionType) {
         const module = this.allModules[moduleKey];
-        this.currentQuizQuestions = module.content
-            .filter(c => c.type === 'quiz')
-            .map(q => ({ question: q.question, options: q.options, answer: q.answer }));
-        
-        if (this.currentQuizQuestions.length === 0) {
-            alert('Bu modülde sınav sorusu yok.');
-            return;
-        }
+        const quizzes = module.content.filter(c => c.type === 'quiz');
+        if (quizzes.length === 0) return alert('Soru yok.');
+
+        this.currentQuizQuestions = quizzes.map(q => ({
+            question: q.question,
+            options: q.options,
+            answer: q.answer
+        }));
 
         this.currentQuestionIndex = 0;
         this.currentQuizAnswers = [];
-        document.getElementById('quizTitle').textContent = `${module.title} - Sınav`;
+        document.getElementById('quizTitle').textContent = `${module.title} - ${this.getSectionName(sectionType)} Sınavı`;
         this.showQuizQuestion(this.currentQuizQuestions[0]);
         this.showSection('quizSection');
     },
 
+    // =========================================================================
+    // 6. BİTİRME SINAVI
+    // =========================================================================
+    startModuleFinalExam: function(moduleKey) {
+        const module = this.allModules[moduleKey];
+        const allQuizzes = module.content.filter(c => c.type === 'quiz');
+        if (allQuizzes.length < 3) return alert('Bitirme sınavı için yeterli soru yok.');
+
+        this.currentQuizQuestions = this.shuffleArray(allQuizzes).slice(0, 5).map(q => ({
+            question: q.question,
+            options: q.options,
+            answer: q.answer
+        }));
+
+        this.currentQuestionIndex = 0;
+        this.currentQuizAnswers = [];
+        this.currentModuleKey = moduleKey;
+        document.getElementById('quizTitle').textContent = `${module.title} - Bitirme Sınavı`;
+        this.showQuizQuestion(this.currentQuizQuestions[0]);
+        this.showSection('quizSection');
+    },
+
+    // =========================================================================
+    // 7. SINAV MEKANİĞİ
+    // =========================================================================
     showQuizQuestion: function(q) {
         const container = document.getElementById('quizQuestions');
         container.innerHTML = `
@@ -159,23 +232,35 @@ const LearningPath = {
     },
 
     // =========================================================================
-    // 5. SONUÇ
+    // 8. SONUÇ
     // =========================================================================
     displayQuizResults: function() {
         const score = this.calculateScore();
         const container = document.getElementById('quizResults');
         let html = `<h3>Sonuç: %${score}</h3>`;
 
-        if (this.currentModuleKey) {
-            const passed = score >= this.PASS_SCORE;
-            if (passed) {
-                this.markModuleCompleted(this.currentModuleKey);
-                html += `<div class="alert alert-success">Modül tamamlandı!</div>`;
+        // BÖLÜM SINAVI MI?
+        if (this.currentSection) {
+            if (score >= this.PASS_SCORE) {
+                this.markSectionCompleted(this.currentModuleKey, this.currentSection);
+                html += `<div class="alert alert-success">${this.getSectionName(this.currentSection)} bölümü tamamlandı!</div>`;
             } else {
                 html += `<div class="alert alert-danger">Başarısız. Tekrar deneyin.</div>`;
             }
             html += `<button class="btn btn-primary" onclick="LearningPath.displayLearningPath(LearningPath.getCurrentUserLevel())">Öğrenme Yoluna Dön</button>`;
-        } else {
+        }
+        // BİTİRME SINAVI MI?
+        else if (this.currentModuleKey) {
+            if (score >= this.PASS_SCORE) {
+                this.markModuleFullyCompleted(this.currentModuleKey);
+                html += `<div class="alert alert-success">Modül tamamlandı!</div>`;
+            } else {
+                html += `<div class="alert alert-danger">Bitirme sınavında başarısız.</div>`;
+            }
+            html += `<button class="btn btn-primary" onclick="LearningPath.displayLearningPath(LearningPath.getCurrentUserLevel())">Öğrenme Yoluna Dön</button>`;
+        }
+        // SEVİYE TESTİ
+        else {
             const level = this.calculateLevelFromScore(score);
             this.saveUserLevel(level);
             html += `<div class="alert alert-info">Seviyeniz: <strong>${level}</strong></div>`;
@@ -185,6 +270,7 @@ const LearningPath = {
         container.innerHTML = html;
         this.showSection('quizResultsSection');
         this.currentModuleKey = null;
+        this.currentSection = null;
     },
 
     calculateScore: function() {
@@ -202,47 +288,35 @@ const LearningPath = {
     },
 
     // =========================================================================
-    // 6. ÖĞRENME YOLU
+    // 9. İLERLEME KAYDET
     // =========================================================================
-    displayLearningPath: function(level) {
-        const container = document.getElementById('learningPathSection');
-        const levelName = level.toUpperCase();
-        let html = `<h1 class="text-center">Öğrenme Yolum: ${levelName}</h1><div class="row g-4">`;
+    markSectionCompleted: function(moduleKey, section) {
+        if (!this.sectionProgress[moduleKey]) this.sectionProgress[moduleKey] = {};
+        this.sectionProgress[moduleKey][section] = true;
+        localStorage.setItem('sectionProgress', JSON.stringify(this.sectionProgress));
+    },
 
-        // Anahtar: a1_m1 → level: A1
-        const levelModules = Object.keys(this.allModules).filter(k => {
-            const modLevel = k.split('_')[0].toUpperCase();
-            return modLevel === levelName;
-        });
-
-        if (levelModules.length === 0) {
-            html += `<div class="alert alert-warning">Bu seviyede modül yok.</div>`;
-        } else {
-            levelModules.forEach(key => {
-                const mod = this.allModules[key];
-                const completed = this.isModuleCompleted(key);
-                html += `
-                    <div class="col-md-4">
-                        <div class="card h-100 ${completed ? 'border-success' : ''}">
-                            <div class="card-body d-flex flex-column">
-                                <h5>${mod.title}</h5>
-                                <p class="text-muted small">${mod.topic}</p>
-                                <button class="btn btn-primary mt-auto" onclick="LearningPath.displayModuleContent('${key}')">
-                                    ${completed ? 'Tekrarla' : 'Başla'}
-                                </button>
-                            </div>
-                        </div>
-                    </div>`;
-            });
-        }
-
-        html += `</div>`;
-        container.innerHTML = html;
-        this.showSection('learningPathSection');
+    markModuleFullyCompleted: function(moduleKey) {
+        const sections = ['word', 'sentence', 'reading'];
+        if (!this.sectionProgress[moduleKey]) this.sectionProgress[moduleKey] = {};
+        sections.forEach(s => this.sectionProgress[moduleKey][s] = true);
+        localStorage.setItem('sectionProgress', JSON.stringify(this.sectionProgress));
     },
 
     // =========================================================================
-    // 7. YARDIMCI
+    // 10. SIFIRLAMA
+    // =========================================================================
+    resetProgress: function() {
+        if (confirm('Tüm ilerleme ve seviye sıfırlanacak. Emin misiniz?')) {
+            localStorage.removeItem('userLevel');
+            localStorage.removeItem('sectionProgress');
+            alert('Sıfırlandı.');
+            location.reload();
+        }
+    },
+
+    // =========================================================================
+    // 11. YARDIMCI
     // =========================================================================
     init: function() {
         this.loadAllData().then(() => {
@@ -257,18 +331,31 @@ const LearningPath = {
 
     getCurrentUserLevel: function() { return localStorage.getItem('userLevel'); },
     saveUserLevel: function(l) { localStorage.setItem('userLevel', l); },
-    isModuleCompleted: function(k) { return JSON.parse(localStorage.getItem('completedModules') || '{}')[k]; },
-    markModuleCompleted: function(k) { const c = JSON.parse(localStorage.getItem('completedModules') || '{}'); c[k] = true; localStorage.setItem('completedModules', JSON.stringify(c)); },
     shuffleArray: function(a) { return [...a].sort(() => Math.random() - 0.5); },
-    showSection: function(id) { 
-        document.querySelectorAll('.module-section').forEach(s => s.classList.remove('active')); 
-        const el = document.getElementById(id); 
-        if (el) el.classList.add('active'); 
+    showSection: function(id) {
+        document.querySelectorAll('.module-section').forEach(s => {
+            s.classList.remove('active');
+            s.style.display = 'none';
+        });
+        const el = document.getElementById(id);
+        if (el) {
+            el.style.display = 'flex';
+            el.classList.add('active');
+        }
     }
 };
 
+// =========================================================================
+// BAŞLAT
+// =========================================================================
 document.addEventListener('DOMContentLoaded', () => {
     window.LearningPath = LearningPath;
     LearningPath.init();
+
+    // Butonlar
     document.getElementById('startTestButton')?.addEventListener('click', () => LearningPath.startLevelTest());
+    document.getElementById('navToPathButton')?.addEventListener('click', () => {
+        const level = LearningPath.getCurrentUserLevel();
+        if (level) LearningPath.displayLearningPath(level);
+    });
 });

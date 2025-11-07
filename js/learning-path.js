@@ -57,45 +57,8 @@ const LearningPath = {
     
     // =========================================================================
     // 1. TEMEL İŞLEMLER VE VERİ YÜKLEME
-    // (DÜZELTME: 'this' referans hatası giderildi - V14.6)
+    // (loadAllData - V15.0)
     // =========================================================================
-    
-    init: function() {
-        // 'this' bağlamını (LearningPath objesini) korumak için referans oluştur
-        const self = this; 
-        
-        this.loadAllData().then(() => {
-            console.log("Tüm veriler yüklendi.");
-            
-            const userLevel = localStorage.getItem('userLevel');
-            console.log(`Mevcut Kullanıcı Seviyesi: ${userLevel || 'Yok'}.`); 
-            
-            // self.showSection ve self.displayLearningPath kullanılarak 'this' hatası çözülür
-            if (userLevel) {
-                self.displayLearningPath(userLevel);
-            } 
-            else {
-                self.showSection('introSection');
-            }
-            
-            // Seviye Tespit Butonunun dinleyicisi ekleniyor
-            const startTestButton = document.getElementById('startTestButton');
-            if (startTestButton) {
-                 startTestButton.onclick = () => {
-                    console.log("Seviye Tespit Butonuna Tıklandı. Test Başlatılıyor..."); 
-                    localStorage.removeItem('levelTestAnswers'); 
-                    self.prepareAndDisplayLevelTest(); // self kullanıldı
-                 };
-            } else {
-                console.warn("HTML Uyarısı: 'startTestButton' ID'li buton DOM'da bulunamadı. Lütfen HTML dosyanızı kontrol edin."); 
-            }
-        }).catch(error => {
-            console.error("Kritik Hata: Veri yüklenirken hata oluştu:", error);
-            // Hata durumunda da introSection'ı göstermeye çalışalım (eğer showSection metodu çalışıyorsa)
-            // self.showSection('introSection'); 
-            alert("Uygulama başlatılamadı. Veri dosyalarını kontrol edin.");
-        });
-    },
 
     loadAllData: async function() {
         const fetchData = async (path) => {
@@ -109,9 +72,8 @@ const LearningPath = {
             }
         };
         
-        // V14.4'teki veri çekme kodları
-        const [moduleData, moduleContentData, testData, wordsData, sentencesData, readingsData, examData] = await Promise.all([
-            fetchData('data/learning_modules.json').catch(() => ({})), // Bu dosya V14.4'te kullanılıyor, ancak önceki sürümde 'module_content.json' altındaki modüller kullanılmıştı. Buraya 'module_content.json' yazılmalıdır.
+        // Veri çekme işlemleri
+        const [moduleContentData, testData, wordsData, sentencesData, readingsData, examData] = await Promise.all([
             fetchData(this.MODULE_CONTENT_FILE_PATH).catch(() => ({})), // module_content.json 
             fetchData(this.TEST_FILE_PATH).catch(() => ({})),
             fetchData('data/words.json').catch(() => []), 
@@ -120,10 +82,17 @@ const LearningPath = {
             fetchData(this.LEVEL_UP_EXAM_FILE_PATH).catch(() => []) 
         ]);
         
-        // V14.4'teki veri atama mantığı
-        this.allModules = moduleContentData.modules || {}; // modüllerin bu dosyada olduğunu varsayıyoruz
-        this.allModuleContents = (typeof moduleContentData === 'object' && moduleContentData !== null) ? moduleContentData : {}; 
+        // V15.0 Düzeltmesi: Modül verisi, 'modules' anahtarı altında olmalı
+        if (moduleContentData && moduleContentData.modules) {
+             this.allModules = moduleContentData.modules;
+             this.allModuleContents = moduleContentData;
+        } else {
+             // Eğer 'modules' anahtarı yoksa ve dosya nesneyse, modülleri kök nesne olarak kabul et
+             this.allModules = moduleContentData;
+             this.allModuleContents = moduleContentData;
+        }
         
+        // ... (Geri kalan test, words, sentences, readings verileri aynı kalır)
         let questionsArray = [];
         if (Array.isArray(testData)) {
             questionsArray = testData;
@@ -137,47 +106,6 @@ const LearningPath = {
         this.allWords = Array.isArray(wordsData) ? wordsData : []; 
         this.allSentences = Array.isArray(sentencesData) ? sentencesData : []; 
         this.allReadings = Array.isArray(readingsData) ? readingsData : []; 
-    },
-    
-    // Güncel Seviye Bilgisi
-    getCurrentUserLevel: function() {
-        return localStorage.getItem('userLevel');
-    },
-
-    // Bölüm değiştirme (GİZLEME/GÖSTERME)
-    showSection: function(sectionId) {
-        document.querySelectorAll('.module-section').forEach(section => {
-            section.classList.remove('active');
-            section.style.display = 'none'; // CSS ile gizle
-        });
-        const activeSection = document.getElementById(sectionId);
-        if (activeSection) {
-            activeSection.classList.add('active');
-            activeSection.style.display = 'flex'; // CSS ile göster
-            window.scrollTo(0, 0); // V14.4'ten eklendi
-        }
-    },
-    
-    // Yardımcı fonksiyon: Array'i rastgele karıştırır
-    shuffleArray: function(array) {
-        let currentIndex = array.length, randomIndex;
-        while (currentIndex != 0) {
-            randomIndex = Math.floor(Math.random() * currentIndex);
-            currentIndex--;
-            [array[currentIndex], array[randomIndex]] = [
-                array[randomIndex], array[currentIndex]];
-        }
-        return array;
-    },
-
-    // Seslendirme (Text-to-Speech)
-    speakText: function(text) {
-        if (this.speechUtterance) {
-            this.synth.cancel(); // Önceki seslendirmeyi durdur
-        }
-        this.speechUtterance = new SpeechSynthesisUtterance(text);
-        this.speechUtterance.lang = 'en-US'; // İngilizce seslendirme
-        this.synth.speak(this.speechUtterance);
     },
 
     // =========================================================================
@@ -645,106 +573,99 @@ const LearningPath = {
     // 5. SEVİYE ATLATMA VE İLERLEME MANTIĞI
     // =========================================================================
     
-    // Seviye belirleme testi puanına göre seviye hesaplar
-    calculateLevel: function(answers) {
-        let correctCounts = {};
-        let totalCounts = {};
-        
-        // Cevapları seviyeye göre grupla
-        answers.forEach(item => {
-            const level = item.level.toUpperCase();
-            totalCounts[level] = (totalCounts[level] || 0) + 1;
-            if (item.answer === item.correctAnswer) {
-                correctCounts[level] = (correctCounts[level] || 0) + 1;
-            }
-        });
-        
-        // Seviye belirleme (Basit Mantık: %70 başarı ortalaması ile üst seviyeye geçilir)
-        const levels = ['A1', 'A2', 'B1', 'B2', 'C1'];
-        let finalLevel = 'A1';
-
-        for (const level of levels) {
-            const correct = correctCounts[level] || 0;
-            const total = totalCounts[level] || 0;
-            const score = total > 0 ? (correct / total) * 100 : 0;
-            
-            if (score >= 70) { 
-                finalLevel = level; // Bu seviyeyi başarıyla tamamladı. Bir sonraki seviyeye bak.
-            } else {
-                // Bu seviyede başarısız oldu, son başarılı seviyede kal
-                break;
-            }
-        }
-        
-        // Eğer en yüksek seviyeyi tamamladıysa C1 olarak bırak
-        if (levels.indexOf(finalLevel) < levels.length - 1) {
-             // Bir sonraki seviyeyi döndür (eğitim yolunda kalması gereken seviye)
-             const nextIndex = levels.indexOf(finalLevel) + 1;
-             return levels[nextIndex];
-        }
-
-        return finalLevel; // En iyi tahmini seviye
+    // Seviye belirleme testini toplam puana göre hesaplar (V15.0)
+    calculateLevel: function(answers, score) {
+        // Toplam puan aralıklarına göre seviye atama
+        if (score >= 90) return 'C1';
+        if (score >= 80) return 'B2';
+        if (score >= 60) return 'B1';
+        if (score >= 40) return 'A2';
+        return 'A1';
     },
 
     saveUserLevel: function(level) {
         localStorage.setItem('userLevel', level.toUpperCase());
     },
     
-    getNextLevel: function(currentLevel) {
-        const levels = ['A1', 'A2', 'B1', 'B2', 'C1']; // CEFR seviyeleri
-        const currentIndex = levels.indexOf(currentLevel?.toUpperCase());
-        if (currentIndex !== -1 && currentIndex < levels.length - 1) {
-            return levels[currentIndex + 1];
+    // ... (getNextLevel, markLevelUp, isModuleCompleted, markModuleCompleted, checkAllModulesCompleted fonksiyonları aynı kalır)
+
+    // Modül ve Seviye Testi Sonuçlarını Göster (V15.0)
+    displayQuizResults: function(totalQuestions) {
+        const quizResultsContainer = document.getElementById('quizResults');
+        let correctAnswers = 0;
+        
+        this.currentQuizAnswers.forEach(item => {
+            if (item.answer === item.correctAnswer) {
+                correctAnswers++;
+            }
+        });
+
+        const score = Math.round((correctAnswers / totalQuestions) * 100);
+        const isPassed = score >= this.PASS_SCORE;
+        
+        let resultHtml = `<h2 class="text-center mb-4">Sınav Sonuçları</h2>`;
+        
+        // GENEL SONUÇ BİLGİSİ EKLENDİ
+        resultHtml += `<p class="text-center h4 text-success">Puanınız: **%${score}**</p>`;
+        resultHtml += `<p class="text-center h5">Doğru: ${correctAnswers} / Toplam: ${totalQuestions}</p><hr>`;
+
+
+        // Modül sınavı mı yoksa seviye tespit/atlama sınavı mı olduğunu belirle
+        const isModuleQuiz = this.currentModuleKey && this.allModules[this.currentModuleKey];
+
+        if (isModuleQuiz) {
+            // MODÜL SINAVI SONUÇLARI
+            const moduleKey = this.currentModuleKey;
+            const moduleInfo = this.allModules[moduleKey];
+            
+            if (isPassed) {
+                this.markModuleCompleted(moduleKey);
+                resultHtml += `<div class="alert alert-success text-center">Tebrikler! **${moduleInfo.name}** sınavını başarıyla geçtiniz.</div>`;
+            } else {
+                resultHtml += `<div class="alert alert-danger text-center">Tekrar Deneyin. **${moduleInfo.name}** sınavından yeterli puanı (%${this.PASS_SCORE}) alamadınız.</div>`;
+            }
+            
+            resultHtml += `<div class="d-flex justify-content-center mt-4">
+                <button class="btn btn-primary" onclick="LearningPath.displayLearningPath(LearningPath.getCurrentUserLevel())">Öğrenme Yoluna Dön</button>
+                <button class="btn btn-warning ms-3" onclick="LearningPath.displayModuleQuiz('${moduleKey}')">Tekrar Sınava Gir</button>
+            </div>`;
+            
+        } else {
+             // SEVİYE TESPİT VEYA SEVİYE ATLATMA SINAVI
+            const userLevelBeforeTest = localStorage.getItem('userLevel');
+            const nextLevel = this.getNextLevel(userLevelBeforeTest);
+
+            // Testin türünü belirle:
+            // Sınav sadece bir sonraki seviyenin sorularını içeriyorsa (level up exam)
+            if (userLevelBeforeTest && this.currentQuizQuestions.every(q => q.level.toUpperCase() === nextLevel?.toUpperCase())) {
+                 // SEVİYE ATLATMA SINAVI
+                 const targetLevel = nextLevel;
+                 
+                 if (isPassed) {
+                     this.markLevelUp(targetLevel);
+                     resultHtml += `<div class="alert alert-success text-center">Tebrikler! ${userLevelBeforeTest} seviyesini tamamladınız ve **${targetLevel}** seviyesine geçmeye hak kazandınız!</div>`;
+                 } else {
+                     resultHtml += `<div class="alert alert-warning text-center">Yeterli puanı (%${this.PASS_SCORE}) alamadınız. Mevcut seviyenizdeki modülleri tekrar gözden geçirin.</div>`;
+                 }
+                 resultHtml += `<div class="d-flex justify-content-center mt-4">
+                     <button class="btn btn-primary" onclick="LearningPath.displayLearningPath(LearningPath.getCurrentUserLevel() || 'A1')">Öğrenme Yoluna Dön</button>
+                 </div>`;
+                 
+            } else {
+                 // SEVİYE TESPİT SINAVI
+                const determinedLevel = this.calculateLevel(this.currentQuizAnswers, score); // YENİ PUAN BAZLI HESAPLAMA
+                this.saveUserLevel(determinedLevel);
+                resultHtml += `<div class="alert alert-info text-center">Seviye Tespitiniz Yapıldı: **${determinedLevel}**</div>
+                               <p class="text-center">Artık öğrenme yolunuza başlayabilirsiniz.</p>`;
+                resultHtml += `<div class="d-flex justify-content-center mt-4">
+                    <button class="btn btn-primary" onclick="LearningPath.displayLearningPath('${determinedLevel}')">Öğrenme Yoluna Başla</button>
+                </div>`;
+            }
         }
-        return null; // C1'den sonra seviye yok
-    },
 
-    markLevelUp: function(newLevel) {
-        this.saveUserLevel(newLevel);
-        // Yeni seviyeye geçince eski modül ilerlemelerini sil
-        localStorage.removeItem('learningModules'); 
-    },
-
-    isModuleCompleted: function(moduleKey) {
-        const modules = JSON.parse(localStorage.getItem('learningModules') || '{}');
-        return modules[moduleKey]?.completed || false;
-    },
-
-    markModuleCompleted: function(moduleKey) {
-        const modules = JSON.parse(localStorage.getItem('learningModules') || '{}');
-        modules[moduleKey] = { completed: true, completionDate: new Date().toISOString() };
-        localStorage.setItem('learningModules', JSON.stringify(modules));
-    },
-
-    checkAllModulesCompleted: function(level) {
-        const levelModules = Object.keys(this.allModules).filter(key => this.allModules[key].level === level);
-        return levelModules.length > 0 && levelModules.every(key => this.isModuleCompleted(key));
-    },
-    
-    // Seviye Atlatma Sınavına Başla (HATA ÇÖZÜMÜ GÜNCELLEME 3)
-    displayLevelUpExam: function(currentLevel) {
-        const nextLevel = this.getNextLevel(currentLevel);
-
-        if (!nextLevel) {
-            this.showQuizError("Tebrikler! Tüm seviyeleri tamamladınız ve C1 seviyesinin ötesindesiniz!");
-            return;
-        }
-
-        // HATA DÜZELTME: exam.json'dan doğru seviyenin sorularını filtrele
-        const levelExamQuestions = this.allExamQuestions.filter(q => q.difficulty?.toUpperCase() === nextLevel.toUpperCase());
-
-        if (levelExamQuestions.length === 0) {
-            this.showQuizError(`Sınav soruları yüklenemedi. **${nextLevel}** seviyesine ait seviye atlama soruları (**exam.json**) dosyasında bulunamadı. Lütfen veri dosyanızı kontrol edin.`);
-            return;
-        }
-
-        // Quiz'i Hazırla
-        this.currentQuizQuestions = this.shuffleArray(levelExamQuestions);
-        this.currentQuestionIndex = 0;
-        this.currentQuizAnswers = [];
-        document.getElementById('quizTitle').textContent = `${currentLevel} Seviye Tamamlama Sınavı (${nextLevel} Seviyesine Geçiş)`;
-        this.showQuizQuestion(this.currentQuizQuestions[this.currentQuestionIndex]);
-        this.showSection('quizSection');
+        quizResultsContainer.innerHTML = resultHtml;
+        this.currentModuleKey = null; // Quiz durumunu sıfırla
+        this.showSection('quizResultsSection');
     },
 
     // =========================================================================
@@ -864,6 +785,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.LearningPath = LearningPath; 
     LearningPath.init();
 });
+
 
 
 

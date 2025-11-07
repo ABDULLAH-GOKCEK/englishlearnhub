@@ -671,7 +671,6 @@ const LearningPath = {
         // Modülleri seviyeye göre filtrele ve sırala
         const levelModules = Object.keys(this.allModules).filter(key => 
             this.allModules[key].level.toUpperCase() === levelName
-            .sort((a, b) => a.localeCompare(b)); // Modül anahtarına göre (A1-M1, A1-M2...) sırala
         
         if (levelModules.length === 0) {
              pathHtml += `<div class="alert alert-danger">Bu seviyeye ait tanımlanmış modül bulunmamaktadır. Lütfen module_content.json dosyasını kontrol edin.</div>`;
@@ -770,6 +769,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.LearningPath = LearningPath; 
     LearningPath.init();
 });
+
 
 
 

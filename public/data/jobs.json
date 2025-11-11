@@ -1,0 +1,24 @@
+{
+  "words": [
+    { "category": "jobs", "word": "teacher", "translation": "öğretmen", "image": "images/jobs/teacher.jpg", "sentence": "The teacher is explaining the lesson.", "translation_sentence": "Öğretmen dersi anlatıyor." },
+    { "category": "jobs", "word": "doctor", "translation": "doktor", "image": "images/jobs/doctor.jpg", "sentence": "The doctor helps sick people.", "translation_sentence": "Doktor hasta insanlara yardım eder." },
+    { "category": "jobs", "word": "nurse", "translation": "hemşire", "image": "images/jobs/nurse.jpg", "sentence": "The nurse is giving medicine.", "translation_sentence": "Hemşire ilaç veriyor." },
+    { "category": "jobs", "word": "engineer", "translation": "mühendis", "image": "images/jobs/engineer.jpg", "sentence": "The engineer is building a bridge.", "translation_sentence": "Mühendis bir köprü inşa ediyor." },
+    { "category": "jobs", "word": "police officer", "translation": "polis memuru", "image": "images/jobs/police_officer.jpg", "sentence": "The police officer is on duty.", "translation_sentence": "Polis memuru görevde." },
+    { "category": "jobs", "word": "firefighter", "translation": "itfaiyeci", "image": "images/jobs/firefighter.jpg", "sentence": "The firefighter is putting out the fire.", "translation_sentence": "İtfaiyeci yangını söndürüyor." },
+    { "category": "jobs", "word": "farmer", "translation": "çiftçi", "image": "images/jobs/farmer.jpg", "sentence": "The farmer works in the field.", "translation_sentence": "Çiftçi tarlada çalışır." },
+    { "category": "jobs", "word": "driver", "translation": "şoför", "image": "images/jobs/driver.jpg", "sentence": "The driver is driving the bus.", "translation_sentence": "Şoför otobüsü sürüyor." },
+    { "category": "jobs", "word": "cook", "translation": "aşçı", "image": "images/jobs/cook.jpg", "sentence": "The cook is making pasta.", "translation_sentence": "Aşçı makarna yapıyor." },
+    { "category": "jobs", "word": "waiter", "translation": "garson", "image": "images/jobs/waiter.jpg", "sentence": "The waiter brings the food.", "translation_sentence": "Garson yemeği getiriyor." },
+    { "category": "jobs", "word": "singer", "translation": "şarkıcı", "image": "images/jobs/singer.jpg", "sentence": "The singer is singing on the stage.", "translation_sentence": "Şarkıcı sahnede şarkı söylüyor." },
+    { "category": "jobs", "word": "actor", "translation": "oyuncu", "image": "images/jobs/actor.jpg", "sentence": "The actor is in a new movie.", "translation_sentence": "Oyuncu yeni bir filmde." },
+    { "category": "jobs", "word": "artist", "translation": "sanatçı", "image": "images/jobs/artist.jpg", "sentence": "The artist is painting a picture.", "translation_sentence": "Sanatçı resim yapıyor." },
+    { "category": "jobs", "word": "pilot", "translation": "pilot", "image": "images/jobs/pilot.jpg", "sentence": "The pilot is flying the plane.", "translation_sentence": "Pilot uçağı uçuruyor." },
+    { "category": "jobs", "word": "soldier", "translation": "asker", "image": "images/jobs/soldier.jpg", "sentence": "The soldier is marching.", "translation_sentence": "Asker yürüyor." },
+    { "category": "jobs", "word": "scientist", "translation": "bilim insanı", "image": "images/jobs/scientist.jpg", "sentence": "The scientist is doing an experiment.", "translation_sentence": "Bilim insanı deney yapıyor." },
+    { "category": "jobs", "word": "dentist", "translation": "dişçi", "image": "images/jobs/dentist.jpg", "sentence": "The dentist checks teeth.", "translation_sentence": "Dişçi dişleri kontrol ediyor." },
+    { "category": "jobs", "word": "lawyer", "translation": "avukat", "image": "images/jobs/lawyer.jpg", "sentence": "The lawyer is in the courtroom.", "translation_sentence": "Avukat mahkeme salonunda." },
+    { "category": "jobs", "word": "builder", "translation": "inşaat işçisi", "image": "images/jobs/builder.jpg", "sentence": "The builder is working on a house.", "translation_sentence": "İnşaat işçisi bir evde çalışıyor." },
+    { "category": "jobs", "word": "driver", "translation": "sürücü", "image": "images/jobs/driver.jpg", "sentence": "The driver is careful on the road.", "translation_sentence": "Sürücü yolda dikkatli." }
+  ]
+}

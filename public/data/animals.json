@@ -1,0 +1,5 @@
+[
+  { "text": "Cat", "image": "assets/images/cat.jpg" },
+  { "text": "Dog", "image": "assets/images/dog.jpg" },
+  { "text": "Elephant", "image": "assets/images/elephant.jpg" }
+]

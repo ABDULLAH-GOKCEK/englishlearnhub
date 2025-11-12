@@ -3,10 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name="description" content="Learn English with interactive modules, AI chat, and level-based progress."/>
+  <meta name="description" content="Learn English step by step from A1 to C2."/>
   <title>English Learn Hub</title>
 
-  <!-- Tailwind CSS (CDN - Geliştirme için) -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="manifest" href="/manifest.json"/>
   <link rel="icon" href="/assets/icons/icon-192.png" type="image/png"/>
@@ -16,8 +15,6 @@
     body { font-family: 'Poppins', sans-serif; }
     .card { transition: all 0.3s ease; }
     .card:hover { transform: translateY(-4px); }
-    .progress-ring { transform: rotate(-90deg); }
-    .progress-ring circle { transition: stroke-dashoffset 0.5s ease; }
   </style>
 </head>
 <body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
@@ -33,23 +30,20 @@
     </div>
   </header>
 
-  <!-- HERO SECTION -->
+  <!-- HERO -->
   <section class="text-center py-16 px-6">
-    <h2 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4">Master English Step by Step</h2>
+    <h2 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4">Start from A1, Reach C2</h2>
     <p class="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
-      Start with a quick placement test and unlock personalized modules.
+      No tests. Just learn. Complete modules and level up!
     </p>
-    <button id="startTestBtn" class="px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-lg font-semibold rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition">
-      Take Quick Test (10 Questions)
-    </button>
   </section>
 
-  <!-- DASHBOARD (Hidden until test) -->
+  <!-- DASHBOARD -->
   <section id="dashboard" class="hidden max-w-5xl mx-auto px-6 py-12">
-    <h2 class="text-3xl font-bold text-center mb-10">Your Learning Dashboard</h2>
+    <h2 class="text-3xl font-bold text-center mb-10">Your Learning Path</h2>
     <div class="flex justify-center mb-12">
       <div class="relative w-40 h-40">
-        <svg class="progress-ring w-full h-full">
+        <svg class="w-full h-full">
           <circle cx="80" cy="80" r="70" stroke="#e5e7eb" stroke-width="12" fill="none"/>
           <circle id="progressCircle" cx="80" cy="80" r="70" stroke="#4f46e5" stroke-width="12" fill="none" stroke-dasharray="439.8" stroke-dashoffset="439.8"/>
         </svg>
@@ -70,225 +64,76 @@
     </div>
   </footer>
 
-  <!-- MODAL -->
-  <div id="placementModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
-    <div class="bg-white rounded-xl shadow-2xl max-w-lg w-full p-6">
-      <h3 class="text-2xl font-bold mb-4">Quick Placement Test</h3>
-      <p class="text-gray-600 mb-6">Answer 10 questions to find your level (2 minutes).</p>
-      <div id="questionContainer"></div>
-      <div class="flex justify-between mt-6">
-        <button id="prevBtn" class="px-4 py-2 bg-gray-200 rounded-lg">Previous</button>
-        <button id="nextBtn" class="px-4 py-2 bg-indigo-600 text-white rounded-lg">Next</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- SCRIPTS -->
   <script>
-    // PWA
     if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW failed:', err));
+      window.addEvent GSTListener('load', () => {
+        navigator.serviceWorker.register('/sw.js');
       });
     }
 
-    // Global State
-    const state = {
-      user: null,
-      level: null,
-      currentQuestion: 0,
-      answers: [],
-      questions: []
-    };
+    const state = { level: 'A1' };
 
-    // DOM Elements
-    const startTestBtn = document.getElementById('startTestBtn');
-    const placementModal = document.getElementById('placementModal');
-    const nextBtn = document.getElementById('nextBtn');
-    const prevBtn = document.getElementById('prevBtn');
-    const questionContainer = document.getElementById('questionContainer');
-
-    // Start Test
-    startTestBtn.addEventListener('click', startTest);
-
-    function startTest() {
-      fetch('/data/placement-test.json')
-        .then(res => {
-          if (!res.ok) throw new Error(`HTTP ${res.status}`);
-          return res.json();
-        })
-        .then(allQuestions => {
-          const selected = selectRandomQuestions(allQuestions, 10);
-          state.questions = selected;
-          state.currentQuestion = 0;
-          state.answers = new Array(10).fill(null);
-          showQuestion();
-          placementModal.classList.remove('hidden');
-        })
-        .catch(err => {
-          console.error("JSON yüklenemedi:", err);
-          questionContainer.innerHTML = '<p class="text-red-600">Error: Questions could not be loaded.</p>';
-        });
+    function getNextLevel(current) {
+      const path = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
+      const idx = path.indexOf(current);
+      return idx < path.length - 1 ? path[idx + 1] : null;
     }
 
-    // Rastgele 10 soru (dengeli)
-    function selectRandomQuestions(allQuestions, count) {
-      const byLevel = { A1: [], A2: [], B1: [], B2: [], C1: [], C2: [] };
-      allQuestions.forEach(q => byLevel[q.level]?.push(q));
+    function loadDashboard(level) {
+      document.getElementById('levelText').textContent = level;
 
-      const selected = [];
-      const levels = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
-      const perLevel = Math.floor(count / levels.length);
-      const extra = count % levels.length;
-
-      levels.forEach((level, i) => {
-        const pool = byLevel[level];
-        const take = perLevel + (i < extra ? 1 : 0);
-        const shuffled = pool.sort(() => 0.5 - Math.random());
-        selected.push(...shuffled.slice(0, take));
-      });
-
-      return selected.sort(() => 0.5 - Math.random());
-    }
-
-    function showQuestion() {
-      const q = state.questions[state.currentQuestion];
-      let html = `<p class="font-medium mb-4">${state.currentQuestion + 1}. ${q.question}</p>`;
-
-      if (q.type === 'multiple') {
-        q.options.forEach((opt, i) => {
-          html += `
-            <label class="block mb-2 cursor-pointer">
-              <input type="radio" name="q${state.currentQuestion}" value="${i}" ${state.answers[state.currentQuestion] === i ? 'checked' : ''} class="mr-2">
-              ${opt}
-            </label>`;
-        });
-      } else if (q.type === 'fill') {
-        html += `<input type="text" class="border rounded-lg px-3 py-2 w-full" value="${state.answers[state.currentQuestion] || ''}" placeholder="Type your answer">`;
-      }
-
-      questionContainer.innerHTML = html;
-      updateButtons();
-    }
-
-    function updateButtons() {
-      prevBtn.disabled = state.currentQuestion === 0;
-      nextBtn.textContent = state.currentQuestion === state.questions.length - 1 ? 'Finish' : 'Next';
-    }
-
-    nextBtn.addEventListener('click', () => {
-      saveAnswer();
-      if (state.currentQuestion < state.questions.length - 1) {
-        state.currentQuestion++;
-        showQuestion();
-      } else {
-        calculateLevel();
-      }
-    });
-
-    prevBtn.addEventListener('click', () => {
-      saveAnswer();
-      state.currentQuestion--;
-      showQuestion();
-    });
-
-    function saveAnswer() {
-      const q = state.questions[state.currentQuestion];
-      if (q.type === 'multiple') {
-        const selected = document.querySelector(`input[name="q${state.currentQuestion}"]:checked`);
-        state.answers[state.currentQuestion] = selected ? parseInt(selected.value) : null;
-      } else {
-        const input = document.querySelector('input[type="text"]');
-        state.answers[state.currentQuestion] = input ? input.value.trim() : null;
-      }
-    }
-
-    function calculateLevel() {
-      let score = { A1: 0, A2: 0, B1: 0, B2: 0, C1: 0, C2: 0 };
-      state.questions.forEach((q, i) => {
-        if (q.type === 'multiple' && state.answers[i] === q.correct) score[q.level]++;
-        else if (q.type === 'fill' && state.answers[i] && state.answers[i].toLowerCase() === q.correct.toLowerCase()) score[q.level]++;
-      });
-
-      const levels = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
-      let determinedLevel = 'A1';
-      for (let lvl of levels) {
-        if (score[lvl] >= 1) determinedLevel = lvl;
-      }
-
-      state.level = determinedLevel;
-      showResult();
-    }
-
-    function showResult() {
       const levelName = {
         A1: "Beginner", A2: "Elementary", B1: "Intermediate",
         B2: "Upper Intermediate", C1: "Advanced", C2: "Proficient"
       };
 
-      placementModal.innerHTML = `
-        <div class="text-center py-8">
-          <h3 class="text-3xl font-bold text-indigo-700 mb-2">Your Level: ${state.level}</h3>
-          <p class="text-lg mb-2">${levelName[state.level]}</p>
-          <p class="text-sm text-gray-600 mb-6">10 questions completed. Ready to learn!</p>
-          <button id="enterHubBtn" class="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700">
-            Enter Learning Hub
-          </button>
-        </div>`;
+      const nextLevel = getNextLevel(level);
 
-      document.getElementById('enterHubBtn').addEventListener('click', () => {
-        placementModal.classList.add('hidden');
-        document.getElementById('dashboard').classList.remove('hidden');
-        loadDashboard(state.level);
-        saveProgress();
-      });
-    }
-
-    function saveProgress() {
-      const progress = {
-        level: state.level,
-        completedTest: true,
-        timestamp: new Date().toISOString()
-      };
-      localStorage.setItem('englishHubProgress', JSON.stringify(progress));
-    }
-
-    function loadDashboard(level) {
-      document.getElementById('levelText').textContent = level;
       const modules = [
-        { name: "Vocabulary Flashcards", icon: "Book", path: "/modules/vocabulary/" },
-        { name: "Flip Cards", icon: "Refresh", path: "/modules/flip-cards/" },
-        { name: "Daily Sentences", icon: "Speech", path: "/modules/daily-sentences/" },
-        { name: "Stories", icon: "Book", path: "/modules/stories/" },
-        { name: "Games", icon: "Gamepad", path: "/modules/games/" },
-        { name: "AI Chat", icon: "Robot", path: "/modules/chat/" },
-        { name: "Quiz", icon: "Checkmark", path: "/modules/quiz/" },
-        { name: "Sentence Builder", icon: "Wrench", path: "/modules/sentence-builder/" }
+        { name: "Vocabulary Flashcards", icon: "Book", path: `/modules/vocabulary/?level=${level}` },
+        { name: "Flip Cards", icon: "Refresh", path: `/modules/flip-cards/?level=${level}` },
+        { name: "Daily Sentences", icon: "Speech", path: `/modules/daily-sentences/?level=${level}` },
+        { name: "Stories", icon: "Book", path: `/modules/stories/?level=${level}` },
+        { name: "Games", icon: "Gamepad", path: `/modules/games/?level=${level}` },
+        { name: "AI Chat", icon: "Robot", path: `/modules/chat/?level=${level}` },
+        { name: "Quiz", icon: "Checkmark", path: `/modules/quiz/?level=${level}` },
+        { name: "Sentence Builder", icon: "Wrench", path: `/modules/sentence-builder/?level=${level}` }
       ];
 
       const grid = document.getElementById('modulesGrid');
-      grid.innerHTML = modules.map(m => `
+      grid.innerHTML = `
+        <div class="col-span-full text-center mb-6">
+          <p class="text-lg text-gray-700">Current Level: <strong>${levelName[level]}</strong></p>
+          ${nextLevel ? `<p class="text-sm text-green-600 mt-2">Complete 3 modules to unlock <strong>${nextLevel}</strong>!</p>` : '<p class="text-sm text-purple-600 mt-2">You reached the top!</p>'}
+        </div>
+      ` + modules.map(m => `
         <a href="${m.path}" class="card bg-white p-6 rounded-xl shadow hover:shadow-lg text-center">
           <div class="text-4xl mb-3">${m.icon}</div>
           <h3 class="font-semibold">${m.name}</h3>
+          <p class="text-xs text-gray-500 mt-1">${level} Content</p>
         </a>
       `).join('');
     }
 
-    // Sayfa yüklendiğinde ilerleme kontrol et
     window.addEventListener('load', () => {
       const saved = localStorage.getItem('englishHubProgress');
+      let currentLevel = 'A1';
+
       if (saved) {
         const progress = JSON.parse(saved);
-        state.level = progress.level;
-        document.getElementById('dashboard').classList.remove('hidden');
-        loadDashboard(state.level);
+        currentLevel = progress.level || 'A1';
+      } else {
+        const init = { level: 'A1', completedModules: 0, timestamp: new Date().toISOString() };
+        localStorage.setItem('englishHubProgress', JSON.stringify(init));
       }
+
+      state.level = currentLevel;
+      document.getElementById('dashboard').classList.remove('hidden');
+      loadDashboard(currentLevel);
     });
 
-    // Login (gelecek)
     document.getElementById('loginBtn').addEventListener('click', () => {
-      alert('Login feature coming soon!');
+      alert('Login coming soon!');
     });
   </script>
 </body>

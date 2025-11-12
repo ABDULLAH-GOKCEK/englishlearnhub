@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Learn English with interactive modules, AI chat, and level-based progress."/>
+  <title>English Learn Hub</title>
+
+  <!-- Tailwind CSS (CDN) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="manifest" href="/manifest.json"/>
+  <link rel="icon" href="/assets/icons/favicon.png" type="image/png"/>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+    body { font-family: 'Poppins', sans-serif; }
+    .card { transition: all 0.3s ease; }
+    .card:hover { transform: translateY(-4px); }
+    .flip-card-inner { transition: transform 0.6s; transform-style: preserve-3d; }
+    .flip-card-front, .flip-card-back { backface-visibility: hidden; }
+    .flip-card-back { transform: rotateY(180deg); }
+    .flipped .flip-card-inner { transform: rotateY(180deg); }
+    .progress-ring { transform: rotate(-90deg); }
+    .progress-ring circle { transition: stroke-dashoffset 0.5s ease; }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+
+  <!-- HEADER -->
+  <header class="bg-white shadow-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+      <h1 class="text-2xl md:text-3xl font-bold text-indigo-700">English Learn Hub</h1>
+      <div class="flex gap-3">
+        <button id="loginBtn" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">Login</button>
+        <button id="registerBtn" class="px-4 py-2 border border-indigo-600 text-indigo-600 rounded-lg hover:bg-indigo-50 transition">Register</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO SECTION -->
+  <section class="text-center py-16 px-6">
+    <h2 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4">Master English Step by Step</h2>
+    <p class="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
+      Start with a free placement test and unlock personalized modules: flashcards, stories, AI chat, and more.
+    </p>
+    <button id="startTestBtn" class="px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-lg font-semibold rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition">
+      Take Placement Test
+    </button>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="py-16 bg-white">
+    <div class="max-w-6xl mx-auto px-6 grid md:grid-cols-4 gap-8">
+      <div class="text-center">
+        <div class="w-16 h-16 mx-auto mb-4 bg-indigo-100 rounded-full flex items-center justify-center">
+          <span class="text-2xl">📚</span>
+        </div>
+        <h3 class="font-semibold text-lg">8 Interactive Modules</h3>
+      </div>
+      <div class="text-center">
+        <div class="w-16 h-16 mx-auto mb-4 bg-purple-100 rounded-full flex items-center justify-center">
+          <span class="text-2xl">🎯</span>
+        </div>
+        <h3 class="font-semibold text-lg">A1 to C2 Levels</h3>
+      </div>
+      <div class="text-center">
+        <div class="w-16 h-16 mx-auto mb-4 bg-pink-100 rounded-full flex items-center justify-center">
+          <span class="text-2xl">🏆</span>
+        </div>
+        <h3 class="font-semibold text-lg">Certificates & Badges</h3>
+      </div>
+      <div class="text-center">
+        <div class="w-16 h-16 mx-auto mb-4 bg-green-100 rounded-full flex items-center justify-center">
+          <span class="text-2xl">🤖</span>
+        </div>
+        <h3 class="font-semibold text-lg">AI Chat with Corrections</h3>
+      </div>
+    </div>
+  </section>
+
+  <!-- DASHBOARD PREVIEW (Hidden until login) -->
+  <section id="dashboard" class="hidden max-w-5xl mx-auto px-6 py-12">
+    <h2 class="text-3xl font-bold text-center mb-10">Your Learning Dashboard</h2>
+    
+    <!-- Progress Ring -->
+    <div class="flex justify-center mb-12">
+      <div class="relative w-40 h-40">
+        <svg class="progress-ring w-full h-full">
+          <circle cx="80" cy="80" r="70" stroke="#e5e7eb" stroke-width="12" fill="none"/>
+          <circle id="progressCircle" cx="80" cy="80" r="70" stroke="#4f46e5" stroke-width="12" fill="none" stroke-dasharray="439.8" stroke-dashoffset="439.8"/>
+        </svg>
+        <div class="absolute inset-0 flex flex-col items-center justify-center">
+          <span id="levelText" class="text-3xl font-bold text-indigo-700">A1</span>
+          <span class="text-sm text-gray-600">Beginner</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modules Grid -->
+    <div class="grid md:grid-cols-3 gap-6" id="modulesGrid">
+      <!-- Modules will be injected via JS -->
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="bg-gray-800 text-white py-8 mt-16">
+    <div class="max-w-6xl mx-auto px-6 text-center">
+      <p>&copy; 2025 English Learn Hub. All rights reserved.</p>
+      <p class="text-sm mt-2">Powered by <a href="https://x.ai" class="underline">xAI</a> & Vercel</p>
+    </div>
+  </footer>
+
+  <!-- MODALS -->
+  <div id="placementModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-xl shadow-2xl max-w-lg w-full p-6">
+      <h3 class="text-2xl font-bold mb-4">Placement Test</h3>
+      <p class="text-gray-600 mb-6">Answer 60 questions to find your perfect level (A1–C2).</p>
+      <div id="questionContainer"></div>
+      <div class="flex justify-between mt-6">
+        <button id="prevBtn" class="px-4 py-2 bg-gray-200 rounded-lg">Previous</button>
+        <button id="nextBtn" class="px-4 py-2 bg-indigo-600 text-white rounded-lg">Next</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPTS -->
+  <script>
+    // PWA Support
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js');
+      });
+    }
+
+    // Global State
+    const state = {
+      user: null,
+      level: null,
+      currentQuestion: 0,
+      answers: [],
+      questions: []
+    };
+
+    // DOM Elements
+    const startTestBtn = document.getElementById('startTestBtn');
+    const placementModal = document.getElementById('placementModal');
+    const nextBtn = document.getElementById('nextBtn');
+    const prevBtn = document.getElementById('prevBtn');
+', 'prevBtn');
+
+    // Start Test
+    startTestBtn.addEventListener('click', () => {
+      fetch('/data/placement-test.json')
+        .then(res => res.json())
+        .then(data => {
+          state.questions = data;
+          state.currentQuestion = 0;
+          state.answers = new Array(data.length).fill(null);
+          showQuestion();
+          placementModal.classList.remove('hidden');
+        });
+    });
+
+    function showQuestion() {
+      const q = state.questions[state.currentQuestion];
+      const container = document.getElementById('questionContainer');
+      let html = `<p class="font-medium mb-4">${q.question}</p>`;
+
+      if (q.type === 'multiple') {
+        q.options.forEach((opt, i) => {
+          html += `
+            <label class="block mb-2 cursor-pointer">
+              <input type="radio" name="q${state.currentQuestion}" value="${i}" ${state.answers[state.currentQuestion] === i ? 'checked' : ''} class="mr-2">
+              ${opt}
+            </label>`;
+        });
+      } else if (q.type === 'fill') {
+        html += `<input type="text" class="border rounded-lg px-3 py-2 w-full" value="${state.answers[state.currentQuestion] || ''}" placeholder="Type your answer">`;
+      }
+
+      container.innerHTML = html;
+      updateButtons();
+    }
+
+    function updateButtons() {
+      prevBtn.disabled = state.currentQuestion === 0;
+      nextBtn.textContent = state.currentQuestion === state.questions.length - 1 ? 'Finish' : 'Next';
+    }
+
+    nextBtn.addEventListener('click', () => {
+      saveAnswer();
+      if (state.currentQuestion < state.questions.length - 1) {
+        state.currentQuestion++;
+        showQuestion();
+      } else {
+        calculateLevel();
+      }
+    });
+
+    prevBtn.addEventListener('click', () => {
+      saveAnswer();
+      state.currentQuestion--;
+      showQuestion();
+    });
+
+    function saveAnswer() {
+      const q = state.questions[state.currentQuestion];
+      if (q.type === 'multiple') {
+        const selected = document.querySelector(`input[name="q${state.currentQuestion}"]:checked`);
+        state.answers[state.currentQuestion] = selected ? parseInt(selected.value) : null;
+      } else {
+        const input = document.querySelector('input[type="text"]');
+        state.answers[state.currentQuestion] = input ? input.value.trim() : null;
+      }
+    }
+
+    function calculateLevel() {
+      // Simplified scoring
+      let score = { A1: 0, A2: 0, B1: 0, B2: 0, C1: 0, C2: 0 };
+      state.questions.forEach((q, i) => {
+        if (q.type === 'multiple' && state.answers[i] === q.correct) score[q.level]++;
+        else if (q.type === 'fill' && state.answers[i] && state.answers[i].toLowerCase() === q.correct.toLowerCase()) score[q.level]++;
+      });
+
+      const levels = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
+      let determinedLevel = 'A1';
+      for (let lvl of levels) {
+        if (score[lvl] >= 7) determinedLevel = lvl; // 70% threshold per level
+      }
+
+      state.level = determinedLevel;
+      showResult();
+    }
+
+    function showResult() {
+      placementModal.innerHTML = `
+        <div class="text-center py-8">
+          <h3 class="text-3xl font-bold text-indigo-700 mb-4">Your Level: ${state.level}</h3>
+          <p class="text-lg mb-6">Great job! You can now access modules tailored to your level.</p>
+          <button onclick="location.reload()" class="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700">
+            Start Learning
+          </button>
+        </div>`;
+    }
+
+    // Login Simulation
+    document.getElementById('loginBtn').addEventListener('click', () => {
+      alert('Login feature coming soon!');
+    });
+  </script>
+
+  <!-- PWA Meta -->
+  <script>
+    // Auto-install prompt (for Android)
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      deferredPrompt = e;
+      const installBtn = document.createElement('button');
+      installBtn.textContent = 'Install App';
+      installBtn.className = 'fixed bottom-4 right-4 bg-green-600 text-white px-4 py-2 rounded-full shadow-lg z-50';
+      installBtn.onclick = () => {
+        deferredPrompt.prompt();
+      };
+      document.body.appendChild(installBtn);
+    });
+  </script>
+</body>
+</html>

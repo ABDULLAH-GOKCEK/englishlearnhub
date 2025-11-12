@@ -6,10 +6,10 @@
   <meta name="description" content="Learn English with interactive modules, AI chat, and level-based progress."/>
   <title>English Learn Hub</title>
 
-  <!-- Tailwind CSS (CDN) -->
+  <!-- Tailwind CSS (CDN - Geliştirme için) -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="manifest" href="/manifest.json"/>
-  <link rel="icon" href="/assets/icons/favicon.png" type="image/png"/>
+  <link rel="icon" href="/assets/icons/icon-192.png" type="image/png"/>
 
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
@@ -48,41 +48,9 @@
     </button>
   </section>
 
-  <!-- FEATURES -->
-  <section class="py-16 bg-white">
-    <div class="max-w-6xl mx-auto px-6 grid md:grid-cols-4 gap-8">
-      <div class="text-center">
-        <div class="w-16 h-16 mx-auto mb-4 bg-indigo-100 rounded-full flex items-center justify-center">
-          <span class="text-2xl">📚</span>
-        </div>
-        <h3 class="font-semibold text-lg">8 Interactive Modules</h3>
-      </div>
-      <div class="text-center">
-        <div class="w-16 h-16 mx-auto mb-4 bg-purple-100 rounded-full flex items-center justify-center">
-          <span class="text-2xl">🎯</span>
-        </div>
-        <h3 class="font-semibold text-lg">A1 to C2 Levels</h3>
-      </div>
-      <div class="text-center">
-        <div class="w-16 h-16 mx-auto mb-4 bg-pink-100 rounded-full flex items-center justify-center">
-          <span class="text-2xl">🏆</span>
-        </div>
-        <h3 class="font-semibold text-lg">Certificates & Badges</h3>
-      </div>
-      <div class="text-center">
-        <div class="w-16 h-16 mx-auto mb-4 bg-green-100 rounded-full flex items-center justify-center">
-          <span class="text-2xl">🤖</span>
-        </div>
-        <h3 class="font-semibold text-lg">AI Chat with Corrections</h3>
-      </div>
-    </div>
-  </section>
-
-  <!-- DASHBOARD PREVIEW (Hidden until login) -->
+  <!-- DASHBOARD PREVIEW -->
   <section id="dashboard" class="hidden max-w-5xl mx-auto px-6 py-12">
     <h2 class="text-3xl font-bold text-center mb-10">Your Learning Dashboard</h2>
-    
-    <!-- Progress Ring -->
     <div class="flex justify-center mb-12">
       <div class="relative w-40 h-40">
         <svg class="progress-ring w-full h-full">
@@ -95,11 +63,7 @@
         </div>
       </div>
     </div>
-
-    <!-- Modules Grid -->
-    <div class="grid md:grid-cols-3 gap-6" id="modulesGrid">
-      <!-- Modules will be injected via JS -->
-    </div>
+    <div class="grid md:grid-cols-3 gap-6" id="modulesGrid"></div>
   </section>
 
   <!-- FOOTER -->
@@ -110,7 +74,7 @@
     </div>
   </footer>
 
-  <!-- MODALS -->
+  <!-- MODAL -->
   <div id="placementModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
     <div class="bg-white rounded-xl shadow-2xl max-w-lg w-full p-6">
       <h3 class="text-2xl font-bold mb-4">Placement Test</h3>
@@ -125,14 +89,14 @@
 
   <!-- SCRIPTS -->
   <script>
-    // PWA Support
+    // PWA
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js');
+        navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW failed:', err));
       });
     }
 
-    // Global State
+    // State
     const state = {
       user: null,
       level: null,
@@ -141,12 +105,12 @@
       questions: []
     };
 
-    // DOM Elements
+    // DOM
     const startTestBtn = document.getElementById('startTestBtn');
     const placementModal = document.getElementById('placementModal');
     const nextBtn = document.getElementById('nextBtn');
     const prevBtn = document.getElementById('prevBtn');
-', 'prevBtn');
+    const questionContainer = document.getElementById('questionContainer');
 
     // Start Test
     startTestBtn.addEventListener('click', () => {
@@ -158,12 +122,15 @@
           state.answers = new Array(data.length).fill(null);
           showQuestion();
           placementModal.classList.remove('hidden');
+        })
+        .catch(err => {
+          questionContainer.innerHTML = '<p class="text-red-600">Error loading questions. Check console.</p>';
+          console.error(err);
         });
     });
 
     function showQuestion() {
       const q = state.questions[state.currentQuestion];
-      const container = document.getElementById('questionContainer');
       let html = `<p class="font-medium mb-4">${q.question}</p>`;
 
       if (q.type === 'multiple') {
@@ -178,7 +145,7 @@
         html += `<input type="text" class="border rounded-lg px-3 py-2 w-full" value="${state.answers[state.currentQuestion] || ''}" placeholder="Type your answer">`;
       }
 
-      container.innerHTML = html;
+      questionContainer.innerHTML = html;
       updateButtons();
     }
 
@@ -215,7 +182,6 @@
     }
 
     function calculateLevel() {
-      // Simplified scoring
       let score = { A1: 0, A2: 0, B1: 0, B2: 0, C1: 0, C2: 0 };
       state.questions.forEach((q, i) => {
         if (q.type === 'multiple' && state.answers[i] === q.correct) score[q.level]++;
@@ -225,7 +191,7 @@
       const levels = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
       let determinedLevel = 'A1';
       for (let lvl of levels) {
-        if (score[lvl] >= 7) determinedLevel = lvl; // 70% threshold per level
+        if (score[lvl] >= 7) determinedLevel = lvl;
       }
 
       state.level = determinedLevel;
@@ -243,25 +209,9 @@
         </div>`;
     }
 
-    // Login Simulation
+    // Login
     document.getElementById('loginBtn').addEventListener('click', () => {
       alert('Login feature coming soon!');
-    });
-  </script>
-
-  <!-- PWA Meta -->
-  <script>
-    // Auto-install prompt (for Android)
-    let deferredPrompt;
-    window.addEventListener('beforeinstallprompt', (e) => {
-      deferredPrompt = e;
-      const installBtn = document.createElement('button');
-      installBtn.textContent = 'Install App';
-      installBtn.className = 'fixed bottom-4 right-4 bg-green-600 text-white px-4 py-2 rounded-full shadow-lg z-50';
-      installBtn.onclick = () => {
-        deferredPrompt.prompt();
-      };
-      document.body.appendChild(installBtn);
     });
   </script>
 </body>

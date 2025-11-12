@@ -114,20 +114,25 @@
 
     // Start Test
     startTestBtn.addEventListener('click', () => {
-      fetch('/data/placement-test.json')
-        .then(res => res.json())
-        .then(data => {
-          state.questions = data;
-          state.currentQuestion = 0;
-          state.answers = new Array(data.length).fill(null);
-          showQuestion();
-          placementModal.classList.remove('hidden');
-        })
-        .catch(err => {
-          questionContainer.innerHTML = '<p class="text-red-600">Error loading questions. Check console.</p>';
-          console.error(err);
-        });
+  console.log("Test başlatılıyor...");
+  fetch('/data/placement-test.json')
+    .then(res => {
+      if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+      return res.json();
+    })
+    .then(data => {
+      console.log("Sorular yüklendi:", data.length);
+      state.questions = data;
+      state.currentQuestion = 0;
+      state.answers = new Array(data.length).fill(null);
+      showQuestion();
+      placementModal.classList.remove('hidden');
+    })
+    .catch(err => {
+      console.error("JSON yüklenemedi:", err);
+      questionContainer.innerHTML = '<p class="text-red-600">Error: Questions could not be loaded. Check file path.</p>';
     });
+});
 
     function showQuestion() {
       const q = state.questions[state.currentQuestion];

@@ -5,37 +5,113 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Öğrenme Yolu | English Learn Hub</title>
 
-  <!-- FAVICON (.ico + .png) -->
-  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <!-- FAVICON DÜZELTİLDİ (aynı klasörde) -->
   <link rel="icon" href="favicon.png" type="image/png">
 
-  <!-- Bootstrap & Font Awesome -->
+  <!-- Bootstrap 5.3 -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
 
   <style>
-    :root { --primary: #667eea; }
-    body { background: #f8f9fa; font-family: 'Segoe UI', sans-serif; }
-    .module-section { display: none; min-height: 70vh; }
-    .module-section.active { display: flex; }
-    .btn-reset { position: fixed; bottom: 20px; right: 20px; z-index: 1000; }
+    :root {
+      --primary: #667eea;
+      --success: #4ade80;
+      --warning: #facc15;
+      --danger: #f87171;
+    }
+    body {
+      background: #f8f9fa;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .navbar-brand {
+      font-weight: 700;
+      color: var(--primary) !important;
+    }
+    .module-section {
+      display: none;
+      min-height: 70vh;
+      padding: 2rem 0;
+    }
+    .module-section.active {
+      display: flex;
+    }
+    .module-card {
+      border: 2px solid #dee2e6;
+      transition: all 0.3s;
+    }
+    .module-card.completed {
+      border-color: var(--success);
+      background: #f0fdf4;
+    }
+    .module-card.in-progress {
+      border-color: var(--warning);
+    }
+    .question-option {
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .question-option:hover {
+      background: #e0e7ff;
+    }
+    .question-option.selected-answer {
+      background: var(--primary);
+      color: white;
+      font-weight: 600;
+    }
+    .btn-reset {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 1000;
+    }
+    .nav-link {
+      color: #495057 !important;
+    }
+    .nav-link.active {
+      color: var(--primary) !important;
+      font-weight: 600;
+    }
   </style>
 </head>
 <body>
-  <!-- Navbar ve diğer içerik... -->
+
+  <!-- Navbar -->
   <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
     <div class="container">
-      <a class="navbar-brand" href="index.html">English Learn Hub</a>
+      <a class="navbar-brand" href="index.html">
+        <i class="fas fa-graduation-cap"></i> English Learn Hub
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="#" onclick="LearningPath.showSection('introSection')">Ana Sayfa</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#" id="navToPathButton" class="d-none" onclick="LearningPath.displayLearningPath(LearningPath.getCurrentUserLevel())">
+              Öğrenme Yolu
+            </a>
+          </li>
+        </ul>
+      </div>
     </div>
   </nav>
+
   <div class="container">
-    <section id="introSection" class="module-section active text-center py-5">
-      <h1>Hoş Geldiniz!</h1>
-      <button id="startTestButton" class="btn btn-primary">Seviye Testi</button>
+
+    <!-- 1. Giriş Ekranı -->
+    <section id="introSection" class="module-section active flex-column align-items-center justify-content-center text-center py-5">
+      <div class="col-md-8">
+        <h1 class="display-5 fw-bold text-primary mb-4">Hoş Geldiniz!</h1>
+        <p class="lead mb-5">İngilizce öğrenme yolculuğunuz başlıyor. Önce seviyenizi belirleyelim.</p>
+        <button id="startTestButton" class="btn btn-primary btn-lg px-5">
+          <i class="fas fa-play me-2"></i> Seviye Tespit Testine Başla
+        </button>
+      </div>
     </section>
-  </div>
-  <button class="btn btn-danger btn-reset" onclick="alert('Sıfırlandı!')">Sıfırla</button>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="js/learning-path.js"></script>
-</body>
-</html>
+
+    <!-- 2. Seviye Testi -->
+    <section id="quizSection" class="module

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Günlük Cümle Öğrenme - İngilizce Öğrenme Platformu</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/daily.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Responsive kontrol için meta tag -->
+    <script>
+        // Cihaz tespiti için script
+        function detectDevice() {
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            const isTablet = /iPad|Android|Tablet/i.test(navigator.userAgent) && !/Mobile/i.test(navigator.userAgent);
+            
+            if (isMobile || isTablet) {
+                document.documentElement.classList.add('mobile-device');
+                document.documentElement.classList.add(isTablet ? 'tablet' : 'mobile');
+            } else {
+                document.documentElement.classList.add('desktop-device');
+                document.documentElement.classList.add('desktop');
+            }
+        }
+        
+        // Sayfa yüklendiğinde cihazı tespit et
+        document.addEventListener('DOMContentLoaded', detectDevice);
+    </script>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>İngilizce Öğrenme Platformu</h1>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Ana Sayfa</a></li>
+                    <li><a href="teaching.html">Kelime Öğrenme</a></li>
+                    <li><a href="flip_cards.html">İngilizce-Türkçe Kelimeler</a></li>
+                    <li><a href="daily.html" class="active">Günlük Cümle Öğrenme</a></li>
+                    <li><a href="reading.html">Okuma-Anlama</a></li>
+                    <li><a href="word_games.html">Kelime Oyunları</a></li>
+                    <li><a href="flashcards_with_sentence_activity.html">Cümle Kurma Çalışması</a></li>
+                    <li><a href="exam.html">Sınav</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Cihaz Bilgisi Göstergesi (isteğe bağlı, test için) -->
+    <div class="device-indicator">
+        <span id="deviceInfo"></span>
+    </div>
+
+    <main class="container">
+        <h2>*kategori seçerek çok kullanılan günlük cümleleri hem İngilizce hem de Türkçe sesli dinleyerek öğrenin </h2>
+        
+        <div class="daily-controls">
+            <select id="dailyCategorySelect">
+                <option value="all">Tüm Kategoriler</option>
+            </select>
+            <div class="navigation-buttons">
+                <button id="prevSentenceBtn" class="btn"><i class="fas fa-chevron-left"></i> Önceki</button>
+                <button id="nextSentenceBtn" class="btn">Sonraki <i class="fas fa-chevron-right"></i></button>
+            </div>
+        </div>
+
+        <div class="daily-sentence-card">
+            <div class="sentence-content">
+                <div class="sentence-english">
+                    <span id="englishText">Cümle yükleniyor...</span>
+                    <i class="fas fa-volume-up speak-icon" id="speakEnglishIcon"></i>
+                </div>
+                <div class="sentence-turkish">
+                    <span id="turkishText">Loading...</span>
+                    <i class="fas fa-volume-up speak-icon" id="speakTurkishIcon"></i>
+                </div>
+            </div>
+            <div class="sentence-info">
+                <span class="sentence-category" id="sentenceCategory">-</span>
+                <span class="sentence-number" id="sentenceNumber">0/0</span>
+            </div>
+        </div>
+
+        <!-- Öğrenim İlerlemesi -->
+        <div id="learningProgress"></div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>© <span id="currentDate"></span> İngilizce Öğrenme Platformu</p>
+        </div>
+    </footer>
+
+    <script>
+        function formatTurkishDate() {
+            const now = new Date();
+            const options = { 
+                day: '2-digit', 
+                month: '2-digit', 
+                year: 'numeric' 
+            };
+            
+            return now.toLocaleDateString('tr-TR', options);
+        }
+        
+        document.getElementById('currentDate').textContent = formatTurkishDate();
+        
+        // Cihaz bilgisini göster (test için)
+        document.addEventListener('DOMContentLoaded', function() {
+            const deviceInfo = document.getElementById('deviceInfo');
+            if (deviceInfo) {
+                if (document.documentElement.classList.contains('mobile')) {
+                    deviceInfo.textContent = '📱 Mobil Görünüm';
+                } else if (document.documentElement.classList.contains('tablet')) {
+                    deviceInfo.textContent = '📟 Tablet Görünüm';
+                } else {
+                    deviceInfo.textContent = '🖥️ Masaüstü Görünüm';
+                }
+            }
+        });
+    </script>
+
+    <script src="js/common.js"></script>
+    <script src="js/daily.js"></script>
+</body>
+</html>

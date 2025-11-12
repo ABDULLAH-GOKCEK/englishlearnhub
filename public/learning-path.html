@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Öğrenme Yolu | English Learn Hub</title>
+
+  <!-- FAVICON (aynı) -->
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+  <link rel="apple-touch-icon" sizes="57x57" href="/apple-icon-57x57.png">
+  <!-- ... (tüm apple-icon ve favicon satırları aynı) -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="msapplication-TileColor" content="#ffffff">
+  <meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
+  <meta name="theme-color" content="#ffffff">
+
+  <!-- Bootstrap & Font Awesome -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+    <div class="container">
+      <a class="navbar-brand" href="/index.html">English Learn Hub</a>
+    </div>
+  </nav>
+
+  <!-- İçerik -->
+  <div class="container">
+    <section id="introSection" class="module-section active text-center py-5">
+      <h1>Hoş Geldiniz!</h1>
+      <button id="startTestButton" class="btn btn-primary">Seviye Testi</button>
+    </section>
+  </div>
+
+  <button class="btn btn-danger btn-reset" onclick="LearningPath.resetProgress()">Sıfırla</button>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/js/learning-path.js"></script>
+</body>
+</html>

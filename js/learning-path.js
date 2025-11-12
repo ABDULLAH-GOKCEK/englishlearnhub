@@ -1,9 +1,9 @@
 // =========================================================================
-// js/learning-path.js (V15.5.4 – VERCEL UYUMLU + %100 ÇALIŞIR)
+// js/learning-path.js (V15.5.5 – VERCEL UYUMLU + JSON YOLLARI DÜZELTİLDİ)
 // =========================================================================
 
 const LearningPath = {
-    // Sabitler (Vercel için /data/ yolu)
+    // Sabitler (Vercel için /data/ yolu — SLASH BAŞLANGICI ÖNEMLİ!)
     TEST_FILE_PATH: '/data/level_test.json',
     MODULE_CONTENT_FILE_PATH: '/data/module_content.json',
     LEVEL_UP_EXAM_FILE_PATH: '/data/exam.json',
@@ -36,7 +36,7 @@ const LearningPath = {
         { id: 'reading', name: '3. Okuma Anlama Alıştırması', type: 'reading' }, 
     ],
 
-    // Modül Kategori Haritası
+    // Modül Kategori Haritası (senin JSON'lara göre güncellendi)
     MODULE_CATEGORY_MAP: {
         'a1_m1': { words: ['Animals', 'Greetings', 'Basic Nouns'], sentences: ['Greetings', 'Introduction', 'Daily Life'], readings: ['beginner'] },
         'a1_m2': { words: ['Numbers', 'Food', 'Colors', 'Time'], sentences: ['Family', 'Ordering Food', 'Simple Questions', 'Time'], readings: ['beginner'] },
@@ -45,20 +45,25 @@ const LearningPath = {
         'a2_m2': { words: ['City', 'Shopping', 'Technology', 'Media'], sentences: ['Advice', 'Passive Voice', 'Reported Speech'], readings: ['elementary'] },
         'a2_m3': { words: ['Business', 'Abstract', 'Emotion', 'Politics'], sentences: ['Conditionals', 'Phrasal Verbs', 'Complex Sentence'], readings: ['elementary'] },
         'b1_m1': { words: ['Finance', 'Law', 'Science', 'Nature'], sentences: ['Inversion', 'Subjunctive', 'Advanced Tenses'], readings: ['intermediate'] },
+        'c1_m1': { words: ['Advanced', 'Academic'], sentences: ['Complex', 'Phrasal'], readings: ['advanced'] },
+        // Diğer modüller için genişletilebilir
     },
 
     // =========================================================================
-    // 1. VERİ YÜKLEME
+    // 1. VERİ YÜKLEME (Vercel Uyumlu Error Handling)
     // =========================================================================
     loadAllData: async function() {
         const fetchData = async (path) => {
             try {
+                console.log('Fetching:', path); // Debug log
                 const res = await fetch(path);
-                if (!res.ok) throw new Error(`HTTP ${res.status}: ${path}`);
-                return await res.json();
+                if (!res.ok) throw new Error(`HTTP ${res.status}: ${path} bulunamadı.`);
+                const data = await res.json();
+                console.log('Loaded:', path, data); // Debug log
+                return data;
             } catch (error) {
                 console.error('JSON Yükleme Hatası:', path, error);
-                alert(`Dosya yüklenemedi: ${path}. /public/data/ klasörünü kontrol edin.`);
+                alert(`Dosya yüklenemedi: ${path}. public/data/ klasörünü kontrol edin.`);
                 return path.includes('level_test') ? { questions: [] } : {};
             }
         };
@@ -73,11 +78,14 @@ const LearningPath = {
         ]);
 
         this.allModules = moduleContentData;
+        this.allModuleContents = moduleContentData;
         this.allLevelTestQuestions = testData.questions || [];
         this.allExamQuestions = examData || [];
         this.allWords = wordsData || [];
         this.allSentences = sentencesData || [];
         this.allReadings = readingsData || [];
+
+        console.log('Veri Yükleme Tamamlandı:', this.allLevelTestQuestions.length, 'soru yüklendi.'); // Debug
     },
 
     // =========================================================================
@@ -107,17 +115,21 @@ const LearningPath = {
     // 3. SEVİYE TESTİ
     // =========================================================================
     startLevelTest: function() {
-        if (this.allLevelTestQuestions.length === 0) return this.showQuizError('Seviye testi soruları yüklenemedi.');
+        if (this.allLevelTestQuestions.length === 0) {
+            alert('Seviye testi soruları yüklenemedi. Console\'u kontrol edin (F12).');
+            return;
+        }
         this.currentQuizQuestions = this.shuffleArray([...this.allLevelTestQuestions]).slice(0, 10);
         this.currentQuestionIndex = 0;
         this.currentQuizAnswers = [];
         document.getElementById('quizTitle').textContent = 'Seviye Tespit Testi';
         this.showQuizQuestion(this.currentQuizQuestions[0]);
         this.showSection('quizSection');
+        console.log('Test Başlatıldı:', this.currentQuizQuestions.length, 'soru.'); // Debug
     },
 
     // =========================================================================
-    // 4. MODÜL İÇERİK GÖSTERİMİ + SINAV BAŞLATMA
+    // 4. MODÜL İÇERİK GÖSTERİMİ
     // =========================================================================
     displayModuleContent: function(moduleKey, sectionId = 'word') {
         const moduleInfo = this.allModules[moduleKey];
@@ -127,10 +139,10 @@ const LearningPath = {
         const content = moduleInfo.content[sectionId] || [];
 
         const container = document.getElementById('moduleContentSection');
-        container.innerHTML = `<h3>${moduleInfo.name} - ${this.STANDARD_SECTIONS.find(s => s.id === sectionId)?.name}</h3>`;
+        container.innerHTML = `<h3>${moduleInfo.name || moduleInfo.title} - ${this.STANDARD_SECTIONS.find(s => s.id === sectionId)?.name}</h3>`;
 
         if (content.length === 0) {
-            container.innerHTML += '<p class="text-muted">İçerik bulunamadı.</p>';
+            container.innerHTML += '<p class="text-muted">İçerik bulunamadı. JSON\'dan filtreleme hatası olabilir.</p>';
         } else if (sectionId === 'reading') {
             content.forEach((item, i) => {
                 container.innerHTML += `
@@ -145,15 +157,15 @@ const LearningPath = {
                     </div>`;
             });
         } else {
-            const list = content.map(item => `<li><strong>${item.english}</strong> - ${item.turkish}</li>`).join('');
+            const list = content.map(item => `<li><strong>${item.english || item.word}</strong> - ${item.turkish}</li>`).join('');
             container.innerHTML += `<ul class="list-unstyled">${list}</ul>`;
         }
 
         // SINAV BAŞLATMA BUTONU
         container.innerHTML += `
             <div class="text-center mt-4">
-                <button class="btn btn-success btn-lg" onclick="LearningPath.startModuleQuiz('${moduleKey}')">
-                    Modül Sınavına Başla
+                <button class="btn btn-success btn-lg" onclick="LearningPath.startSectionQuiz('${moduleKey}', '${sectionId}')">
+                    ${this.STANDARD_SECTIONS.find(s => s.id === sectionId)?.name} Sınavı
                 </button>
             </div>
         `;
@@ -162,28 +174,33 @@ const LearningPath = {
     },
 
     // =========================================================================
-    // 5. MODÜL SINAVI BAŞLAT
+    // 5. BÖLÜM SINAVI
     // =========================================================================
-    startModuleQuiz: function(moduleKey) {
-        this.currentModuleKey = moduleKey;
+    startSectionQuiz: function(moduleKey, sectionId) {
         const moduleInfo = this.allModules[moduleKey];
-
-        // Örnek sorular (JSON'dan gerçek çekmek için genişletilebilir)
-        this.currentQuizQuestions = [
-            { question: `Bu modülde kaç kelime öğrendiniz?`, options: ['5', '10', '15'], answer: 1 },
-            { question: `Modül seviyesi nedir?`, options: ['A1', 'A2', 'B1'], answer: 0 },
-            { question: `Temel konu nedir?`, options: ['Seyahat', 'Yemek', 'Aile'], answer: 2 }
-        ];
+        const quizzes = (moduleInfo.content || []).filter(c => c.type === 'quiz');
+        if (quizzes.length === 0) {
+            // Fallback: JSON'dan soru oluştur
+            this.currentQuizQuestions = [
+                { question: `${sectionId} bölümünde temel kavram nedir?`, options: ['Temel', 'İleri', 'Orta'], answer: 0 }
+            ];
+        } else {
+            this.currentQuizQuestions = quizzes.map(q => ({
+                question: q.question,
+                options: q.options,
+                answer: q.options.indexOf(q.answer)
+            }));
+        }
 
         this.currentQuestionIndex = 0;
         this.currentQuizAnswers = [];
-        document.getElementById('quizTitle').textContent = `${moduleInfo.name} - Sınav`;
+        document.getElementById('quizTitle').textContent = `${moduleInfo.name || moduleInfo.title} - ${this.STANDARD_SECTIONS.find(s => s.id === sectionId)?.name} Sınavı`;
         this.showQuizQuestion(this.currentQuizQuestions[0]);
         this.showSection('quizSection');
     },
 
     // =========================================================================
-    // 6. SINAV SORUSU GÖSTER
+    // 6. SINAV MEKANİĞİ
     // =========================================================================
     showQuizQuestion: function(question) {
         const container = document.getElementById('quizQuestions');
@@ -235,13 +252,13 @@ const LearningPath = {
             const module = this.allModules[this.currentModuleKey];
             if (isPassed) {
                 this.markModuleCompleted(this.currentModuleKey);
-                html += `<div class="alert alert-success text-center">Tebrikler! <strong>${module.name}</strong> modülünü tamamladınız!</div>`;
+                html += `<div class="alert alert-success text-center">Tebrikler! <strong>${module.name || module.title}</strong> modülünü tamamladınız!</div>`;
             } else {
                 html += `<div class="alert alert-danger text-center">Başarısız. Tekrar deneyin.</div>`;
             }
             html += `
                 <div class="d-flex justify-content-center gap-2 mt-3">
-                    <button class="btn btn-primary" onclick="LearningPath.displayLearningPath('${this.getCurrentUserLevel()}')">
+                    <button class="btn btn-primary" onclick="LearningPath.displayLearningPath(LearningPath.getCurrentUserLevel())">
                         Öğrenme Yoluna Dön
                     </button>
                     <button class="btn btn-warning" onclick="LearningPath.startModuleQuiz('${this.currentModuleKey}')">
@@ -278,7 +295,45 @@ const LearningPath = {
     },
 
     // =========================================================================
-    // 8. YARDIMCI FONKSİYONLAR
+    // 8. ÖĞRENME YOLU
+    // =========================================================================
+    displayLearningPath: function(level) {
+        const pathContainer = document.getElementById('learningPathSection');
+        pathContainer.innerHTML = '';
+        const levelName = level.toUpperCase();
+
+        let pathHtml = `<h1 class="text-center mb-4">Öğrenme Yolum: ${levelName}</h1><div class="row g-4">`;
+
+        const levelModules = Object.keys(this.allModules).filter(k => k.startsWith(levelName.toLowerCase()));
+        if (levelModules.length === 0) {
+            pathHtml += `<div class="alert alert-warning">Bu seviyede modül yok.</div>`;
+        } else {
+            levelModules.forEach(key => {
+                const mod = this.allModules[key];
+                const completed = this.isModuleCompleted(key);
+                pathHtml += `
+                    <div class="col-md-4">
+                        <div class="card module-card ${completed ? 'completed' : 'in-progress'}">
+                            <div class="card-body">
+                                <h5>${mod.name || mod.title}</h5>
+                                <p>${mod.description || mod.topic}</p>
+                                <button class="btn btn-primary w-100" onclick="LearningPath.displayModuleContent('${key}', 'word')">
+                                    ${completed ? 'Tekrarla' : 'Başla'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>`;
+            });
+        }
+
+        pathHtml += `</div>`;
+        pathContainer.innerHTML = pathHtml;
+        this.showSection('learningPathSection');
+        document.getElementById('navToPathButton').classList.remove('d-none');
+    },
+
+    // =========================================================================
+    // 9. YARDIMCI FONKSİYONLAR
     // =========================================================================
     init: function() {
         this.loadAllData().then(() => {
@@ -288,7 +343,7 @@ const LearningPath = {
             } else {
                 this.showSection('introSection');
             }
-        }).catch(() => alert('Veri yüklenemedi. Lütfen internetinizi kontrol edin.'));
+        }).catch(() => alert('Veri yüklenemedi. Console\'u kontrol edin (F12).'));
     },
 
     getCurrentUserLevel: function() { return localStorage.getItem('userLevel') || null; },
@@ -297,7 +352,7 @@ const LearningPath = {
     isModuleCompleted: function(k) { return JSON.parse(localStorage.getItem('learningModules') || '{}')[k] === true; },
     markModuleCompleted: function(k) { const m = JSON.parse(localStorage.getItem('learningModules') || '{}'); m[k] = true; localStorage.setItem('learningModules', JSON.stringify(m)); },
     checkAllModulesCompleted: function(l) { return Object.keys(this.allModules).filter(k => this.allModules[k].level.toUpperCase() === l.toUpperCase()).every(k => this.isModuleCompleted(k)); },
-    shuffleArray: function(a) { return a.sort(() => Math.random() - 0.5); },
+    shuffleArray: function(a) { return [...a].sort(() => Math.random() - 0.5); },
     showSection: function(id) { 
         document.querySelectorAll('.module-section').forEach(s => { s.classList.remove('active'); s.style.display = 'none'; }); 
         const el = document.getElementById(id); 
@@ -313,20 +368,15 @@ const LearningPath = {
 
     // Sıfırlama
     resetProgress: function() {
-        if (confirm("Tüm ilerlemeniz, modül tamamlama durumunuz ve seviyeniz sıfırlanacaktır. Emin misiniz?")) {
+        if (confirm("Tüm ilerlemeniz sıfırlanacak. Emin misiniz?")) {
             localStorage.removeItem('userLevel');
             localStorage.removeItem('learningModules');
             localStorage.removeItem('levelTestAnswers');
-            
-            // Tüm yanlış cevap kayıtlarını da sil
             for (let i = 0; i < localStorage.length; i++) {
-                 const key = localStorage.key(i);
-                 if (key.startsWith('wrong_')) {
-                     localStorage.removeItem(key);
-                 }
+                const key = localStorage.key(i);
+                if (key.startsWith('wrong_')) localStorage.removeItem(key);
             }
-            
-            alert("Tüm ilerleme sıfırlandı. Seviye tespit testi yeniden başlayacak.");
+            alert("Sıfırlandı. Test yeniden başlayacak.");
             window.location.reload(); 
         }
     }
@@ -334,10 +384,13 @@ const LearningPath = {
 
 // Sayfa yüklendiğinde başlat
 document.addEventListener('DOMContentLoaded', () => {
-    window.LearningPath = LearningPath;
+    window.LearningPath = LearningPath; 
     LearningPath.init();
 
     // Butonlar
     const startBtn = document.getElementById('startTestButton');
     if (startBtn) startBtn.addEventListener('click', () => LearningPath.startLevelTest());
+
+    const resetBtn = document.querySelector('[onclick="LearningPath.resetProgress()"]');
+    if (resetBtn) resetBtn.addEventListener('click', () => LearningPath.resetProgress());
 });

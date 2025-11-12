@@ -66,7 +66,7 @@
 
   <script>
     if ('serviceWorker' in navigator) {
-      window.addEvent GSTListener('load', () => {
+      window.addEventListener('load', () => {
         navigator.serviceWorker.register('/sw.js');
       });
     }
@@ -107,10 +107,11 @@
           ${nextLevel ? `<p class="text-sm text-green-600 mt-2">Complete 3 modules to unlock <strong>${nextLevel}</strong>!</p>` : '<p class="text-sm text-purple-600 mt-2">You reached the top!</p>'}
         </div>
       ` + modules.map(m => `
-        <a href="${m.path}" class="card bg-white p-6 rounded-xl shadow hover:shadow-lg text-center">
+        <a href="${m.path}" class="card bg-white p-6 rounded-xl shadow hover:shadow-lg text-center block cursor-pointer">
           <div class="text-4xl mb-3">${m.icon}</div>
           <h3 class="font-semibold">${m.name}</h3>
           <p class="text-xs text-gray-500 mt-1">${level} Content</p>
+          <p class="text-xs text-indigo-600 mt-2">Click to Start</p>
         </a>
       `).join('');
     }

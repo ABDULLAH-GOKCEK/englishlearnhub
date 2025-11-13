@@ -1,4 +1,4 @@
-# Kök dizinde oluştur
+# Kök dizinde yeniden oluştur
 cat > manifest.json << 'EOF'
 {
   "name": "English Learn Hub",

@@ -8,15 +8,15 @@ const FILES = [
   '/assets/icons/icon-512.png'
 ];
 
-self.addEventListener('install', e => {
-  e.waitUntil(
+self.addEventListener('install', event => {
+  event.waitUntil(
     caches.open(CACHE).then(cache => cache.addAll(FILES))
   );
 });
 
-self.addEventListener('fetch', e => {
-  e.respondWith(
-    caches.match(e.request).then(res => res || fetch(e.request))
+self.addEventListener('fetch', event => {
+  event.respondWith(
+    caches.match(event.request).then(response => response || fetch(event.request))
   );
 });
 EOF

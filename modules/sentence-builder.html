@@ -3,42 +3,43 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <title>Vocabulary</title>
+  <title>Sentence Builder</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="p-6 bg-gradient-to-br from-blue-50 to-indigo-100">
-  <a href="/" class="text-indigo-600">&larr; Back</a>
-  <h1 class="text-3xl font-bold mb-6">Vocabulary Flashcards</h1>
-  <div id="cards" class="grid md:grid-cols-3 gap-4"></div>
-  <button onclick="completeModule()" class="mt-6 px-6 py-3 bg-green-600 text-white rounded-lg">Complete</button>
+<body class="bg-gradient-to-br from-indigo-50 to-purple-50 min-h-screen">
+
+  <div class="container mx-auto px-4 py-8 max-w-2xl">
+    <a href="/" class="text-indigo-600 hover:underline text-sm flex items-center mb-4">
+      Back
+    </a>
+    <h1 class="text-3xl font-bold text-indigo-700 mb-6">Cümle Kur</h1>
+
+    <div class="bg-white p-6 rounded-2xl shadow-lg">
+      <p class="text-lg font-bold mb-4">Aşağıdaki kelimeleri doğru sıraya koy:</p>
+      <div id="sentence" class="text-xl text-center mb-6 text-gray-700">
+        I / to / go / school / every / day
+      </div>
+
+      <div class="flex flex-wrap gap-3 justify-center mb-6">
+        <span class="px-4 py-2 bg-indigo-100 text-indigo-700 rounded-lg cursor-move">I</span>
+        <span class="px-4 py-2 bg-indigo-100 text-indigo-700 rounded-lg cursor-move">go</span>
+        <span class="px-4 py-2 bg-indigo-100 text-indigo-700 rounded-lg cursor-move">to</span>
+        <span class="px-4 py-2 bg-indigo-100 text-indigo-700 rounded-lg cursor-move">school</span>
+        <span class="px-4 py-2 bg-indigo-100 text-indigo-700 rounded-lg cursor-move">every</span>
+        <span class="px-4 py-2 bg-indigo-100 text-indigo-700 rounded-lg cursor-move">day</span>
+      </div>
+
+      <button onclick="completeModule()" class="w-full bg-green-600 text-white py-3 rounded-xl font-bold hover:bg-green-700 transition">
+        Complete Module
+      </button>
+    </div>
+  </div>
 
   <script>
-    const level = new URLSearchParams(location.search).get('level') || 'A1';
-    fetch('/data/sentences.json')
-      .then(r => r.json())
-      .then(words => {
-        const filtered = words.filter(w => w.difficulty === (level === 'A1' || level === 'A2' ? 'easy' : level === 'B1' || level === 'B2' ? 'medium' : 'hard'));
-        document.getElementById('cards').innerHTML = filtered.slice(0, 12).map(w => `
-          <div class="bg-white p-4 rounded-xl shadow text-center">
-            <img src="${w.image}" class="w-full h-32 object-cover mb-2">
-            <h3 class="font-bold">${w.word}</h3>
-            <p>${w.turkish}</p>
-            <button onclick="new SpeechSynthesisUtterance('${w.word}').speak()" class="text-xs text-indigo-600">Play</button>
-          </div>
-        `).join('');
-      });
-
     function completeModule() {
-      let p = JSON.parse(localStorage.getItem('englishHubProgress') || '{}');
-      p.completedModules = (p.completedModules || 0) + 1;
-      if (p.completedModules >= 3) {
-        const levels = ['A1','A2','B1','B2','C1','C2'];
-        const i = levels.indexOf(p.level);
-        if (i < 5) { p.level = levels[i+1]; p.completedModules = 0; alert('Level Up!'); }
-      }
-      localStorage.setItem('englishHubProgress', JSON.stringify(p));
-      setTimeout(() => location.href = '/', 500);
+      window.addXP(18);
+      alert("Tebrikler! Cümle kurma tamamlandı! +18 XP");
+      setTimeout(() => window.location.href = '/', 500);
     }
   </script>
 </body>

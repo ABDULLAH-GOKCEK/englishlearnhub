@@ -9,17 +9,19 @@
 <body class="bg-gradient-to-br from-indigo-50 to-purple-50 min-h-screen">
 
   <div class="container mx-auto px-4 py-8 max-w-2xl">
-    <a href="/" class="text-indigo-600 hover:underline text-sm flex items-center mb-4">Back</a>
+    <a href="/" class="text-indigo-600 hover:underline text-sm flex items-center mb-4">
+      Back
+    </a>
     <h1 class="text-3xl font-bold text-indigo-700 mb-6">AI Chat</h1>
 
-    <div id="chat" class="bg-white rounded-2xl shadow-lg p-4 h-96 overflow-y-auto mb-4"></div>
+    <div id="chat" class="bg-white rounded-2xl shadow-lg p-4 h-96 overflow-y-auto mb-4 space-y-3"></div>
 
     <div class="flex gap-2">
-      <input id="input" type="text" placeholder="Mesaj yaz..." class="flex-1 p-3 rounded-lg border focus:outline-none focus:border-indigo-600">
-      <button onclick="send()" class="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700">Gönder</button>
+      <input id="input" type="text" placeholder="Type a message..." class="flex-1 p-3 rounded-lg border focus:outline-none focus:border-indigo-600" onkeypress="if(event.key==='Enter') send()">
+      <button onclick="send()" class="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition">Send</button>
     </div>
 
-    <button onclick="completeModule(30)" class="mt-6 w-full bg-green-600 text-white py-3 rounded-xl font-bold hover:bg-green-700">
+    <button onclick="completeModule(30)" class="mt-6 w-full bg-green-600 text-white py-3 rounded-xl font-bold hover:bg-green-700 transition">
       Complete Module (+30 XP)
     </button>
   </div>
@@ -28,15 +30,21 @@
     function speak(text) {
       const utter = new SpeechSynthesisUtterance(text);
       utter.lang = 'en-US';
+      utter.rate = 0.9;
       speechSynthesis.speak(utter);
     }
 
     function addMsg(text, sender) {
+      const chat = document.getElementById('chat');
       const div = document.createElement('div');
       div.className = sender === 'user' ? 'text-right' : 'text-left';
-      div.innerHTML = `<div class="inline-block p-3 rounded-xl mb-2 ${sender === 'user' ? 'bg-blue-600 text-white' : 'bg-gray-200'}">${text}</div>`;
-      document.getElementById('chat').appendChild(div);
-      document.getElementById('chat').scrollTop = document.getElementById('chat').scrollHeight;
+      div.innerHTML = `
+        <div class="inline-block p-3 rounded-xl max-w-xs ${sender === 'user' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-800'}">
+          ${text}
+        </div>
+      `;
+      chat.appendChild(div);
+      chat.scrollTop = chat.scrollHeight;
       if (sender === 'ai') speak(text);
     }
 
@@ -44,24 +52,35 @@
       const input = document.getElementById('input');
       const msg = input.value.trim();
       if (!msg) return;
+
       addMsg(msg, 'user');
       input.value = '';
+      input.disabled = true;
 
-      const res = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: msg, level: 'A1' })
-      });
-      const data = await res.json();
-      addMsg(data.reply, 'ai');
+      try {
+        const res = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: msg, level: 'A1' })
+        });
+
+        const data = await res.json();
+        addMsg(data.reply || "No response", 'ai');
+      } catch (err) {
+        addMsg("Connection error. Try again.", 'ai');
+      }
+
+      input.disabled = false;
+      input.focus();
     }
 
     function completeModule(xp) {
       window.addXP(xp);
-      alert(`+${xp} XP!`);
+      alert(`+${xp} XP! Chat completed!`);
       setTimeout(() => location.href = '/', 800);
     }
 
+    // Fallback addXP
     if (typeof window.addXP === 'undefined') {
       window.addXP = (xp) => {
         let p = JSON.parse(localStorage.getItem('englishHubProgress') || '{"level":0,"xp":0}');
@@ -69,6 +88,9 @@
         localStorage.setItem('englishHubProgress', JSON.stringify(p));
       };
     }
+
+    // Hoş geldin mesajı
+    setTimeout(() => addMsg("Hi! I'm your English teacher. Ask me anything in English!", 'ai'), 500);
   </script>
 </body>
 </html>

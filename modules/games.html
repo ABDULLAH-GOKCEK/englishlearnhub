@@ -3,59 +3,49 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <title>Games</title>
+  <title>English Games</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
-    body { font-family: 'Poppins', sans-serif; }
-  </style>
+  <link rel="stylesheet" href="/assets/icons/icon-192.png" type="image/png">
 </head>
-<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen p-6">
-  <div class="max-w-4xl mx-auto">
-    <a href="/" class="text-indigo-600 hover:underline text-sm">&larr; Back</a>
-    <h1 class="text-3xl font-bold text-indigo-700 mt-4 mb-6">English Games</h1>
+<body class="bg-gradient-to-br from-indigo-50 to-purple-50 min-h-screen">
 
-    <div class="grid md:grid-cols-2 gap-6">
-      <a href="#word-guess" class="bg-white p-6 rounded-xl shadow hover:shadow-lg text-center">
-        <div class="text-5xl mb-3">Target</div>
-        <h3 class="font-semibold">Word Guess</h3>
-        <p class="text-sm text-gray-600 mt-2">Guess the word from clues</p>
-      </a>
+  <div class="container mx-auto px-4 py-8">
+    <a href="/" class="text-indigo-600 hover:underline text-sm flex items-center mb-4">
+      Back
+    </a>
+    <h1 class="text-3xl font-bold text-indigo-700 mb-8">English Games</h1>
 
-      <a href="#hangman" class="bg-white p-6 rounded-xl shadow hover:shadow-lg text-center">
-        <div class="text-5xl mb-3">Hanged Man</div>
-        <h3 class="font-semibold">Hangman</h3>
-        <p class="text-sm text-gray-600 mt-2">Classic word game</p>
-      </a>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Target Game -->
+      <div class="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition text-center cursor-pointer" onclick="startGame('target')">
+        <h2 class="text-2xl font-bold mb-2">Target</h2>
+        <p class="text-gray-600 mb-1">Word Guess</p>
+        <p class="text-sm text-gray-500">Guess the word from clues</p>
+      </div>
+
+      <!-- Hanged Man -->
+      <div class="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition text-center cursor-pointer" onclick="startGame('hangman')">
+        <h2 class="text-2xl font-bold mb-2">Hanged Man</h2>
+        <p class="text-gray-600 mb-1">Hangman</p>
+        <p class="text-sm text-gray-500">Classic word game</p>
+      </div>
     </div>
 
-    <button onclick="completeModule()" class="mt-8 px-6 py-3 bg-green-600 text-white rounded-lg w-full">
+    <!-- Complete Button -->
+    <button onclick="completeModule()" class="mt-12 w-full bg-green-600 text-white py-3 rounded-xl font-bold hover:bg-green-700 transition">
       Complete Module
     </button>
   </div>
 
   <script>
-    // Basit oyunlar (inline)
-    document.addEventListener('click', e => {
-      if (e.target.closest('a[href="#word-guess"]')) {
-        alert('Word Guess: "A small red fruit" → Apple!');
-      }
-      if (e.target.closest('a[href="#hangman"]')) {
-        alert('Hangman: _ _ _ _ _ (5 letters) → Hello!');
-      }
-    });
+    function startGame(type) {
+      alert(`Starting ${type} game... (Demo)`);
+    }
 
     function completeModule() {
-      let p = JSON.parse(localStorage.getItem('englishHubProgress') || '{}');
-      p.completedModules = (p.completedModules || 0) + 1;
-      if (p.completedModules >= 3) {
-        const levels = ['A1','A2','B1','B2','C1','C2'];
-        const i = levels.indexOf(p.level);
-        if (i < 5) { p.level = levels[i+1]; p.completedModules = 0; alert('Level Up!'); }
-      }
-      localStorage.setItem('englishHubProgress', JSON.stringify(p));
-      setTimeout(() => location.href = '/', 500);
+      window.addXP(20);
+      alert("Tebrikler! Oyunlar modülü tamamlandı! +20 XP");
+      setTimeout(() => window.location.href = '/', 500);
     }
   </script>
 </body>

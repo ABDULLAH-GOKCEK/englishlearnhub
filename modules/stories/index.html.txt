@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Vocabulary</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="p-6 bg-gradient-to-br from-blue-50 to-indigo-100">
+  <a href="/" class="text-indigo-600">&larr; Back</a>
+  <h1 class="text-3xl font-bold mb-6">Vocabulary Flashcards</h1>
+  <div id="cards" class="grid md:grid-cols-3 gap-4"></div>
+  <button onclick="completeModule()" class="mt-6 px-6 py-3 bg-green-600 text-white rounded-lg">Complete</button>
+
+  <script>
+    const level = new URLSearchParams(location.search).get('level') || 'A1';
+    fetch('/data/reading_stories.json')
+      .then(r => r.json())
+      .then(words => {
+        const filtered = words.filter(w => w.difficulty === (level === 'A1' || level === 'A2' ? 'easy' : level === 'B1' || level === 'B2' ? 'medium' : 'hard'));
+        document.getElementById('cards').innerHTML = filtered.slice(0, 12).map(w => `
+          <div class="bg-white p-4 rounded-xl shadow text-center">
+            <img src="${w.image}" class="w-full h-32 object-cover mb-2">
+            <h3 class="font-bold">${w.word}</h3>
+            <p>${w.turkish}</p>
+            <button onclick="new SpeechSynthesisUtterance('${w.word}').speak()" class="text-xs text-indigo-600">Play</button>
+          </div>
+        `).join('');
+      });
+
+    function completeModule() {
+      let p = JSON.parse(localStorage.getItem('englishHubProgress') || '{}');
+      p.completedModules = (p.completedModules || 0) + 1;
+      if (p.completedModules >= 3) {
+        const levels = ['A1','A2','B1','B2','C1','C2'];
+        const i = levels.indexOf(p.level);
+        if (i < 5) { p.level = levels[i+1]; p.completedModules = 0; alert('Level Up!'); }
+      }
+      localStorage.setItem('englishHubProgress', JSON.stringify(p));
+      setTimeout(() => location.href = '/', 500);
+    }
+  </script>
+</body>
+</html>

@@ -3,13 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name="description" content="Learn English step by step from A1 to C2."/>
+  <meta name="description" content="Learn English from A1 to C2 with interactive modules."/>
   <title>English Learn Hub</title>
-
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="manifest" href="/manifest.json"/>
   <link rel="icon" href="/assets/icons/icon-192.png" type="image/png"/>
-
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
     body { font-family: 'Poppins', sans-serif; }
@@ -23,19 +21,14 @@
   <header class="bg-white shadow-md sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
       <h1 class="text-2xl md:text-3xl font-bold text-indigo-700">English Learn Hub</h1>
-      <div class="flex gap-3">
-        <button id="loginBtn" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">Login</button>
-        <button id="registerBtn" class="px-4 py-2 border border-indigo-600 text-indigo-600 rounded-lg hover:bg-indigo-50 transition">Register</button>
-      </div>
+      <button id="loginBtn" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Login</button>
     </div>
   </header>
 
   <!-- HERO -->
   <section class="text-center py-16 px-6">
     <h2 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4">Start from A1, Reach C2</h2>
-    <p class="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
-      No tests. Just learn. Complete modules and level up!
-    </p>
+    <p class="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">No tests. Just learn. Complete modules and level up!</p>
   </section>
 
   <!-- DASHBOARD -->
@@ -59,8 +52,7 @@
   <!-- FOOTER -->
   <footer class="bg-gray-800 text-white py-8 mt-16">
     <div class="max-w-6xl mx-auto px-6 text-center">
-      <p>&copy; 2025 English Learn Hub. All rights reserved.</p>
-      <p class="text-sm mt-2">Powered by <a href="https://x.ai" class="underline">xAI</a> & Vercel</p>
+      <p>© 2025 English Learn Hub</p>
     </div>
   </footer>
 
@@ -81,12 +73,7 @@
 
     function loadDashboard(level) {
       document.getElementById('levelText').textContent = level;
-
-      const levelName = {
-        A1: "Beginner", A2: "Elementary", B1: "Intermediate",
-        B2: "Upper Intermediate", C1: "Advanced", C2: "Proficient"
-      };
-
+      const levelName = { A1: "Beginner", A2: "Elementary", B1: "Intermediate", B2: "Upper Intermediate", C1: "Advanced", C2: "Proficient" };
       const nextLevel = getNextLevel(level);
 
       const modules = [

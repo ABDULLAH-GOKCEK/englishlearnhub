@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI Chat</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+    body { font-family: 'Poppins', sans-serif; }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen p-6">
+  <div class="max-w-4xl mx-auto">
+    <a href="/" class="text-indigo-600 hover:underline text-sm">&larr; Back to Dashboard</a>
+    <h1 class="text-3xl font-bold text-indigo-700 mt-4 mb-6">AI Chat Assistant</h1>
+
+    <div id="chat" class="bg-white rounded-xl shadow-lg p-6 h-96 overflow-y-auto mb-4 space-y-4"></div>
+
+    <div class="flex gap-2">
+      <input id="input" type="text" placeholder="Ask me anything in English..." class="flex-1 border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+      <button id="send" class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Send</button>
+    </div>
+
+    <button onclick="completeModule()" class="mt-4 px-6 py-3 bg-green-600 text-white rounded-lg w-full">
+      Complete Module
+    </button>
+  </div>
+
+  <script>
+    const chat = document.getElementById('chat');
+    const input = document.getElementById('input');
+    const send = document.getElementById('send');
+
+    function addMessage(text, sender = 'user') {
+      const div = document.createElement('div');
+      div.className = sender === 'user' ? 'text-right' : 'text-left';
+      div.innerHTML = `<div class="inline-block max-w-xs p-3 rounded-lg ${sender === 'user' ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-800'}">${text}</div>`;
+      chat.appendChild(div);
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    send.addEventListener('click', () => {
+      const msg = input.value.trim();
+      if (!msg) return;
+      addMessage(msg, 'user');
+      input.value = '';
+
+      // xAI API (örnek)
+      fetch('https://api.x.ai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Bearer YOUR_XAI_API_KEY',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: 'grok-beta',
+          messages: [{ role: 'user', content: msg }],
+          temperature: 0.7
+        })
+      })
+      .then(r => r.json())
+      .then(data => {
+        const reply = data.choices[0]?.message?.content || "Sorry, I couldn't respond.";
+        addMessage(reply, 'ai');
+      })
+      .catch(() => addMessage("API error. Try again later.", 'ai'));
+    });
+
+    input.addEventListener('keypress', e => e.key === 'Enter' && send.click());
+
+    // Örnek başlangıç mesajı
+    setTimeout(() => addMessage("Hello! I'm your English learning assistant. Ask me anything!", 'ai'), 500);
+
+    function completeModule() {
+      let p = JSON.parse(localStorage.getItem('englishHubProgress') || '{}');
+      p.completedModules = (p.completedModules || 0) + 1;
+      if (p.completedModules >= 3) {
+        const levels = ['A1','A2','B1','B2','C1','C2'];
+        const i = levels.indexOf(p.level);
+        if (i < 5) { p.level = levels[i+1]; p.completedModules = 0; alert('Level Up!'); }
+      }
+      localStorage.setItem('englishHubProgress', JSON.stringify(p));
+      setTimeout(() => location.href = '/', 500);
+    }
+  </script>
+</body>
+</html>

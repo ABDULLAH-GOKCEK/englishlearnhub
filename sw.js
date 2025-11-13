@@ -1,4 +1,3 @@
-cat > sw.js << 'EOF'
 const CACHE = 'elh-v1';
 const FILES = [
   '/',
@@ -8,15 +7,10 @@ const FILES = [
   '/assets/icons/icon-512.png'
 ];
 
-self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE).then(cache => cache.addAll(FILES))
-  );
+self.addEventListener('install', e => {
+  e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)));
 });
 
-self.addEventListener('fetch', event => {
-  event.respondWith(
-    caches.match(event.request).then(response => response || fetch(event.request))
-  );
+self.addEventListener('fetch', e => {
+  e.respondWith(caches.match(e.request).then(r => r || fetch(e.request)));
 });
-EOF

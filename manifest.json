@@ -1,5 +1,3 @@
-# Kök dizinde yeniden oluştur
-cat > manifest.json << 'EOF'
 {
   "name": "English Learn Hub",
   "short_name": "ELH",
@@ -20,4 +18,3 @@ cat > manifest.json << 'EOF'
     }
   ]
 }
-EOF

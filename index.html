@@ -1,128 +1,189 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="tr" class="scroll-smooth">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name="description" content="Learn English from A1 to C2 with interactive modules."/>
   <title>English Learn Hub</title>
+  <meta name="description" content="A1-C2 İngilizce öğrenme uygulaması. AI Chat, Oyunlar, Hikayeler, Quiz ve daha fazlası!">
+  
+  <!-- PWA -->
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" href="/assets/icons/icon-192.png" type="image/png">
+  <link rel="apple-touch-icon" href="/assets/icons/icon-192.png">
+  <meta name="theme-color" content="#4f46e5">
+
+  <!-- Tailwind CSS (CDN - Production için PostCSS önerilir) -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="manifest" href="/manifest.json"/>
-  <link rel="icon" href="/assets/icons/icon-192.png" type="image/png"/>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
-    body { font-family: 'Poppins', sans-serif; }
-    .card { transition: all 0.3s ease; }
-    .card:hover { transform: translateY(-4px); }
-  </style>
-</head>
-<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
-
-  <!-- HEADER -->
-  <header class="bg-white shadow-md sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-      <h1 class="text-2xl md:text-3xl font-bold text-indigo-700">English Learn Hub</h1>
-      <button id="loginBtn" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Login</button>
-    </div>
-  </header>
-
-  <!-- HERO -->
-  <section class="text-center py-16 px-6">
-    <h2 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4">Start from A1, Reach C2</h2>
-    <p class="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">No tests. Just learn. Complete modules and level up!</p>
-  </section>
-
-  <!-- DASHBOARD -->
-  <section id="dashboard" class="hidden max-w-5xl mx-auto px-6 py-12">
-    <h2 class="text-3xl font-bold text-center mb-10">Your Learning Path</h2>
-    <div class="flex justify-center mb-12">
-      <div class="relative w-40 h-40">
-        <svg class="w-full h-full">
-          <circle cx="80" cy="80" r="70" stroke="#e5e7eb" stroke-width="12" fill="none"/>
-          <circle id="progressCircle" cx="80" cy="80" r="70" stroke="#4f46e5" stroke-width="12" fill="none" stroke-dasharray="439.8" stroke-dashoffset="439.8"/>
-        </svg>
-        <div class="absolute inset-0 flex flex-col items-center justify-center">
-          <span id="levelText" class="text-3xl font-bold text-indigo-700">A1</span>
-          <span class="text-sm text-gray-600">Beginner</span>
-        </div>
-      </div>
-    </div>
-    <div class="grid md:grid-cols-3 gap-6" id="modulesGrid"></div>
-  </section>
-
-  <!-- FOOTER -->
-  <footer class="bg-gray-800 text-white py-8 mt-16">
-    <div class="max-w-6xl mx-auto px-6 text-center">
-      <p>© 2025 English Learn Hub</p>
-    </div>
-  </footer>
-
   <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#4f46e5',
+            secondary: '#818cf8',
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- PWA Install Button -->
+  <script>
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      document.getElementById('installButton').classList.remove('hidden');
+    });
+
+    function installPWA() {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(() => {
+          document.getElementById('installButton').classList.add('hidden');
+          deferredPrompt = null;
+        });
+      }
+    }
+
+    // Service Worker
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('/sw.js');
       });
     }
-
-    const state = { level: 'A1' };
-
-    function getNextLevel(current) {
-      const path = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
-      const idx = path.indexOf(current);
-      return idx < path.length - 1 ? path[idx + 1] : null;
-    }
-
-    function loadDashboard(level) {
-      document.getElementById('levelText').textContent = level;
-      const levelName = { A1: "Beginner", A2: "Elementary", B1: "Intermediate", B2: "Upper Intermediate", C1: "Advanced", C2: "Proficient" };
-      const nextLevel = getNextLevel(level);
-
-      const modules = [
-        { name: "Vocabulary Flashcards", icon: "Book", path: `/modules/vocabulary/?level=${level}` },
-        { name: "Flip Cards", icon: "Refresh", path: `/modules/flip-cards/?level=${level}` },
-        { name: "Daily Sentences", icon: "Speech", path: `/modules/daily-sentences/?level=${level}` },
-        { name: "Stories", icon: "Book", path: `/modules/stories/?level=${level}` },
-        { name: "Games", icon: "Gamepad", path: `/modules/games/?level=${level}` },
-        { name: "AI Chat", icon: "Robot", path: `/modules/chat/?level=${level}` },
-        { name: "Quiz", icon: "Checkmark", path: `/modules/quiz/?level=${level}` },
-        { name: "Sentence Builder", icon: "Wrench", path: `/modules/sentence-builder/?level=${level}` }
-      ];
-
-      const grid = document.getElementById('modulesGrid');
-      grid.innerHTML = `
-        <div class="col-span-full text-center mb-6">
-          <p class="text-lg text-gray-700">Current Level: <strong>${levelName[level]}</strong></p>
-          ${nextLevel ? `<p class="text-sm text-green-600 mt-2">Complete 3 modules to unlock <strong>${nextLevel}</strong>!</p>` : '<p class="text-sm text-purple-600 mt-2">You reached the top!</p>'}
-        </div>
-      ` + modules.map(m => `
-        <a href="${m.path}" class="card bg-white p-6 rounded-xl shadow hover:shadow-lg text-center block cursor-pointer">
-          <div class="text-4xl mb-3">${m.icon}</div>
-          <h3 class="font-semibold">${m.name}</h3>
-          <p class="text-xs text-gray-500 mt-1">${level} Content</p>
-          <p class="text-xs text-indigo-600 mt-2">Click to Start</p>
-        </a>
-      `).join('');
-    }
-
-    window.addEventListener('load', () => {
-      const saved = localStorage.getItem('englishHubProgress');
-      let currentLevel = 'A1';
-
-      if (saved) {
-        const progress = JSON.parse(saved);
-        currentLevel = progress.level || 'A1';
-      } else {
-        const init = { level: 'A1', completedModules: 0, timestamp: new Date().toISOString() };
-        localStorage.setItem('englishHubProgress', JSON.stringify(init));
-      }
-
-      state.level = currentLevel;
-      document.getElementById('dashboard').classList.remove('hidden');
-      loadDashboard(currentLevel);
-    });
-
-    document.getElementById('loginBtn').addEventListener('click', () => {
-      alert('Login coming soon!');
-    });
   </script>
+</head>
+
+<body class="bg-gradient-to-br from-indigo-50 to-purple-50 min-h-screen font-sans">
+
+  <!-- Header -->
+  <header class="bg-white shadow-lg sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+      <div class="flex items-center space-x-3">
+        <img src="/assets/icons/icon-192.png" alt="ELH" class="w-10 h-10 rounded-lg">
+        <h1 class="text-2xl font-bold text-primary">English Learn Hub</h1>
+      </div>
+      <button id="installButton" onclick="installPWA()" class="hidden bg-primary text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">
+        Uygulamayı Yükle
+      </button>
+    </div>
+  </header>
+
+  <!-- Progress Bar -->
+  <div class="bg-white shadow-sm py-3 px-6">
+    <div class="max-w-7xl mx-auto">
+      <div class="flex justify-between items-center text-sm">
+        <span id="currentLevel" class="font-bold text-primary">A1</span>
+        <div class="flex-1 mx-4 bg-gray-200 rounded-full h-3 relative overflow-hidden">
+          <div id="progressBar" class="absolute top-0 left-0 h-full bg-gradient-to-r from-primary to-secondary rounded-full transition-all duration-500" style="width: 0%"></div>
+        </div>
+        <span id="nextLevel" class="font-bold text-secondary">A2</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
+
+      <!-- Chat -->
+      <a href="modules/chat.html" class="module-card group">
+        <div class="bg-gradient-to-br from-blue-500 to-indigo-600 p-6 rounded-2xl text-white shadow-lg transform transition hover:scale-105">
+          <div class="text-4xl mb-3">Robot</div>
+          <h3 class="text-lg font-bold">AI Chat</h3>
+          <p class="text-sm opacity-90">Gerçek zamanlı konuşma</p>
+        </div>
+      </a>
+
+      <!-- Games -->
+      <a href="modules/games.html" class="module-card group">
+        <div class="bg-gradient-to-br from-green-500 to-emerald-600 p-6 rounded-2xl text-white shadow-lg transform transition hover:scale-105">
+          <div class="text-4xl mb-3">Gamepad</div>
+          <h3 class="text-lg font-bold">Oyunlar</h3>
+          <p class="text-sm opacity-90">Eğlenceli mini oyunlar</p>
+        </div>
+      </a>
+
+      <!-- Vocabulary -->
+      <a href="modules/flip-cards.html" class="module-card group">
+        <div class="bg-gradient-to-br from-purple-500 to-pink-600 p-6 rounded-2xl text-white shadow-lg transform transition hover:scale-105">
+          <div class="text-4xl mb-3">Flashcards</div>
+          <h3 class="text-lg font-bold">Kelime Kartları</h3>
+          <p class="text-sm opacity-90">Flip ile öğren</p>
+        </div>
+      </a>
+
+      <!-- Stories -->
+      <a href="modules/stories.html" class="module-card group">
+        <div class="bg-gradient-to-br from-yellow-500 to-orange-600 p-6 rounded-2xl text-white shadow-lg transform transition hover:scale-105">
+          <div class="text-4xl mb-3">Book</div>
+          <h3 class="text-lg font-bold">Hikayeler</h3>
+          <p class="text-sm opacity-90">Seviyene uygun okuma</p>
+        </div>
+      </a>
+
+      <!-- Quiz -->
+      <a href="modules/quiz.html" class="module-card group">
+        <div class="bg-gradient-to-br from-red-500 to-rose-600 p-6 rounded-2xl text-white shadow-lg transform transition hover:scale-105">
+          <div class="text-4xl mb-3">Question Mark</div>
+          <h3 class="text-lg font-bold">Quiz</h3>
+          <p class="text-sm opacity-90">Bilgini test et</p>
+        </div>
+      </a>
+
+      <!-- Sentence Builder -->
+      <a href="modules/sentence-builder.html" class="module-card group">
+        <div class="bg-gradient-to-br from-teal-500 to-cyan-600 p-6 rounded-2xl text-white shadow-lg transform transition hover:scale-105">
+          <div class="text-4xl mb-3">Puzzle</div>
+          <h3 class="text-lg font-bold">Cümle Kur</h3>
+          <p class="text-sm opacity-90">Doğru sırala</p>
+        </div>
+      </a>
+
+      <!-- Daily Sentences -->
+      <a href="modules/daily-sentences.html" class="module-card group">
+        <div class="bg-gradient-to-br from-indigo-500 to-purple-600 p-6 rounded-2xl text-white shadow-lg transform transition hover:scale-105">
+          <div class="text-4xl mb-3">Calendar</div>
+          <h3 class="text-lg font-bold">Günlük Cümle</h3>
+          <p class="text-sm opacity-90">Her gün yeni bir cümle</p>
+        </div>
+      </a>
+
+    </div>
+  </main>
+
+  <!-- Progress & Level Logic -->
+  <script>
+    const levels = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
+    let progress = JSON.parse(localStorage.getItem('englishHubProgress') || '{"level":0,"xp":0}');
+
+    function updateProgress() {
+      const levelIndex = progress.level;
+      const current = levels[levelIndex];
+      const next = levels[levelIndex + 1] || 'Tamamlandı!';
+      const xpInLevel = progress.xp % 100;
+      const percentage = xpInLevel;
+
+      document.getElementById('currentLevel').textContent = current;
+      document.getElementById('nextLevel').textContent = next;
+      document.getElementById('progressBar').style.width = percentage + '%';
+
+      localStorage.setItem('englishHubProgress', JSON.stringify(progress));
+    }
+
+    // XP Ekle (örnek: modül tamamlandığında)
+    window.addXP = function(points) {
+      progress.xp += points;
+      if (progress.xp >= (progress.level + 1) * 100) {
+        progress.level = Math.min(progress.level + 1, levels.length - 1);
+        alert(`Tebrikler! ${levels[progress.level]} seviyesine yükseldin!`);
+      }
+      updateProgress();
+    };
+
+    updateProgress();
+  </script>
+
 </body>
 </html>

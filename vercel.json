@@ -1,19 +1,11 @@
 {
   "rewrites": [
-    {
-      "source": "/modules/(.*)",
-      "destination": "/modules/$1/index.html"
-    }
+    { "source": "/modules/(.*)", "destination": "/modules/$1/index.html" }
   ],
   "headers": [
     {
       "source": "/modules/(.*)/index.html",
-      "headers": [
-        {
-          "key": "Content-Type",
-          "value": "text/html"
-        }
-      ]
+      "headers": [ { "key": "Content-Type", "value": "text/html" } ]
     }
   ]
 }

@@ -3,49 +3,63 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>English Games</title>
+  <title>Games</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="/assets/icons/icon-192.png" type="image/png">
 </head>
 <body class="bg-gradient-to-br from-indigo-50 to-purple-50 min-h-screen">
 
   <div class="container mx-auto px-4 py-8">
-    <a href="/" class="text-indigo-600 hover:underline text-sm flex items-center mb-4">
-      Back
-    </a>
+    <a href="/" class="text-indigo-600 hover:underline text-sm flex items-center mb-4">Back</a>
     <h1 class="text-3xl font-bold text-indigo-700 mb-8">English Games</h1>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <!-- Target Game -->
-      <div class="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition text-center cursor-pointer" onclick="startGame('target')">
+      <div class="bg-white p-8 rounded-2xl shadow-lg text-center cursor-pointer hover:scale-105 transition" onclick="startTargetGame()">
         <h2 class="text-2xl font-bold mb-2">Target</h2>
-        <p class="text-gray-600 mb-1">Word Guess</p>
-        <p class="text-sm text-gray-500">Guess the word from clues</p>
+        <p class="text-gray-600">Word Guess from Clues</p>
       </div>
 
-      <!-- Hanged Man -->
-      <div class="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition text-center cursor-pointer" onclick="startGame('hangman')">
+      <div class="bg-white p-8 rounded-2xl shadow-lg text-center cursor-pointer hover:scale-105 transition" onclick="startHangman()">
         <h2 class="text-2xl font-bold mb-2">Hanged Man</h2>
-        <p class="text-gray-600 mb-1">Hangman</p>
-        <p class="text-sm text-gray-500">Classic word game</p>
+        <p class="text-gray-600">Classic Hangman</p>
       </div>
     </div>
 
-    <!-- Complete Button -->
-    <button onclick="completeModule()" class="mt-12 w-full bg-green-600 text-white py-3 rounded-xl font-bold hover:bg-green-700 transition">
-      Complete Module
+    <button onclick="completeModule(25)" class="mt-12 w-full bg-green-600 text-white py-3 rounded-xl font-bold hover:bg-green-700">
+      Complete Module (+25 XP)
     </button>
   </div>
 
   <script>
-    function startGame(type) {
-      alert(`Starting ${type} game... (Demo)`);
+    function speak(text) {
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = 'en-US';
+      speechSynthesis.speak(utter);
     }
 
-    function completeModule() {
-      window.addXP(20);
-      alert("Tebrikler! Oyunlar modülü tamamlandı! +20 XP");
-      setTimeout(() => window.location.href = '/', 500);
+    function startTargetGame() {
+      speak("Guess the word: It has 5 letters and means happy.");
+      setTimeout(() => alert("Demo: Answer is 'Happy'"), 2000);
+    }
+
+    function startHangman() {
+      speak("Hangman started! Guess the word: _ _ _ _ _");
+      setTimeout(() => alert("Demo: Word is 'Hello'"), 2000);
+    }
+
+    function completeModule(xp) {
+      window.addXP(xp);
+      alert(`Tebrikler! +${xp} XP kazandın!`);
+      setTimeout(() => location.href = '/', 800);
+    }
+
+    // addXP varsa yükle
+    if (typeof window.addXP === 'undefined') {
+      window.addXP = (xp) => {
+        let p = JSON.parse(localStorage.getItem('englishHubProgress') || '{"level":0,"xp":0}');
+        p.xp += xp;
+        if (p.xp >= (p.level + 1) * 100) p.level++;
+        localStorage.setItem('englishHubProgress', JSON.stringify(p));
+      };
     }
   </script>
 </body>

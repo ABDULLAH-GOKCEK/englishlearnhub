@@ -155,35 +155,41 @@
 
   <!-- Progress & Level Logic -->
   <script>
-    const levels = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
-    let progress = JSON.parse(localStorage.getItem('englishHubProgress') || '{"level":0,"xp":0}');
+  const levels = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
+  let progress = JSON.parse(localStorage.getItem('englishHubProgress') || '{"level":0,"xp":0}');
 
-    function updateProgress() {
-      const levelIndex = progress.level;
-      const current = levels[levelIndex];
-      const next = levels[levelIndex + 1] || 'Tamamlandı!';
-      const xpInLevel = progress.xp % 100;
-      const percentage = xpInLevel;
-
-      document.getElementById('currentLevel').textContent = current;
-      document.getElementById('nextLevel').textContent = next;
-      document.getElementById('progressBar').style.width = percentage + '%';
-
-      localStorage.setItem('englishHubProgress', JSON.stringify(progress));
+  window.addXP = function(points) {
+    progress.xp += points;
+    if (progress.xp >= (progress.level + 1) * 100) {
+      progress.level = Math.min(progress.level + 1, 5);
+      alert(`Tebrikler! ${levels[progress.level]} seviyesine yükseldin!`);
     }
+    localStorage.setItem('englishHubProgress', JSON.stringify(progress));
+    if (window.updateProgress) window.updateProgress();
+  };
 
-    // XP Ekle (örnek: modül tamamlandığında)
-    window.addXP = function(points) {
-      progress.xp += points;
-      if (progress.xp >= (progress.level + 1) * 100) {
-        progress.level = Math.min(progress.level + 1, levels.length - 1);
-        alert(`Tebrikler! ${levels[progress.level]} seviyesine yükseldin!`);
-      }
-      updateProgress();
-    };
+  window.updateProgress = function() {
+    const levelIndex = progress.level;
+    const current = levels[levelIndex];
+    const next = levels[levelIndex + 1] || 'Tamamlandı!';
+    const xpInLevel = progress.xp % 100;
 
+    const currentEl = document.getElementById('currentLevel');
+    const nextEl = document.getElementById('nextLevel');
+    const barEl = document.getElementById('progressBar');
+
+    if (currentEl) currentEl.textContent = current;
+    if (nextEl) nextEl.textContent = next;
+    if (barEl) barEl.style.width = xpInLevel + '%';
+  };
+
+  // Sayfa yüklendiğinde güncelle
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', updateProgress);
+  } else {
     updateProgress();
-  </script>
+  }
+</script>
 
 </body>
 </html>

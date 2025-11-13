@@ -1,10 +1,11 @@
+# Kök dizinde oluştur
+cat > manifest.json << 'EOF'
 {
   "name": "English Learn Hub",
-  "short_name": "EngHub",
-  "description": "Learn English with AI, games, and certificates",
+  "short_name": "ELH",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#f8fafc",
+  "background_color": "#ffffff",
   "theme_color": "#4f46e5",
   "icons": [
     {
@@ -19,3 +20,4 @@
     }
   ]
 }
+EOF

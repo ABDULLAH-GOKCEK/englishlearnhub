@@ -10,11 +10,17 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Message is required' });
   }
 
+  // Token kontrolü
+  if (!process.env.HUGGINGFACE_TOKEN) {
+    console.error('HUGGINGFACE_TOKEN is missing');
+    return res.status(500).json({ reply: 'AI service not configured.' });
+  }
+
   try {
     const response = await fetch('https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.1', {
       method: 'POST',
       headers: {
-        'Authorization': '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', // BURAYA HUGGING FACE TOKENINI YAZ
+        'Authorization': `Bearer ${process.env.HUGGINGFACE_TOKEN}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -24,15 +30,22 @@ export default async function handler(req, res) {
     });
 
     const data = await response.json();
+
+    // Hata kontrolü
+    if (!response.ok) {
+      console.error('Hugging Face API error:', data);
+      return res.status(500).json({ reply: 'AI is busy. Try again!' });
+    }
+
     let reply = data[0]?.generated_text || "Sorry, I didn't understand.";
 
-    // Temizle: Kullanıcı mesajını çıkar
+    // Temizle: Kullanıcı mesajını ve gereksiz kısımları çıkar
     reply = reply.split('User:')[0].trim();
     reply = reply.replace(/Assistant:|\[INST\].*/g, '').trim();
 
     res.status(200).json({ reply });
   } catch (error) {
     console.error('AI Error:', error);
-    res.status(500).json({ reply: "I'm having trouble connecting. Try again!" });
+    res.status(500).json({ reply: "I'm having trouble. Try again!" });
   }
 }

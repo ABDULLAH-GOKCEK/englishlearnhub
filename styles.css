@@ -1,45 +1,30 @@
-/* styles.css */
+/* styles.css - Tüm uygulama için ortak CSS */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-body {
-  @apply bg-gradient-to-br from-indigo-50 to-purple-50 min-h-screen font-sans;
+@layer base {
+  body {
+    @apply bg-gradient-to-br from-indigo-50 to-purple-50 min-h-screen font-sans;
+  }
 }
 
-.flip-card {
-  perspective: 1000px;
+.chat-bubble {
+  @apply p-3 rounded-lg max-w-xs break-words;
 }
 
-.flip-card-inner {
-  transition: transform 0.6s;
-  transform-style: preserve-3d;
-  @apply relative w-full h-full;
+.chat-user {
+  @apply bg-indigo-100 text-indigo-900 ml-auto;
 }
 
-.flipped .flip-card-inner {
-  transform: rotateY(180deg);
+.chat-ai {
+  @apply bg-gray-100 text-gray-900 mr-auto;
 }
 
-.flip-card-front, .flip-card-back {
-  backface-visibility: hidden;
-  @apply absolute w-full h-full rounded-xl shadow-lg;
+.btn {
+  @apply px-4 py-2 rounded-lg font-medium transition;
 }
 
-.flip-card-back {
-  transform: rotateY(180deg);
-}
-
-.modal {
-  @apply fixed inset-0 bg-black/50 flex items-center justify-center z-50;
-}
-
-.modal-content {
-  @apply bg-white p-6 rounded-2xl shadow-2xl max-w-lg w-full m-4;
-  animation: zoomIn 0.3s ease;
-}
-
-@keyframes zoomIn {
-  from { transform: scale(0.9); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
+.btn-primary {
+  @apply bg-indigo-600 text-white hover:bg-indigo-700;
 }

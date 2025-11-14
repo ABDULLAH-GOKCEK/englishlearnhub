@@ -1,0 +1,9 @@
+# .env.local → API anahtarı gizli
+.env.local
+
+# Node.js (isteğe bağlı)
+node_modules/
+package-lock.json
+
+# Vercel cache
+.vercel

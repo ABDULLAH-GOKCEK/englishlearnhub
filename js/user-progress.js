@@ -14,29 +14,27 @@ class UserProgress {
         total.streak = this.updateStreak(total.streak);
         localStorage.setItem('userProgress', JSON.stringify(total));
 
-        // Grafik güncelle
         if (typeof ProgressCharts !== 'undefined') {
             setTimeout(() => ProgressCharts.updateAllCharts(), 100);
         }
 
-        // Dashboard güncelle
         this.updateDashboard();
+        AchievementSystem.checkAchievements(userProfile.profile);
     }
 
     static updateStreak(current) {
-        const last = localStorage.getItem('lastActivityDate');
-        const today = new Date().toISOString().split('T')[0];
-        if (!last) return 1;
-        const diff = (new Date(today) - new Date(last)) / 86400000;
+        const last = localStorage.getItem('lastActivityDate') || today;
+        localStorage.setItem('lastActivityDate', new Date().toISOString().split('T')[0]);
+        const diff = (new Date() - new Date(last)) / 86400000;
         return diff === 1 ? current + 1 : diff === 0 ? current : 1;
     }
 
     static updateDashboard() {
         const data = JSON.parse(localStorage.getItem('userProgress') || '{"totalPoints":0,"totalWords":0,"level":"A1","streak":0}');
-        document.getElementById('totalPoints')?.then(e => e.textContent = data.totalPoints);
-        document.getElementById('totalWords')?.then(e => e.textContent = data.totalWords);
-        document.getElementById('level')?.then(e => e.textContent = data.level);
-        document.getElementById('streak')?.then(e => e.textContent = data.streak);
+        ['totalPoints', 'totalWords', 'streak', 'level'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = data[id] || 0;
+        });
     }
 }
 

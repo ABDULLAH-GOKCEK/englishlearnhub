@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Kelime Öğren</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../styles.css">
+  <script src="../js/user-progress.js"></script>
+</head>
+<body>
+  <div class="container mx-auto px-4 py-8 max-w-5xl">
+    <a href="/" class="text-indigo-600 hover:underline text-sm mb-4 inline-block">Back</a>
+    <h1 class="text-3xl font-bold text-indigo-700 mb-6">Kelime Öğren</h1>
+
+    <select id="categorySelect" class="mb-6 p-2 border rounded-lg w-full md:w-auto">
+      <option value="all">Tümü</option>
+      <option value="Animals">Hayvanlar</option>
+      <option value="Foods">Yiyecekler</option>
+      <option value="Vehicles">Araçlar</option>
+    </select>
+
+    <div id="wordsContainer" class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8"></div>
+
+    <button onclick="completeModule()" class="w-full bg-green-600 text-white py-3 rounded-xl font-bold text-lg">
+      Tamamla (+50 XP)
+    </button>
+  </div>
+
+  <script src="../js/modules/teaching.js"></script>
+</body>
+</html>

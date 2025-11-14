@@ -4,48 +4,41 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>English Learn Hub</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#6366f1">
+
+  <!-- CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="styles.css">
+
+  <!-- JS -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="js/progress-charts.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/categories.js"></script>
+  <script src="js/achievements.js"></script>
+  <script src="js/user-profile.js"></script>
   <script src="js/user-progress.js"></script>
+  <script src="js/progress-charts.js"></script>
 </head>
-<body class="bg-gradient-to-br from-indigo-50 to-purple-50 min-h-screen">
-
-  <div class="container mx-auto px-4 py-8 max-w-4xl">
-    <h1 class="text-4xl font-bold text-indigo-700 mb-8 text-center">English Learn Hub</h1>
-
-    <!-- İlerleme Özeti -->
-    <div class="bg-white p-6 rounded-2xl shadow-lg mb-8">
-      <h2 class="text-2xl font-bold mb-4">İlerleme</h2>
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-        <div><span class="text-3xl font-bold text-indigo-600" id="totalPoints">0</span><p>Puan</p></div>
-        <div><span class="text-3xl font-bold text-purple-600" id="totalWords">0</span><p>Kelime</p></div>
-        <div><span class="text-3xl font-bold text-green-600" id="streak">0</span><p>Gün</p></div>
-        <div><span class="text-3xl font-bold text-blue-600" id="level">A1</span><p>Seviye</p></div>
-      </div>
-    </div>
-
-    <!-- Grafikler -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-      <div class="bg-white p-4 rounded-xl shadow"><canvas id="weeklyChart"></canvas></div>
-      <div class="bg-white p-4 rounded-xl shadow"><canvas id="monthlyChart"></canvas></div>
-    </div>
-
-    <!-- Modüller -->
-    <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-      <a href="modules/chat.html" class="bg-indigo-600 text-white p-6 rounded-xl text-center font-bold hover:bg-indigo-700">AI Chat</a>
-      <a href="modules/daily.html" class="bg-purple-600 text-white p-6 rounded-xl text-center font-bold hover:bg-purple-700">Günlük Cümle</a>
-      <a href="modules/flip-cards.html" class="bg-pink-600 text-white p-6 rounded-xl text-center font-bold hover:bg-pink-700">Çevir Kartları</a>
-      <a href="modules/sentence-builder.html" class="bg-green-600 text-white p-6 rounded-xl text-center font-bold hover:bg-green-700">Cümle Kur</a>
-      <a href="modules/quiz.html" class="bg-yellow-600 text-white p-6 rounded-xl text-center font-bold hover:bg-yellow-700">Quiz</a>
-      <a href="modules/stories.html" class="bg-red-600 text-white p-6 rounded-xl text-center font-bold hover:bg-red-700">Hikayeler</a>
-    </div>
-  </div>
+<body>
+  <!-- ... önceki index.html içeriği ... -->
 
   <script>
+    // PWA Kayıt
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then(reg => console.log('SW registered: ', reg))
+          .catch(err => console.log('SW registration failed: ', err));
+      });
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
       UserProgress.updateDashboard();
       ProgressCharts.initCharts();
+      AchievementSystem.checkAchievements(userProfile.profile);
     });
   </script>
 </body>

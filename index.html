@@ -1,195 +1,52 @@
 <!DOCTYPE html>
-<html lang="tr" class="scroll-smooth">
+<html lang="tr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>English Learn Hub</title>
-  <meta name="description" content="A1-C2 İngilizce öğrenme uygulaması. AI Chat, Oyunlar, Hikayeler, Quiz ve daha fazlası!">
-  
-  <!-- PWA -->
-  <link rel="manifest" href="/manifest.json">
-  <link rel="icon" href="/assets/icons/icon-192.png" type="image/png">
-  <link rel="apple-touch-icon" href="/assets/icons/icon-192.png">
-  <meta name="theme-color" content="#4f46e5">
-
-  <!-- Tailwind CSS (CDN - Production için PostCSS önerilir) -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            primary: '#4f46e5',
-            secondary: '#818cf8',
-          }
-        }
-      }
-    }
-  </script>
-
-  <!-- PWA Install Button -->
-  <script>
-    let deferredPrompt;
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      document.getElementById('installButton').classList.remove('hidden');
-    });
-
-    function installPWA() {
-      if (deferredPrompt) {
-        deferredPrompt.prompt();
-        deferredPrompt.userChoice.then(() => {
-          document.getElementById('installButton').classList.add('hidden');
-          deferredPrompt = null;
-        });
-      }
-    }
-
-    // Service Worker
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js');
-      });
-    }
-  </script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="js/progress-charts.js"></script>
+  <script src="js/user-progress.js"></script>
 </head>
+<body class="bg-gradient-to-br from-indigo-50 to-purple-50 min-h-screen">
 
-<body class="bg-gradient-to-br from-indigo-50 to-purple-50 min-h-screen font-sans">
+  <div class="container mx-auto px-4 py-8 max-w-4xl">
+    <h1 class="text-4xl font-bold text-indigo-700 mb-8 text-center">English Learn Hub</h1>
 
-  <!-- Header -->
-  <header class="bg-white shadow-lg sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-      <div class="flex items-center space-x-3">
-        <img src="/assets/icons/icon-192.png" alt="ELH" class="w-10 h-10 rounded-lg">
-        <h1 class="text-2xl font-bold text-primary">English Learn Hub</h1>
+    <!-- İlerleme Özeti -->
+    <div class="bg-white p-6 rounded-2xl shadow-lg mb-8">
+      <h2 class="text-2xl font-bold mb-4">İlerleme</h2>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+        <div><span class="text-3xl font-bold text-indigo-600" id="totalPoints">0</span><p>Puan</p></div>
+        <div><span class="text-3xl font-bold text-purple-600" id="totalWords">0</span><p>Kelime</p></div>
+        <div><span class="text-3xl font-bold text-green-600" id="streak">0</span><p>Gün</p></div>
+        <div><span class="text-3xl font-bold text-blue-600" id="level">A1</span><p>Seviye</p></div>
       </div>
-      <button id="installButton" onclick="installPWA()" class="hidden bg-primary text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">
-        Uygulamayı Yükle
-      </button>
     </div>
-  </header>
 
-  <!-- Progress Bar -->
-  <div class="bg-white shadow-sm py-3 px-6">
-    <div class="max-w-7xl mx-auto">
-      <div class="flex justify-between items-center text-sm">
-        <span id="currentLevel" class="font-bold text-primary">A1</span>
-        <div class="flex-1 mx-4 bg-gray-200 rounded-full h-3 relative overflow-hidden">
-          <div id="progressBar" class="absolute top-0 left-0 h-full bg-gradient-to-r from-primary to-secondary rounded-full transition-all duration-500" style="width: 0%"></div>
-        </div>
-        <span id="nextLevel" class="font-bold text-secondary">A2</span>
-      </div>
+    <!-- Grafikler -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+      <div class="bg-white p-4 rounded-xl shadow"><canvas id="weeklyChart"></canvas></div>
+      <div class="bg-white p-4 rounded-xl shadow"><canvas id="monthlyChart"></canvas></div>
+    </div>
+
+    <!-- Modüller -->
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+      <a href="modules/chat.html" class="bg-indigo-600 text-white p-6 rounded-xl text-center font-bold hover:bg-indigo-700">AI Chat</a>
+      <a href="modules/daily.html" class="bg-purple-600 text-white p-6 rounded-xl text-center font-bold hover:bg-purple-700">Günlük Cümle</a>
+      <a href="modules/flip-cards.html" class="bg-pink-600 text-white p-6 rounded-xl text-center font-bold hover:bg-pink-700">Çevir Kartları</a>
+      <a href="modules/sentence-builder.html" class="bg-green-600 text-white p-6 rounded-xl text-center font-bold hover:bg-green-700">Cümle Kur</a>
+      <a href="modules/quiz.html" class="bg-yellow-600 text-white p-6 rounded-xl text-center font-bold hover:bg-yellow-700">Quiz</a>
+      <a href="modules/stories.html" class="bg-red-600 text-white p-6 rounded-xl text-center font-bold hover:bg-red-700">Hikayeler</a>
     </div>
   </div>
 
-  <!-- Main Content -->
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
-
-      <!-- Chat -->
-      <a href="modules/chat.html" class="module-card group">
-        <div class="bg-gradient-to-br from-blue-500 to-indigo-600 p-6 rounded-2xl text-white shadow-lg transform transition hover:scale-105">
-          <div class="text-4xl mb-3">Robot</div>
-          <h3 class="text-lg font-bold">AI Chat</h3>
-          <p class="text-sm opacity-90">Gerçek zamanlı konuşma</p>
-        </div>
-      </a>
-
-      <!-- Games -->
-      <a href="modules/games.html" class="module-card group">
-        <div class="bg-gradient-to-br from-green-500 to-emerald-600 p-6 rounded-2xl text-white shadow-lg transform transition hover:scale-105">
-          <div class="text-4xl mb-3">Gamepad</div>
-          <h3 class="text-lg font-bold">Oyunlar</h3>
-          <p class="text-sm opacity-90">Eğlenceli mini oyunlar</p>
-        </div>
-      </a>
-
-      <!-- Vocabulary -->
-      <a href="modules/flip-cards.html" class="module-card group">
-        <div class="bg-gradient-to-br from-purple-500 to-pink-600 p-6 rounded-2xl text-white shadow-lg transform transition hover:scale-105">
-          <div class="text-4xl mb-3">Flashcards</div>
-          <h3 class="text-lg font-bold">Kelime Kartları</h3>
-          <p class="text-sm opacity-90">Flip ile öğren</p>
-        </div>
-      </a>
-
-      <!-- Stories -->
-      <a href="modules/stories.html" class="module-card group">
-        <div class="bg-gradient-to-br from-yellow-500 to-orange-600 p-6 rounded-2xl text-white shadow-lg transform transition hover:scale-105">
-          <div class="text-4xl mb-3">Book</div>
-          <h3 class="text-lg font-bold">Hikayeler</h3>
-          <p class="text-sm opacity-90">Seviyene uygun okuma</p>
-        </div>
-      </a>
-
-      <!-- Quiz -->
-      <a href="modules/quiz.html" class="module-card group">
-        <div class="bg-gradient-to-br from-red-500 to-rose-600 p-6 rounded-2xl text-white shadow-lg transform transition hover:scale-105">
-          <div class="text-4xl mb-3">Question Mark</div>
-          <h3 class="text-lg font-bold">Quiz</h3>
-          <p class="text-sm opacity-90">Bilgini test et</p>
-        </div>
-      </a>
-
-      <!-- Sentence Builder -->
-      <a href="modules/sentence-builder.html" class="module-card group">
-        <div class="bg-gradient-to-br from-teal-500 to-cyan-600 p-6 rounded-2xl text-white shadow-lg transform transition hover:scale-105">
-          <div class="text-4xl mb-3">Puzzle</div>
-          <h3 class="text-lg font-bold">Cümle Kur</h3>
-          <p class="text-sm opacity-90">Doğru sırala</p>
-        </div>
-      </a>
-
-      <!-- Daily Sentences -->
-      <a href="modules/daily-sentences.html" class="module-card group">
-        <div class="bg-gradient-to-br from-indigo-500 to-purple-600 p-6 rounded-2xl text-white shadow-lg transform transition hover:scale-105">
-          <div class="text-4xl mb-3">Calendar</div>
-          <h3 class="text-lg font-bold">Günlük Cümle</h3>
-          <p class="text-sm opacity-90">Her gün yeni bir cümle</p>
-        </div>
-      </a>
-
-    </div>
-  </main>
-
-  <!-- Progress & Level Logic -->
   <script>
-  const levels = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
-  let progress = JSON.parse(localStorage.getItem('englishHubProgress') || '{"level":0,"xp":0}');
-
-  window.addXP = function(points) {
-    progress.xp += points;
-    if (progress.xp >= (progress.level + 1) * 100) {
-      progress.level = Math.min(progress.level + 1, 5);
-      alert(`Tebrikler! ${levels[progress.level]} seviyesine yükseldin!`);
-    }
-    localStorage.setItem('englishHubProgress', JSON.stringify(progress));
-    if (window.updateProgress) window.updateProgress();
-  };
-
-  window.updateProgress = function() {
-    const levelIndex = progress.level;
-    const current = levels[levelIndex];
-    const next = levels[levelIndex + 1] || 'Tamamlandı!';
-    const xpInLevel = progress.xp % 100;
-
-    const currentEl = document.getElementById('currentLevel');
-    const nextEl = document.getElementById('nextLevel');
-    const barEl = document.getElementById('progressBar');
-
-    if (currentEl) currentEl.textContent = current;
-    if (nextEl) nextEl.textContent = next;
-    if (barEl) barEl.style.width = xpInLevel + '%';
-  };
-
-  // Sayfa yüklendiğinde güncelle
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', updateProgress);
-  } else {
-    updateProgress();
-  }
-</script>
-
+    document.addEventListener('DOMContentLoaded', () => {
+      UserProgress.updateDashboard();
+      ProgressCharts.initCharts();
+    });
+  </script>
 </body>
 </html>

@@ -1,82 +1,44 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="tr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Flip Cards</title>
+  <title>Çevir Kartları</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="../../js/user-progress.js"></script>
+  <style>
+    .flip-card { perspective: 1000px; width: 180px; height: 240px; }
+    .flip-card-inner { transition: transform 0.6s; transform-style: preserve-3d; }
+    .flipped { transform: rotateY(180deg); }
+    .flip-card-front, .flip-card-back { backface-visibility: hidden; position: absolute; width: 100%; height: 100%; }
+    .flip-card-back { transform: rotateY(180deg); }
+  </style>
 </head>
 <body class="bg-gradient-to-br from-indigo-50 to-purple-50 min-h-screen">
+  <div class="container mx-auto px-4 py-8 max-w-5xl">
+    <a href="/" class="text-indigo-600 hover:underline text-sm mb-4 inline-block">Back</a>
+    <h1 class="text-3xl font-bold text-indigo-700 mb-6">Çevir Kartları</h1>
 
-  <div class="container mx-auto px-4 py-8">
-    <a href="/" class="text-indigo-600 hover:underline text-sm flex items-center mb-4">Back</a>
-    <h1 class="text-3xl font-bold text-indigo-700 mb-6">Kelime Kartları</h1>
+    <select id="categorySelect" class="mb-6 p-2 border rounded-lg">
+      <option value="all">Tümü</option>
+      <option value="Animals">Hayvanlar</option>
+      <option value="Foods">Yiyecekler</option>
+    </select>
 
-    <div class="grid grid-cols-2 gap-4" id="cards">
-      <!-- JS ile doldurulacak -->
-    </div>
+    <div id="flashcardsContainer" class="grid grid-cols-2 md:grid-cols-4 gap-6"></div>
 
-    <button onclick="completeModule(20)" class="mt-8 w-full bg-green-600 text-white py-3 rounded-xl font-bold hover:bg-green-700">
-      Complete Module (+20 XP)
+    <button onclick="complete()" class="mt-8 w-full bg-green-600 text-white py-3 rounded-xl font-bold">
+      Tamamla (+30 XP)
     </button>
   </div>
 
+  <script src="../../js/modules/flip-cards.js"></script>
   <script>
-    const words = [
-      { en: "Hello", tr: "Merhaba", img: "https://via.placeholder.com/150?text=Hello" },
-      { en: "Dog", tr: "Köpek", img: "https://via.placeholder.com/150?text=Dog" },
-      { en: "Cat", tr: "Kedi", img: "https://via.placeholder.com/150?text=Cat" },
-      { en: "House", tr: "Ev", img: "https://via.placeholder.com/150?text=House" }
-    ];
-
-    function speak(text) {
-      const utter = new SpeechSynthesisUtterance(text);
-      utter.lang = 'en-US';
-      speechSynthesis.speak(utter);
-    }
-
-    function createCard(word) {
-      const div = document.createElement('div');
-      div.className = 'flip-card cursor-pointer';
-      div.onclick = () => {
-        div.classList.toggle('flipped');
-        speak(word.en);
-      };
-      div.innerHTML = `
-        <div class="flip-card-inner relative w-full h-40 preserve-3d transition-transform duration-500">
-          <div class="flip-card-front absolute inset-0 backface-hidden bg-gradient-to-br from-purple-500 to-pink-600 flex flex-col items-center justify-center rounded-2xl p-4">
-            <img src="${word.img}" class="w-16 h-16 mb-2 rounded">
-            <p class="text-white text-xl font-bold">${word.en}</p>
-          </div>
-          <div class="flip-card-back absolute inset-0 backface-hidden bg-white flex items-center justify-center rounded-2xl p-4">
-            <p class="text-gray-800 text-xl font-bold text-center">${word.tr}</p>
-          </div>
-        </div>
-      `;
-      return div;
-    }
-
-    words.forEach(w => document.getElementById('cards').appendChild(createCard(w)));
-
-    function completeModule(xp) {
-      window.addXP(xp);
-      alert(`+${xp} XP!`);
+    function complete() {
+      UserProgress.update(30, 5);
+      alert('+30 XP kazandın!');
       setTimeout(() => location.href = '/', 800);
     }
-
-    if (typeof window.addXP === 'undefined') {
-      window.addXP = (xp) => {
-        let p = JSON.parse(localStorage.getItem('englishHubProgress') || '{"level":0,"xp":0}');
-        p.xp += xp;
-        localStorage.setItem('englishHubProgress', JSON.stringify(p));
-      };
-    }
   </script>
-
-  <style>
-    .preserve-3d { transform-style: preserve-3d; }
-    .backface-hidden { backface-visibility: hidden; }
-    .flipped .flip-card-inner { transform: rotateY(180deg); }
-  </style>
 </body>
 </html>

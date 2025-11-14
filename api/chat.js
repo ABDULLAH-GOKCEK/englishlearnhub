@@ -15,18 +15,19 @@ export default async function handler(req, res) {
             body: JSON.stringify({
                 model: 'grok-beta',
                 messages: [
-                    { role: 'system', content: `You are a friendly English teacher for ${level} level. Keep answers short and simple.` },
+                    { role: 'system', content: `You are a helpful English teacher for ${level} level. Answer in Turkish if user asks in Turkish. Keep it short.` },
                     { role: 'user', content: message }
                 ],
-                max_tokens: 80
+                max_tokens: 100
             })
         });
 
         const data = await response.json();
-        const reply = data.choices?.[0]?.message?.content?.trim() || "Anlamadım.";
+        const reply = data.choices?.[0]?.message?.content?.trim() || "Anlamadım, tekrar dene.";
 
         res.status(200).json({ reply });
     } catch (error) {
-        res.status(500).json({ reply: 'AI meşgul, tekrar dene!' });
+        console.error(error);
+        res.status(500).json({ reply: 'AI meşgul, lütfen bekle.' });
     }
 }

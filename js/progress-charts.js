@@ -1,56 +1,68 @@
-// progress-charts.js
+// js/progress-charts.js
 class ProgressCharts {
     static charts = {};
 
     static initCharts() {
         this.initWeeklyChart();
         this.initMonthlyChart();
-        this.initStatsChart();
-        this.initAchievementsGrid();
     }
 
     static initWeeklyChart() {
         const ctx = document.getElementById('weeklyChart');
         if (!ctx) return;
 
-        const weeklyStats = this.getWeeklyStats();
-        const labels = weeklyStats.map(day => new Date(day.date).toLocaleDateString('tr-TR', { weekday: 'short' }));
-        const pointsData = weeklyStats.map(day => day.points);
-        const wordsData = weeklyStats.map(day => day.words);
+        const labels = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'];
+        const data = this.getLast7Days();
 
-        if (this.charts.weeklyChart) this.charts.weeklyChart.destroy();
-
-        this.charts.weeklyChart = new Chart(ctx, {
+        if (this.charts.weekly) this.charts.weekly.destroy();
+        this.charts.weekly = new Chart(ctx, {
             type: 'line',
-            data: { labels, datasets: [
-                { label: 'Puan', data: pointsData, borderColor: '#667eea', backgroundColor: 'rgba(102, 126, 234, 0.1)', fill: true },
-                { label: 'Kelime', data: wordsData, borderColor: '#f093fb', backgroundColor: 'rgba(240, 147, 251, 0.1)', fill: true }
-            ]},
-            options: { responsive: true, plugins: { title: { display: true, text: 'Haftalık İlerleme' }}}
+            data: { labels, datasets: [{ label: 'Puan', data, borderColor: '#6366f1', fill: true }] },
+            options: { responsive: true, plugins: { title: { display: true, text: 'Haftalık' }}}
         });
     }
 
-    static getWeeklyStats() {
-        const today = new Date();
-        const stats = [];
+    static initMonthlyChart() {
+        const ctx = document.getElementById('monthlyChart');
+        if (!ctx) return;
+
+        const labels = Array.from({length: 30}, (_, i) => i + 1);
+        const data = this.getLast30Days();
+
+        if (this.charts.monthly) this.charts.monthly.destroy();
+        this.charts.monthly = new Chart(ctx, {
+            type: 'bar',
+            data: { labels, datasets: [{ label: 'Kelime', data, backgroundColor: '#8b5cf6' }] },
+            options: { responsive: true, plugins: { title: { display: true, text: 'Aylık' }}}
+        });
+    }
+
+    static getLast7Days() {
+        const data = [];
         for (let i = 6; i >= 0; i--) {
-            const date = new Date(today);
-            date.setDate(today.getDate() - i);
-            const dateStr = date.toISOString().split('T')[0];
-            const dayData = JSON.parse(localStorage.getItem(`activity_${dateStr}`) || '{"points":0,"words":0}');
-            stats.push({ date: dateStr, points: dayData.points || 0, words: dayData.words || 0 });
+            const date = new Date();
+            date.setDate(date.getDate() - i);
+            const key = `activity_${date.toISOString().split('T')[0]}`;
+            const day = JSON.parse(localStorage.getItem(key) || '{"points":0}');
+            data.push(day.points || 0);
         }
-        return stats;
+        return data;
     }
 
-    static updateAllCharts() {
-        this.destroyAllCharts();
+    static getLast30Days() {
+        const data = [];
+        for (let i = 29; i >= 0; i--) {
+            const date = new Date();
+            date.setDate(date.getDate() - i);
+            const key = `activity_${date.toISOString().split('T')[0]}`;
+            const day = JSON.parse(localStorage.getItem(key) || '{"words":0}');
+            data.push(day.words || 0);
+        }
+        return data;
+    }
+
+    static updateAll() {
         this.initCharts();
-    }
-
-    static destroyAllCharts() {
-        Object.values(this.charts).forEach(chart => chart?.destroy());
-        this.charts = {};
     }
 }
 

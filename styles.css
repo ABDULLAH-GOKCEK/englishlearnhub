@@ -1,0 +1,88 @@
+/* styles.css - Tüm proje için ortak CSS */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    font-family: 'Poppins', sans-serif;
+    @apply bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen;
+  }
+}
+
+.flip-card {
+  perspective: 1000px;
+}
+
+.flip-card-inner {
+  transition: transform 0.6s;
+  transform-style: preserve-3d;
+  @apply relative w-full h-full;
+}
+
+.flipped .flip-card-inner {
+  transform: rotateY(180deg);
+}
+
+.flip-card-front, .flip-card-back {
+  backface-visibility: hidden;
+  @apply absolute w-full h-full rounded-xl shadow-lg;
+}
+
+.flip-card-back {
+  transform: rotateY(180deg);
+}
+
+.card-hover:hover {
+  @apply scale-105 shadow-xl;
+}
+
+/* Responsive Kart Boyutları */
+@screen md {
+  .word-card {
+    @apply w-48 h-64;
+  }
+}
+
+@screen lg {
+  .word-card {
+    @apply w-56 h-72;
+  }
+}
+
+/* Modal CSS */
+.modal {
+  @apply fixed inset-0 bg-black/50 flex items-center justify-center z-50;
+}
+
+.modal-content {
+  @apply bg-white p-6 rounded-2xl shadow-2xl max-w-2xl w-full m-4;
+  animation: zoomIn 0.3s ease;
+}
+
+@keyframes zoomIn {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+/* Butonlar */
+.btn {
+  @apply px-4 py-2 rounded-lg font-medium transition;
+}
+
+.btn-primary {
+  @apply bg-indigo-600 text-white hover:bg-indigo-700;
+}
+
+.btn-success {
+  @apply bg-green-600 text-white hover:bg-green-700;
+}
+
+/* Feedback */
+.feedback-success {
+  @apply text-green-600 font-bold;
+}
+
+.feedback-error {
+  @apply text-red-600 font-bold;
+}

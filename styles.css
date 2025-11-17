@@ -1,4 +1,4 @@
-/* styles.css - Tüm uygulama için ortak CSS */
+/* styles.css – 17 Kasım 2025 */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -9,22 +9,24 @@
   }
 }
 
+.module-card {
+  transition: all 0.3s ease;
+}
+.module-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
 .chat-bubble {
-  @apply p-3 rounded-lg max-w-xs break-words;
+  @apply p-4 rounded-2xl max-w-xs break-words shadow;
 }
-
 .chat-user {
-  @apply bg-indigo-100 text-indigo-900 ml-auto;
+  @apply bg-indigo-600 text-white ml-auto;
 }
-
 .chat-ai {
-  @apply bg-gray-100 text-gray-900 mr-auto;
-}
-
-.btn {
-  @apply px-4 py-2 rounded-lg font-medium transition;
+  @apply bg-gray-200 text-gray-900 mr-auto;
 }
 
 .btn-primary {
-  @apply bg-indigo-600 text-white hover:bg-indigo-700;
+  @apply bg-indigo-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-indigo-700 transition;
 }

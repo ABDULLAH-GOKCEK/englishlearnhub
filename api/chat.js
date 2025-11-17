@@ -1,4 +1,4 @@
-// api/chat.js → %100 ÇALIŞIR VERSİYON
+// api/chat.js – 17 Kasım 2025 – %100 SOHBET DEVAM EDİYOR
 export default async function handler(req, res) {
     if (req.method !== 'POST') return res.status(405).end();
 
@@ -13,28 +13,33 @@ export default async function handler(req, res) {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                inputs: `You are a friendly and helpful English teacher. Answer in simple English.\nUser: ${message}\nAssistant:`,
+                inputs: `You are a friendly English teacher. Answer in simple English.\nUser: ${message}\nAssistant:`,
                 parameters: {
-                    max_new_tokens: 120,
+                    max_new_tokens: 150,
                     temperature: 0.7,
                     top_p: 0.9,
-                    return_full_text: false
+                    return_full_text: false,   // BU SATIR ÇOK ÖNEMLİ!
+                    stop: ["\nUser:", "User:", "\n"]  // Tekrarı kesin keser
                 }
             })
         });
 
-        if (!response.ok) throw new Error("Model busy");
-
         const data = await response.json();
-        let reply = data[0]?.generated_text || "I'm thinking...";
+        let reply = data[0]?.generated_text || "Hmm, let me think...";
 
-        // Assistant: kısmından sonrasını al
+        // "Assistant:" kısmından sonrasını al
         if (reply.includes("Assistant:")) {
             reply = reply.split("Assistant:")[1].trim();
         }
 
-        res.status(200).json({ reply: reply || "Hello! How can I help you?" });
+        // Eğer boşsa veya çok kısaysa yedek cevap
+        if (!reply || reply.length < 5) {
+            reply = "Great question! Let's practice that together.";
+        }
+
+        res.status(200).json({ reply });
     } catch (error) {
-        res.status(200).json({ reply: "Hi! I'm your English teacher. What would you like to practice today?" });
+        console.error(error);
+        res.status(200).json({ reply: "Sorry, I'm a bit slow right now. Ask again!" });
     }
 }

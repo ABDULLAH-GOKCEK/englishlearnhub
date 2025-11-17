@@ -3,8 +3,8 @@ export default async function handler(req, res) {
     if (req.method !== 'POST') return res.status(405).end();
 
     const apiKey = process.env.GROK_API_KEY;
-    if (!apiKey) {
-        console.error('GROK_API_KEY eksik!');
+    if (!apiKey || apiKey.trim() === '') {
+        console.error('GROK_API_KEY eksik veya boş!');
         return res.status(500).json({ reply: 'API key eksik.' });
     }
 
@@ -14,7 +14,7 @@ export default async function handler(req, res) {
         const response = await fetch('https://api.x.ai/v1/chat/completions', {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${apiKey}`,
+                'Authorization': `Bearer ${apiKey.trim()}`,
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({

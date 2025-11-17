@@ -3,6 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  
+  <!-- KALICI CACHE ÖNLEYİCİ (Artık ilk açışta hep en güncel gelir!) -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+
   <title>English Learn Hub</title>
 
   <!-- PWA -->
@@ -10,20 +16,20 @@
   <meta name="theme-color" content="#6366f1">
   <link rel="apple-touch-icon" href="/images/icons/icon-192x192.png">
 
-  <!-- CSS -->
+  <!-- Tailwind CDN + Güncel styles.css (v=25 → her güncelleme +1 yap) -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/styles.css?v=25">
 
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <!-- JS -->
-  <script src="/js/common.js"></script>
-  <script src="/js/categories.js"></script>
-  <script src="/js/achievements.js"></script>
-  <script src="/js/user-profile.js"></script>
-  <script src="/js/user-progress.js"></script>
-  <script src="/js/progress-charts.js"></script>
+  <!-- Tüm JS dosyaları (versiyonlu) -->
+  <script src="/js/common.js?v=25"></script>
+  <script src="/js/categories.js?v=25"></script>
+  <script src="/js/achievements.js?v=25"></script>
+  <script src="/js/user-profile.js?v=25"></script>
+  <script src="/js/user-progress.js?v=25"></script>
+  <script src="/js/progress-charts.js?v=25"></script>
 </head>
 <body class="bg-gradient-to-br from-indigo-50 to-purple-50 min-h-screen">
 
@@ -32,59 +38,59 @@
 
     <!-- İlerleme Özeti -->
     <div class="bg-white p-6 rounded-2xl shadow-lg mb-8">
-      <h2 class="text-2xl font-bold mb-4">İlerleme</h2>
+      <h2 class="text-2xl font-bold mb-4 text-gray-800">İlerleme</h2>
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-        <div><span class="text-3xl font-bold text-indigo-600" id="totalPoints">0</span><p>Puan</p></div>
-        <div><span class="text-3xl font-bold text-purple-600" id="totalWords">0</span><p>Kelime</p></div>
-        <div><span class="text-3xl font-bold text-green-600" id="streak">0</span><p>Gün</p></div>
-        <div><span class="text-3xl font-bold text-blue-600" id="level">A1</span><p>Seviye</p></div>
+        <div><span class="text-3xl font-bold text-indigo-600" id="totalPoints">0</span><p class="text-sm">Puan</p></div>
+        <div><span class="text-3xl font-bold text-purple-600" id="totalWords">0</span><p class="text-sm">Kelime</p></div>
+        <div><span class="text-3xl font-bold text-green-600" id="streak">0</span><p class="text-sm">Gün</p></div>
+        <div><span class="text-3xl font-bold text-blue-600" id="level">A1</span><p class="text-sm">Seviye</p></div>
       </div>
     </div>
 
     <!-- Grafikler -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-      <div class="bg-white p-4 rounded-xl shadow"><canvas id="weeklyChart"></canvas></div>
-      <div class="bg-white p-4 rounded-xl shadow"><canvas id="monthlyChart"></canvas></div>
+      <div class="bg-white p-6 rounded-2xl shadow-lg"><canvas id="weeklyChart"></canvas></div>
+      <div class="bg-white p-6 rounded-2xl shadow-lg"><canvas id="monthlyChart"></canvas></div>
     </div>
 
     <!-- Modüller -->
     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-      <a href="/modules/chat.html" class="module-card bg-white p-6 rounded-xl shadow hover:shadow-xl card-hover text-center">
-        <div class="text-4xl mb-3">🤖</div>
-        <h3 class="font-semibold">AI Chat</h3>
+      <a href="/modules/chat.html" class="module-card bg-white p-8 rounded-2xl shadow hover:shadow-2xl transition text-center">
+        <div class="text-5xl mb-4">AI Chat</div>
+        <h3 class="font-bold text-lg">AI Chat</h3>
       </a>
-      <a href="/modules/daily-sentences.html" class="module-card bg-white p-6 rounded-xl shadow hover:shadow-xl card-hover text-center">
-        <div class="text-4xl mb-3">📅</div>
-        <h3 class="font-semibold">Günlük Cümle</h3>
+      <a href="/modules/daily-sentences.html" class="module-card bg-white p-8 rounded-2xl shadow hover:shadow-2xl transition text-center">
+        <div class="text-5xl mb-4">Günlük Cümle</div>
+        <h3 class="font-bold text-lg">Günlük Cümle</h3>
       </a>
-      <a href="/modules/flip-cards.html" class="module-card bg-white p-6 rounded-xl shadow hover:shadow-xl card-hover text-center">
-        <div class="text-4xl mb-3">🔄</div>
-        <h3 class="font-semibold">Çevir Kartları</h3>
+      <a href="/modules/flip-cards.html" class="module-card bg-white p-8 rounded-2xl shadow hover:shadow-2xl transition text-center">
+        <div class="text-5xl mb-4">Çevir Kartları</div>
+        <h3 class="font-bold text-lg">Çevir Kartları</h3>
       </a>
-      <a href="/modules/teaching.html" class="module-card bg-white p-6 rounded-xl shadow hover:shadow-xl card-hover text-center">
-        <div class="text-4xl mb-3">📚</div>
-        <h3 class="font-semibold">Kelime Öğren</h3>
+      <a href="/modules/teaching.html" class="module-card bg-white p-8 rounded-2xl shadow hover:shadow-2xl transition text-center">
+        <div class="text-5xl mb-4">Kelime Öğren</div>
+        <h3 class="font-bold text-lg">Kelime Öğren</h3>
       </a>
-      <a href="/modules/sentence-builder.html" class="module-card bg-white p-6 rounded-xl shadow hover:shadow-xl card-hover text-center">
-        <div class="text-4xl mb-3">🔨</div>
-        <h3 class="font-semibold">Cümle Kur</h3>
+      <a href="/modules/sentence-builder.html" class="module-card bg-white p-8 rounded-2xl shadow hover:shadow-2xl transition text-center">
+        <div class="text-5xl mb-4">Cümle Kur</div>
+        <h3 class="font-bold text-lg">Cümle Kur</h3>
       </a>
-      <a href="/modules/quiz.html" class="module-card bg-white p-6 rounded-xl shadow hover:shadow-xl card-hover text-center">
-        <div class="text-4xl mb-3">❓</div>
-        <h3 class="font-semibold">Quiz</h3>
+      <a href="/modules/quiz.html" class="module-card bg-white p-8 rounded-2xl shadow hover:shadow-2xl transition text-center">
+        <div class="text-5xl mb-4">Quiz</div>
+        <h3 class="font-bold text-lg">Quiz</h3>
       </a>
-      <a href="/modules/stories.html" class="module-card bg-white p-6 rounded-xl shadow hover:shadow-xl card-hover text-center">
-        <div class="text-4xl mb-3">📖</div>
-        <h3 class="font-semibold">Hikayeler</h3>
+      <a href="/modules/stories.html" class="module-card bg-white p-8 rounded-2xl shadow hover:shadow-2xl transition text-center">
+        <div class="text-5xl mb-4">Hikayeler</div>
+        <h3 class="font-bold text-lg">Hikayeler</h3>
       </a>
-      <a href="/modules/games.html" class="module-card bg-white p-6 rounded-xl shadow hover:shadow-xl card-hover text-center">
-        <div class="text-4xl mb-3">🎮</div>
-        <h3 class="font-semibold">Oyunlar</h3>
+      <a href="/modules/games.html" class="module-card bg-white p-8 rounded-2xl shadow hover:shadow-2xl transition text-center">
+        <div class="text-5xl mb-4">Oyunlar</div>
+        <h3 class="font-bold text-lg">Oyunlar</h3>
       </a>
     </div>
   </div>
 
-  <!-- PWA Kayıt -->
+  <!-- Service Worker (PWA) -->
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
@@ -93,7 +99,7 @@
     }
   </script>
 
-  <!-- Başlatma -->
+  <!-- Sayfa yüklendiğinde grafikleri ve ilerlemeyi başlat -->
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       UserProgress.updateDashboard();

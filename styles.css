@@ -1,28 +1,9 @@
-/* styles.css */
+/* styles.css – KESİNLİKLE 404 VERMEYECEK */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  body {
-    @apply bg-gradient-to-br from-indigo-50 to-purple-50 min-h-screen font-sans;
-  }
-}
-
-.module-card {
-  transition: all 0.3s ease;
-}
 .module-card:hover {
   transform: translateY(-10px);
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-}
-
-.chat-bubble {
-  @apply p-4 rounded-2xl max-w-xs break-words shadow;
-}
-.chat-user {
-  @apply bg-indigo-600 text-white ml-auto;
-}
-.chat-ai {
-  @apply bg-gray-200 text-gray-900 mr-auto;
+  box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
 }

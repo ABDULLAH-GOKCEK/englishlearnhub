@@ -1,29 +1,32 @@
-// api/chat.js → Hugging Face (KESİN ÇALIŞIR)
+// api/chat.js → Hugging Face Mistral (KESİN ÇALIŞIR)
 export default async function handler(req, res) {
     if (req.method !== 'POST') return res.status(405).end();
 
-    const { message } = req.body;
-    if (!message) return res.status(400).json({ reply: "Mesaj yaz!" });
+    const { message, role = "Genel İngilizce Öğretmeni" } = req.body;
 
     try {
         const response = await fetch("https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.3", {
+            method: "POST",
             headers: {
                 "Authorization": "Bearer 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",
                 "Content-Type": "application/json",
             },
-            method: "POST",
             body: JSON.stringify({
-                inputs: `You are a friendly English teacher. Answer in English, keep it short.\nUser: ${message}\nAssistant:`,
-                parameters: { max_new_tokens: 80 }
+                inputs: `${role}\n\nUser: ${message}\nAssistant:`,
+                parameters: {
+                    max_new_tokens: 150,
+                    temperature: 0.7,
+                    return_full_text: false
+                }
             })
         });
 
         const data = await response.json();
-        let reply = data[0]?.generated_text || "Sorry, I didn't understand.";
-        reply = reply.split("Assistant:")[1]?.trim() || reply;
+        const reply = data[0]?.generated_text?.trim() || "Bir saniye, düşünemedim.";
 
         res.status(200).json({ reply });
-    } catch (e) {
-        res.status(500).json({ reply: "Try again." });
+    } catch (error) {
+        console.error("HF Error:", error);
+        res.status(500).json({ reply: "Biraz yavaşladım, tekrar dene." });
     }
 }

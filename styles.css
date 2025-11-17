@@ -1,4 +1,4 @@
-/* styles.css – 17 Kasım 2025 */
+/* styles.css */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -14,7 +14,7 @@
 }
 .module-card:hover {
   transform: translateY(-10px);
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
 }
 
 .chat-bubble {
@@ -25,8 +25,4 @@
 }
 .chat-ai {
   @apply bg-gray-200 text-gray-900 mr-auto;
-}
-
-.btn-primary {
-  @apply bg-indigo-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-indigo-700 transition;
 }
